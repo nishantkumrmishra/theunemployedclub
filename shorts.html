@@ -7,33 +7,59 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=3.0">
+    <link rel="stylesheet" href="css/style.css?v=4.0">
   <style>
-    /* Exact Red-Marked Layout & Sizing Lock */
-    .shorts-main-content {
-      display: flex !important;
-      justify-content: center !important;
-      align-items: flex-end !important;
+    /* Exact Red-Marked Layout & Sizing Lock (3-Box Layout from Annotated User Specification) */
+    html, body.page-shorts {
+      height: 100% !important;
+      overflow-y: hidden !important;
+    }
+    .page-shorts #wrapper {
       min-height: calc(100vh - var(--header-height)) !important;
-      padding: 10px 24px 22px 24px !important;
+      height: calc(100vh - var(--header-height)) !important;
+      overflow: hidden !important;
+    }
+    .page-shorts #main-content,
+    .shorts-main-content {
+      margin-left: var(--sidebar-width) !important;
+      width: calc(100% - var(--sidebar-width)) !important;
+      max-width: none !important;
+      height: calc(100vh - var(--header-height)) !important;
+      min-height: calc(100vh - var(--header-height)) !important;
+      max-height: calc(100vh - var(--header-height)) !important;
+      padding: 4px 16px 16px 8px !important;
       box-sizing: border-box !important;
-      overflow-x: hidden !important;
+      display: flex !important;
+      align-items: flex-end !important;
+      justify-content: stretch !important;
+      overflow: hidden !important;
+    }
+    body.sidebar-collapsed #main-content {
+      margin-left: 72px !important;
+      width: calc(100% - 72px) !important;
     }
     .shorts-stage {
       display: flex !important;
       align-items: flex-end !important;
       justify-content: space-between !important;
-      gap: 20px !important;
+      gap: 14px !important;
+      position: relative !important;
       width: 100% !important;
-      max-width: 1440px !important;
-      margin: 0 auto !important;
+      max-width: 100% !important;
+      height: calc(100vh - var(--header-height) - 16px) !important;
+      margin: 0 !important;
+      padding: 0 !important;
       box-sizing: border-box !important;
     }
-    /* 1. Left Box: Video Details Only (~370px x 130px, anchored bottom-left) */
+    /* 1. Left Box: Video Details Only (370px x 130px, anchored immediately beside sidebar at bottom-left) */
     .shorts-info-panel {
       width: 370px !important;
+      min-width: 370px !important;
+      max-width: 370px !important;
       height: 130px !important;
-      flex-shrink: 0 !important;
+      min-height: 130px !important;
+      max-height: 130px !important;
+      flex: 0 0 370px !important;
       padding: 14px 18px !important;
       display: flex !important;
       flex-direction: column !important;
@@ -45,6 +71,7 @@
       border: 1px solid var(--color-border) !important;
       border-radius: 0 !important;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+      margin: 0 !important;
     }
     .shorts-info-title {
       font-size: 1.05rem !important;
@@ -68,18 +95,23 @@
       overflow: hidden !important;
       word-break: break-word !important;
     }
-    /* 2. Middle Box: Tall 9:16 Video Player (420px x 705px, fills top to bottom) */
+    /* 2. Middle Box: Tall 9:16 Video Player (420px wide, fills entire height between header and bottom baseline) */
     .shorts-center-container {
       display: flex !important;
       align-items: flex-end !important;
       justify-content: center !important;
       position: relative !important;
-      flex-shrink: 0 !important;
+      height: 100% !important;
+      flex: 0 0 420px !important;
+      width: 420px !important;
+      margin: 0 !important;
     }
     .shorts-screen-box {
       width: 420px !important;
-      height: 705px !important;
-      max-height: calc(100vh - 75px) !important;
+      min-width: 420px !important;
+      max-width: 420px !important;
+      height: calc(100vh - var(--header-height) - 18px) !important;
+      max-height: calc(100vh - var(--header-height) - 18px) !important;
       background: #000000 !important;
       border: 1px solid var(--color-border) !important;
       position: relative !important;
@@ -90,12 +122,16 @@
       justify-content: flex-end !important;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
       box-sizing: border-box !important;
+      margin: 0 !important;
     }
-    /* 3. Right Box: Comments & Up Next Queue (530px x 275px, anchored bottom-right) */
+    /* 3. Right Box: Comments & Up Next Queue (~540px wide, 350px tall, anchored bottom-right) */
     .shorts-companion-panel {
-      width: 530px !important;
-      height: 275px !important;
-      flex-shrink: 0 !important;
+      flex: 1 1 auto !important;
+      max-width: 540px !important;
+      min-width: 400px !important;
+      height: 350px !important;
+      min-height: 350px !important;
+      max-height: 350px !important;
       background: var(--bg-card) !important;
       border: 1px solid var(--color-border) !important;
       border-radius: 0 !important;
@@ -104,6 +140,7 @@
       overflow: hidden !important;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
       box-sizing: border-box !important;
+      margin: 0 !important;
     }
   </style>
   <script src="js/components.js"></script>

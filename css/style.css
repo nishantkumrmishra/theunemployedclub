@@ -1946,32 +1946,43 @@ body.sidebar-collapsed .shorts-grid > .short-card:nth-child(n+7) {
    All 3 boxes bottom-aligned, spanning full width across the content canvas
    ======================================================== */
 .shorts-main-content {
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  min-height: calc(100vh - var(--header-height));
-  padding: 10px 20px 22px 20px;
-  box-sizing: border-box;
-  overflow-x: hidden;
+  margin-left: var(--sidebar-width) !important;
+  width: calc(100% - var(--sidebar-width)) !important;
+  max-width: none !important;
+  height: calc(100vh - var(--header-height)) !important;
+  min-height: calc(100vh - var(--header-height)) !important;
+  max-height: calc(100vh - var(--header-height)) !important;
+  padding: 4px 16px 16px 8px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: stretch !important;
+  overflow: hidden !important;
 }
 
 .shorts-stage {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 18px;
-  position: relative;
-  max-width: 1420px;
-  width: 100%;
-  margin: 0 auto;
-  box-sizing: border-box;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+  position: relative !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  height: calc(100vh - var(--header-height) - 16px) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
 }
 
-/* 1. LEFT BOX: VIDEO TITLE & DESCRIPTION ONLY (Exact: ~370px x 130px) */
+/* 1. LEFT BOX: VIDEO TITLE & DESCRIPTION ONLY (Exact: 370px x 130px) */
 .shorts-info-panel {
-  width: clamp(280px, 24vw, 375px);
-  height: 130px;
-  flex-shrink: 0;
+  width: 370px !important;
+  min-width: 370px !important;
+  max-width: 370px !important;
+  height: 130px !important;
+  min-height: 130px !important;
+  max-height: 130px !important;
+  flex: 0 0 370px !important;
   background: var(--bg-card);
   border: 1px solid var(--color-border);
   border-radius: 0 !important;
@@ -1983,6 +1994,7 @@ body.sidebar-collapsed .shorts-grid > .short-card:nth-child(n+7) {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
   box-sizing: border-box;
   overflow: hidden;
+  margin: 0 !important;
 }
 
 .shorts-info-title {
@@ -2009,19 +2021,24 @@ body.sidebar-collapsed .shorts-grid > .short-card:nth-child(n+7) {
   word-break: break-word;
 }
 
-/* 2. MIDDLE BOX: TALL 9:16 VERTICAL VIDEO PLAYER (Exact: 420px x 705px) */
+/* 2. MIDDLE BOX: TALL 9:16 VERTICAL VIDEO PLAYER (Exact: 420px wide, fills top to bottom) */
 .shorts-center-container {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  position: relative;
-  flex-shrink: 0;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  position: relative !important;
+  height: 100% !important;
+  flex: 0 0 420px !important;
+  width: 420px !important;
+  margin: 0 !important;
 }
 
 .shorts-screen-box {
-  width: clamp(380px, 28vw, 420px);
-  height: clamp(650px, calc(100vh - var(--header-height) - 34px), 710px);
-  max-height: calc(100vh - 75px);
+  width: 420px !important;
+  min-width: 420px !important;
+  max-width: 420px !important;
+  height: calc(100vh - var(--header-height) - 18px) !important;
+  max-height: calc(100vh - var(--header-height) - 18px) !important;
   background: #000000;
   border: 1px solid var(--color-border);
   position: relative;
@@ -2032,6 +2049,7 @@ body.sidebar-collapsed .shorts-grid > .short-card:nth-child(n+7) {
   justify-content: flex-end;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   box-sizing: border-box;
+  margin: 0 !important;
 }
 
 .shorts-video-element {
@@ -2268,20 +2286,19 @@ body.sidebar-collapsed .shorts-grid > .short-card:nth-child(n+7) {
 
 .shorts-time-display {
   font-family: inherit;
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.76rem;
+  letter-spacing: 0.03em;
+  opacity: 0.9;
 }
 
-/* Persistent Slim Progress Line */
 .shorts-timeline-progress {
   position: absolute;
+  bottom: 0;
   left: 0;
   right: 0;
-  bottom: 0;
   height: 3px;
-  background: rgba(255, 255, 255, 0.2);
-  z-index: 15;
+  background: rgba(255, 255, 255, 0.25);
+  z-index: 22;
   transition: opacity 0.2s ease;
 }
 
@@ -2290,16 +2307,19 @@ body.sidebar-collapsed .shorts-grid > .short-card:nth-child(n+7) {
   opacity: 0;
 }
 
-.shorts-progress-bar {
-  width: 0%;
+.shorts-timeline-bar {
   height: 100%;
   background: var(--color-accent);
 }
 
-/* 3. RIGHT BOX: COMMENTS & UP NEXT QUEUE (Exact: ~530px x 275px) */
+/* 3. RIGHT BOX: COMMENTS & UP NEXT QUEUE (Exact: ~540px wide x 350px tall) */
 .shorts-companion-panel {
-  width: clamp(360px, 35vw, 530px);
-  height: 275px;
+  flex: 1 1 auto !important;
+  max-width: 540px !important;
+  min-width: 400px !important;
+  height: 350px !important;
+  min-height: 350px !important;
+  max-height: 350px !important;
   flex-shrink: 0;
   background: var(--bg-card);
   border: 1px solid var(--color-border);
@@ -2309,6 +2329,7 @@ body.sidebar-collapsed .shorts-grid > .short-card:nth-child(n+7) {
   overflow: hidden;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
   box-sizing: border-box;
+  margin: 0 !important;
 }
 
 .shorts-tabs-header {
