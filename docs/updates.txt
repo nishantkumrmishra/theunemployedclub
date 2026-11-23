@@ -11,6 +11,10 @@
 + [Shorts Playback] Added full-screen click handler on `#shorts-box` to toggle play and pause.
 + [Shorts Playback] Synchronized play overlay visibility with native HTML5 `play` and `pause` events.
 + [Shorts Playback] Replaced fake interval timeline with real-time video `timeupdate` tracking.
++ [Shorts UX] Replaced standard music note with animated spinning CD / Vinyl disc logo for Original Sound.
++ [Shorts UX] Added flyout volume slider popup with percentage readout and real-time audio volume control.
++ [Shorts UX] Added mouse wheel scroll and touch swipe up/down navigation to flick between shorts.
++ [Shorts UX] Removed mock comments: reset counter to 0 and added editorial under-construction reminder notice.
 + [Extractor] Updated `tools/extractor.bat` and `tools/main.py` to save items as Drafts (`pending_review`).
 + [Extractor] Configured extractor to avoid direct publishing to public feeds without authentication.
 + [Admin Studio] Added Amber `Editorial Review Queue` card in `admin.html` with pending count badges.
@@ -18,7 +22,7 @@
 + [Admin Studio] Built 1-click placement selector for `Top 2 Rows`, `Middle Row`, `Shorts`, and `Bottom Feed`.
 + [Admin Studio] Added `Approve & Publish`, `Edit in Form`, and `Dismiss` draft controls.
 + [Security] Added `js/staging-feed.js` and `tools/extracted/` to `.gitignore` to prevent repository suspensions.
-+ [Deployment] Pushed commit `1971fb1` to `origin main` and updated GitHub Pages live build.
++ [Deployment] Pushed clean updates to `origin main` and updated GitHub Pages live build.
 ```
 
 ```diff

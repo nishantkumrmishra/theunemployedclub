@@ -1,5 +1,6 @@
 // The Unemployed Club - Dedicated Shorts Player Logic
-// Supports Direct MP4, WebM, and Adaptive HLS (.m3u8) streams + Dynamic Catalog Integration
+// Supports Direct MP4, WebM, and Adaptive HLS (.m3u8) streams,
+// Wheel Scroll Navigation, Flyout Volume Slider, Animated CD Logo, and Catalog Integration.
 
 const fallbackShorts = [
   {
@@ -7,7 +8,7 @@ const fallbackShorts = [
     title: "Everyday minimalism in editorial design",
     views: "520K views",
     likes: "38K",
-    comments: "642",
+    comments: "0",
     image: "images/pic03.jpg",
     videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
   },
@@ -16,7 +17,7 @@ const fallbackShorts = [
     title: "Behind the darkroom prints & film",
     views: "340K views",
     likes: "25K",
-    comments: "380",
+    comments: "0",
     image: "images/pic03.jpg",
     videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
   },
@@ -25,7 +26,7 @@ const fallbackShorts = [
     title: "Typographic rhythm in under 60 seconds",
     views: "1.2M views",
     likes: "89K",
-    comments: "1.4K",
+    comments: "0",
     image: "images/pic03.jpg",
     videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
   },
@@ -34,7 +35,7 @@ const fallbackShorts = [
     title: "Analog camera walk through autumn streets",
     views: "890K views",
     likes: "61K",
-    comments: "720",
+    comments: "0",
     image: "images/pic03.jpg",
     videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4"
   },
@@ -43,7 +44,7 @@ const fallbackShorts = [
     title: "Soundscapes of the foggy coastline",
     views: "670K views",
     likes: "45K",
-    comments: "512",
+    comments: "0",
     image: "images/pic03.jpg",
     videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4"
   },
@@ -52,45 +53,15 @@ const fallbackShorts = [
     title: "Future Imperfect: 10 years later",
     views: "430K views",
     likes: "31K",
-    comments: "295",
+    comments: "0",
     image: "images/pic03.jpg",
     videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4"
   }
 ];
 
-const mockComments = [
-  {
-    user: "Elena Vance",
-    time: "2 hours ago",
-    text: "The composition in this clip is sublime. That autumn lighting through the vintage lens is breathtaking.",
-    likes: "142",
-    avatar: "images/avatar.jpg"
-  },
-  {
-    user: "Marcus Thorne",
-    time: "5 hours ago",
-    text: "Where did you source that vintage 35mm film stock? The natural grain structure and tones are gorgeous.",
-    likes: "89",
-    avatar: "images/avatar.jpg"
-  },
-  {
-    user: "Studio Atelier",
-    time: "8 hours ago",
-    text: "Minimalism done right. The typography and quiet pacing match Future Imperfect so well.",
-    likes: "54",
-    avatar: "images/avatar.jpg"
-  },
-  {
-    user: "David K.",
-    time: "1 day ago",
-    text: "Watched this three times in a row. Inspiring micro-documentary work!",
-    likes: "28",
-    avatar: "images/avatar.jpg"
-  }
-];
-
 let currentIndex = 0;
 let isMuted = true;
+let currentVolume = 0.8;
 let hlsInstance = null;
 
 const VOL_ICONS = {
@@ -109,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
         title: s.title || "Untitled Short",
         views: s.views || "450K views",
         likes: "42K",
-        comments: "580",
+        comments: "0",
         image: s.artworkUrl || s.image || "images/pic03.jpg",
         videoUrl: s.videoUrl || ""
       }));
@@ -133,19 +104,22 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // 3. Elements
+  const stageEl = document.getElementById("shorts-stage");
   const shortsBox = document.getElementById("shorts-box");
   const video = document.getElementById("shorts-video");
-  const videoSource = document.getElementById("shorts-source");
   const playOverlay = document.getElementById("shorts-play-overlay");
   const screenPlayBtn = document.getElementById("shorts-screen-play-btn");
   const captionEl = document.getElementById("shorts-caption");
   const likeCountEl = document.getElementById("short-like-count");
+  const commentCountEl = document.getElementById("short-comment-count");
   const progressBar = document.getElementById("shorts-progress-bar");
   const volIcon = document.getElementById("short-vol-icon");
   const btnPrev = document.getElementById("btn-short-prev");
   const btnNext = document.getElementById("btn-short-next");
   const btnLike = document.getElementById("btn-short-like");
   const btnVol = document.getElementById("btn-short-volume");
+  const volSlider = document.getElementById("shorts-volume-slider");
+  const volPctEl = document.getElementById("shorts-vol-pct");
   const btnSub = document.getElementById("btn-shorts-sub");
   const btnComment = document.getElementById("btn-short-comment");
 
@@ -158,6 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const queueList = document.getElementById("shorts-queue-list");
   const commentInput = document.getElementById("new-comment-input");
   const btnPostComment = document.getElementById("btn-post-comment");
+  const commentNotice = document.getElementById("comment-notice");
 
   function switchTab(tab) {
     if (tab === "comments") {
@@ -184,31 +159,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Render Zero Comments with Editorial Empty State
   function renderComments() {
     if (!commentsList) return;
-    commentsList.innerHTML = "";
-    mockComments.forEach(c => {
-      const li = document.createElement("li");
-      li.className = "comment-item";
-      li.innerHTML = `
-        <img src="${c.avatar}" alt="${c.user}" class="comment-author-avatar" />
-        <div class="comment-content">
-          <div class="comment-meta">
-            <span class="comment-user">${c.user}</span>
-            <span class="comment-time">${c.time}</span>
-          </div>
-          <p class="comment-text">${c.text}</p>
-          <div class="comment-actions">
-            <button class="comment-like-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h3"/><path d="M14 10V4.5a2.5 2.5 0 0 0-5 0v1.5"/></svg>
-              <span>${c.likes}</span>
-            </button>
-            <span>Reply</span>
-          </div>
-        </div>
-      `;
-      commentsList.appendChild(li);
-    });
+    commentsList.innerHTML = `
+      <li class="comment-empty-notice">
+        <h5>0 Comments</h5>
+        <p>No comments on this short yet.<br/>Be the first to join the conversation when comments launch.</p>
+      </li>
+    `;
+    if (tabComments) tabComments.textContent = "Comments (0)";
+    if (commentCountEl) commentCountEl.textContent = "0";
   }
 
   function renderQueue() {
@@ -236,24 +197,34 @@ document.addEventListener("DOMContentLoaded", () => {
       li.appendChild(a);
       queueList.appendChild(li);
     });
+    if (tabQueue) tabQueue.textContent = `Up Next (${activeShorts.length})`;
+  }
+
+  // Under-Construction Reminder for Comments
+  function flashConstructionNotice() {
+    if (!commentNotice) return;
+    commentNotice.classList.add("notice-flash");
+    setTimeout(() => {
+      commentNotice.classList.remove("notice-flash");
+    }, 1200);
+  }
+
+  if (commentInput) {
+    commentInput.addEventListener("focus", () => {
+      flashConstructionNotice();
+    });
   }
 
   if (btnPostComment && commentInput) {
-    btnPostComment.addEventListener("click", () => {
-      const val = commentInput.value.trim();
-      if (!val) return;
-      mockComments.unshift({
-        user: "User",
-        time: "Just now",
-        text: val,
-        likes: "0",
-        avatar: "images/avatar.jpg"
-      });
-      commentInput.value = "";
-      renderComments();
-    });
+    const handlePostAttempt = () => {
+      flashConstructionNotice();
+      if (commentInput.value.trim()) {
+        commentInput.value = "";
+      }
+    };
+    btnPostComment.addEventListener("click", handlePostAttempt);
     commentInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") btnPostComment.click();
+      if (e.key === "Enter") handlePostAttempt();
     });
   }
 
@@ -261,14 +232,12 @@ document.addEventListener("DOMContentLoaded", () => {
   function loadStreamUrl(streamUrl) {
     if (!video) return;
 
-    // Destroy existing Hls instance if any
     if (hlsInstance) {
       hlsInstance.destroy();
       hlsInstance = null;
     }
 
     if (!streamUrl) {
-      // Fallback sample if streamUrl is empty
       streamUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
     }
 
@@ -301,7 +270,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     } else {
       video.src = streamUrl;
-      if (videoSource) videoSource.src = streamUrl;
       video.load();
       video.addEventListener("loadedmetadata", onMetadataReady, { once: true });
       attemptAutoplay();
@@ -315,18 +283,15 @@ document.addEventListener("DOMContentLoaded", () => {
   function attemptAutoplay() {
     if (!video) return;
     video.muted = isMuted;
+    video.volume = currentVolume;
     const playPromise = video.play();
     if (playPromise !== undefined) {
-      playPromise.catch((err) => {
-        // If unmuted autoplay rejected, retry muted
+      playPromise.catch(() => {
         if (!isMuted) {
           isMuted = true;
           video.muted = true;
           updateVolumeUI();
-          video.play().catch(() => {
-            // Autoplay completely blocked: show play button
-            updatePlayUI(false);
-          });
+          video.play().catch(() => updatePlayUI(false));
         } else {
           updatePlayUI(false);
         }
@@ -353,13 +318,17 @@ document.addEventListener("DOMContentLoaded", () => {
     renderQueue();
   }
 
-  // 5. Native Video Event Listeners for Perfect Playback Synchronization
+  // 5. Playback Synchronization & Animated CD Status
   function updatePlayUI(playing) {
     if (!playOverlay) return;
     if (playing) {
       playOverlay.classList.add("is-playing");
+      if (stageEl) stageEl.classList.add("is-playing");
+      if (shortsBox) shortsBox.classList.add("is-playing");
     } else {
       playOverlay.classList.remove("is-playing");
+      if (stageEl) stageEl.classList.remove("is-playing");
+      if (shortsBox) shortsBox.classList.remove("is-playing");
     }
   }
 
@@ -369,13 +338,11 @@ document.addEventListener("DOMContentLoaded", () => {
     video.addEventListener("pause", () => updatePlayUI(false));
     video.addEventListener("ended", () => {
       updatePlayUI(false);
-      // Auto-advance to next short or loop
       if (!video.loop) {
         loadShort(currentIndex + 1);
       }
     });
 
-    // Real-time timeline progress
     video.addEventListener("timeupdate", () => {
       if (progressBar && video.duration && !isNaN(video.duration)) {
         const pct = (video.currentTime / video.duration) * 100;
@@ -384,23 +351,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Toggle Play / Pause on user click
   function togglePlayPause() {
     if (!video) return;
     if (video.paused) {
-      // User gesture initiated play: if muted and user desires sound, allow unmuting
       video.play().catch(err => console.warn("[Shorts] Play error:", err));
     } else {
       video.pause();
     }
   }
 
-  // Click on Screen Box or Video element triggers play/pause
+  // Screen Box / Play Overlay Click Handlers
   if (shortsBox) {
     shortsBox.addEventListener("click", (e) => {
-      // Prevent clicking actions, channel row, or buttons from toggling play
-      if (e.target.closest(".shorts-bottom-info") || e.target.closest(".shorts-actions-column")) {
-        return;
+      if (e.target && typeof e.target.closest === "function") {
+        if (e.target.closest(".shorts-bottom-info") || e.target.closest(".shorts-actions-column")) {
+          return;
+        }
       }
       togglePlayPause();
     });
@@ -420,7 +386,63 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 6. Navigation Buttons
+  // ==============================================================
+  // 6. SCROLL UP AND DOWN MOVES TO DIFFERENT SHORTS
+  // ==============================================================
+  let isWheeling = false;
+
+  const handleWheelScroll = (e) => {
+    // Ignore wheel events if scrolling inside the comments or up next lists
+    if (e.target && typeof e.target.closest === "function") {
+      if (e.target.closest("#tab-content-comments") || e.target.closest("#tab-content-queue") || e.target.closest("#shorts-companion-panel")) {
+        return;
+      }
+    }
+
+    if (isWheeling) return;
+
+    if (Math.abs(e.deltaY) > 15) {
+      isWheeling = true;
+      if (e.deltaY > 0) {
+        // Scroll down -> Next short
+        loadShort(currentIndex + 1);
+      } else {
+        // Scroll up -> Previous short
+        loadShort(currentIndex - 1);
+      }
+
+      setTimeout(() => {
+        isWheeling = false;
+      }, 550);
+    }
+  };
+
+  window.addEventListener("wheel", handleWheelScroll, { passive: true });
+  document.addEventListener("wheel", handleWheelScroll, { passive: true });
+
+  // Touch Swipe for Mobile & Trackpads
+  let touchStartY = 0;
+  if (shortsBox) {
+    shortsBox.addEventListener("touchstart", (e) => {
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    shortsBox.addEventListener("touchend", (e) => {
+      const touchEndY = e.changedTouches[0].clientY;
+      const diffY = touchStartY - touchEndY;
+      if (Math.abs(diffY) > 45) {
+        if (diffY > 0) {
+          // Swipe up -> Next short
+          loadShort(currentIndex + 1);
+        } else {
+          // Swipe down -> Previous short
+          loadShort(currentIndex - 1);
+        }
+      }
+    }, { passive: true });
+  }
+
+  // 7. Navigation Buttons
   if (btnPrev) {
     btnPrev.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -434,7 +456,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Keyboard Navigation: ArrowUp / ArrowDown / Space
+  // Keyboard Navigation: ArrowUp / ArrowDown / Space / M
   document.addEventListener("keydown", (e) => {
     if (["input", "textarea"].includes(document.activeElement.tagName.toLowerCase())) return;
     if (e.key === "ArrowUp") {
@@ -452,18 +474,33 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 7. Volume / Mute Interaction
+  // ==============================================================
+  // 8. VOLUME FLYOUT SLIDER & MUTE CONTROLS
+  // ==============================================================
   function updateVolumeUI() {
-    if (!volIcon) return;
-    volIcon.innerHTML = isMuted ? VOL_ICONS.muted : VOL_ICONS.unmuted;
+    if (volIcon) {
+      volIcon.innerHTML = isMuted ? VOL_ICONS.muted : VOL_ICONS.unmuted;
+    }
     if (btnVol) {
-      btnVol.setAttribute("title", isMuted ? "Unmute Sound" : "Mute Sound");
+      btnVol.setAttribute("title", isMuted ? "Unmute Sound" : "Mute Sound (Hover for Volume)");
+    }
+    if (volSlider) {
+      volSlider.value = isMuted ? 0 : currentVolume;
+    }
+    if (volPctEl) {
+      volPctEl.textContent = isMuted ? "0%" : `${Math.round(currentVolume * 100)}%`;
     }
   }
 
   function toggleMute() {
     isMuted = !isMuted;
-    if (video) video.muted = isMuted;
+    if (video) {
+      video.muted = isMuted;
+      if (!isMuted) {
+        if (currentVolume <= 0.05) currentVolume = 0.8;
+        video.volume = currentVolume;
+      }
+    }
     updateVolumeUI();
   }
 
@@ -474,7 +511,29 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 8. Like Button
+  if (volSlider) {
+    volSlider.addEventListener("input", (e) => {
+      const val = parseFloat(e.target.value);
+      currentVolume = val;
+      if (video) {
+        video.volume = val;
+        if (val === 0) {
+          isMuted = true;
+          video.muted = true;
+        } else {
+          isMuted = false;
+          video.muted = false;
+        }
+      }
+      updateVolumeUI();
+    });
+
+    volSlider.addEventListener("click", (e) => {
+      e.stopPropagation();
+    });
+  }
+
+  // 9. Like Button
   let liked = false;
   if (btnLike) {
     btnLike.addEventListener("click", (e) => {
@@ -488,7 +547,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 9. Subscribe Button
+  // 10. Subscribe Button
   if (btnSub) {
     btnSub.addEventListener("click", (e) => {
       e.stopPropagation();
