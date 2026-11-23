@@ -3,769 +3,284 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Unemployed Club - Design Studio & Playground</title>
+  <title>The Unemployed Club - Design Preview & Page Switcher</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css?v=6.0">
   <style>
-    :root {
-      --bg-studio: #0e0f12;
-      --bg-panel: #16181d;
-      --bg-panel-sub: #1c1f26;
-      --color-border: #282c35;
-      --color-fg: #9ba1b0;
-      --color-fg-bold: #f0f2f5;
-      --color-accent: #2ebaae;
-      --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-
-    * {
-      box-sizing: border-box;
+    /* Reset & Full Screen Edge-to-Edge Canvas */
+    html, body {
       margin: 0;
       padding: 0;
-    }
-
-    html, body {
+      width: 100%;
       height: 100%;
-      background: var(--bg-studio);
-      color: var(--color-fg);
-      font-family: var(--font-sans);
       overflow: hidden;
-      font-size: 13px;
+      background: var(--bg-body, #f4f4f4);
+      font-family: var(--font-sans, 'Manrope', sans-serif);
     }
 
-    /* Top Studio Navigation Header */
-    .studio-header {
-      height: 52px;
-      background: var(--bg-panel);
-      border-bottom: 1px solid var(--color-border);
+    /* Website-Matching Design Navigation Header */
+    .design-nav-header {
+      height: var(--header-height, 56px);
+      background: var(--bg-card, #ffffff);
+      border-bottom: 1px solid var(--color-border, #e2e8f0);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 16px;
-      gap: 16px;
-      z-index: 100;
+      padding: 0 20px;
       position: relative;
+      z-index: 1000;
+      box-sizing: border-box;
     }
 
-    .studio-brand {
+    .design-nav-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .design-logo {
       display: flex;
       align-items: center;
       gap: 10px;
-      color: var(--color-fg-bold);
+      text-decoration: none;
+      color: var(--color-fg-bold, #111111);
+      font-size: 1.05rem;
       font-weight: 600;
-      font-size: 0.95rem;
       letter-spacing: -0.01em;
-      white-space: nowrap;
     }
 
-    .studio-brand svg {
-      color: var(--color-accent);
+    .design-logo svg {
+      color: var(--color-accent, #2ebaae);
       flex-shrink: 0;
     }
 
-    .studio-tag {
+    .design-preview-tag {
       font-size: 0.72rem;
       font-weight: 500;
-      color: var(--color-accent);
-      background: rgba(46, 186, 174, 0.12);
+      color: var(--color-accent, #2ebaae);
+      background: rgba(46, 186, 174, 0.08);
       border: 1px solid rgba(46, 186, 174, 0.3);
-      padding: 2px 7px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    /* Page Navigation Tabs */
-    .page-tabs-bar {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      background: var(--bg-studio);
-      padding: 3px;
-      border: 1px solid var(--color-border);
-      overflow-x: auto;
-    }
-
-    .page-tab-btn {
-      background: transparent;
-      border: none;
-      color: var(--color-fg);
-      font-family: inherit;
-      font-size: 0.78rem;
-      padding: 6px 12px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-      transition: all 0.15s ease;
-    }
-
-    .page-tab-btn:hover {
-      color: var(--color-fg-bold);
-      background: var(--bg-panel-sub);
-    }
-
-    .page-tab-btn.is-active {
-      color: #ffffff;
-      background: var(--color-accent);
-      font-weight: 600;
-    }
-
-    .page-tab-btn svg {
-      width: 13px;
-      height: 13px;
-      flex-shrink: 0;
-    }
-
-    /* Right Viewport & Action Controls */
-    .viewport-controls {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .viewport-preset-group {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      background: var(--bg-studio);
-      padding: 3px;
-      border: 1px solid var(--color-border);
-    }
-
-    .btn-vp {
-      background: transparent;
-      border: none;
-      color: var(--color-fg);
-      font-family: inherit;
-      font-size: 0.74rem;
-      padding: 5px 9px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .btn-vp:hover {
-      color: var(--color-fg-bold);
-      background: var(--bg-panel-sub);
-    }
-
-    .btn-vp.is-active {
-      color: var(--color-fg-bold);
-      background: var(--bg-panel-sub);
-      font-weight: 600;
-    }
-
-    .btn-action-tool {
-      background: var(--bg-panel-sub);
-      border: 1px solid var(--color-border);
-      color: var(--color-fg-bold);
-      font-family: inherit;
-      font-size: 0.76rem;
-      padding: 6px 11px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      text-decoration: none;
-      transition: all 0.15s ease;
-    }
-
-    .btn-action-tool:hover {
-      border-color: var(--color-accent);
-      color: var(--color-accent);
-    }
-
-    /* Main Studio Canvas Layout */
-    .studio-main {
-      height: calc(100% - 52px);
-      display: flex;
-      position: relative;
-    }
-
-    /* Left Design Experimentation Drawer */
-    .experiment-drawer {
-      width: 280px;
-      background: var(--bg-panel);
-      border-right: 1px solid var(--color-border);
-      height: 100%;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-      transition: width 0.2s ease, transform 0.2s ease;
-    }
-
-    .experiment-drawer.is-collapsed {
-      transform: translateX(-100%);
-      width: 0;
-      border-right: none;
-      overflow: hidden;
-    }
-
-    .drawer-section {
-      padding: 16px;
-      border-bottom: 1px solid var(--color-border);
-    }
-
-    .drawer-section-title {
-      font-size: 0.74rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--color-fg);
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .control-row {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 12px;
-    }
-
-    .control-row:last-child {
-      margin-bottom: 0;
-    }
-
-    .control-label {
-      font-size: 0.75rem;
-      color: var(--color-fg);
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .control-label span:last-child {
-      color: var(--color-fg-bold);
-      font-family: monospace;
-    }
-
-    /* Color Swatch Options */
-    .theme-swatches {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 6px;
-    }
-
-    .swatch-btn {
-      width: 100%;
-      height: 28px;
-      border: 1px solid var(--color-border);
-      cursor: pointer;
-      transition: transform 0.15s ease, border-color 0.15s ease;
-    }
-
-    .swatch-btn:hover {
-      transform: scale(1.08);
-      border-color: #ffffff;
-    }
-
-    .swatch-btn.is-active {
-      border: 2px solid #ffffff;
-      outline: 1px solid var(--color-accent);
-    }
-
-    /* Segmented Radio Options */
-    .seg-group {
-      display: flex;
-      background: var(--bg-studio);
-      border: 1px solid var(--color-border);
-      padding: 2px;
-    }
-
-    .seg-btn {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: var(--color-fg);
-      font-size: 0.72rem;
-      padding: 5px 8px;
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.15s ease;
-    }
-
-    .seg-btn:hover {
-      color: var(--color-fg-bold);
-    }
-
-    .seg-btn.is-active {
-      background: var(--bg-panel-sub);
-      color: var(--color-fg-bold);
-      font-weight: 600;
-    }
-
-    /* Central Viewport Stage */
-    .viewport-stage {
-      flex: 1;
-      height: 100%;
-      background: #08090b;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: auto;
-      padding: 16px;
-    }
-
-    .viewport-meta-bar {
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 0.74rem;
-      color: var(--color-fg);
-    }
-
-    .viewport-meta-badge {
-      background: var(--bg-panel);
-      border: 1px solid var(--color-border);
       padding: 3px 8px;
-      color: var(--color-fg-bold);
-      font-family: monospace;
+      letter-spacing: 0.03em;
     }
 
-    .viewport-frame-wrapper {
-      position: relative;
-      background: #ffffff;
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
-      border: 1px solid var(--color-border);
-      transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1), height 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .preview-iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      display: block;
-      background: #ffffff;
-    }
-
-    /* Component Inspector Modal / Drawer */
-    .component-gallery {
-      display: none;
-      width: 100%;
-      height: 100%;
-      overflow-y: auto;
-      padding: 24px;
-      background: var(--bg-studio);
-    }
-
-    .component-gallery.is-active {
-      display: block;
-    }
-
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-      gap: 20px;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    .gallery-card {
-      background: var(--bg-panel);
-      border: 1px solid var(--color-border);
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .gallery-card-title {
-      font-size: 0.84rem;
-      font-weight: 600;
-      color: var(--color-fg-bold);
-      border-bottom: 1px solid var(--color-border);
-      padding-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .gallery-card-preview {
-      background: #ffffff;
-      padding: 16px;
-      color: #111111;
+    /* Seamless Dropdown Menu for Switching Pages */
+    .design-page-dropdown-container {
       display: flex;
       align-items: center;
-      justify-content: center;
-      min-height: 140px;
+      gap: 10px;
+    }
+
+    .design-dropdown-label {
+      font-size: 0.8rem;
+      color: var(--color-fg-light, #666666);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .design-dropdown-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .design-page-select {
+      appearance: none;
+      -webkit-appearance: none;
+      background: #fafafa;
+      border: 1px solid var(--color-border, #e2e8f0);
+      padding: 8px 36px 8px 14px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--color-fg-bold, #111111);
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.15s ease, background 0.15s ease;
+      min-width: 220px;
+    }
+
+    .design-page-select:hover,
+    .design-page-select:focus {
+      border-color: var(--color-accent, #2ebaae);
+      background: #ffffff;
+    }
+
+    .design-dropdown-arrow {
+      position: absolute;
+      right: 12px;
+      pointer-events: none;
+      color: var(--color-fg-light, #666666);
+      display: flex;
+      align-items: center;
+    }
+
+    /* Header Actions */
+    .design-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-design-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--color-fg, #333333);
+      background: #fafafa;
+      border: 1px solid var(--color-border, #e2e8f0);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+    }
+
+    .btn-design-action:hover {
+      border-color: var(--color-accent, #2ebaae);
+      color: var(--color-accent, #2ebaae);
+      background: #ffffff;
+    }
+
+    .btn-design-action svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+
+    /* 100% Full-Screen Edge-to-Edge Frame (Zero Black Margins) */
+    .design-full-frame-container {
+      width: 100vw;
+      height: calc(100vh - var(--header-height, 56px));
+      margin: 0;
+      padding: 0;
+      border: none;
+      overflow: hidden;
+      display: block;
+      background: var(--bg-body, #f4f4f4);
+    }
+
+    .design-full-iframe {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      border: none;
+      display: block;
+      background: transparent;
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Studio Navigation Header -->
-  <header class="studio-header">
-    <div class="studio-brand">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="12 2 2 7 12 12 22 7 12 2"/>
-        <polyline points="2 17 12 22 22 17"/>
-        <polyline points="2 12 12 17 22 12"/>
-      </svg>
-      <span>The Unemployed Club</span>
-      <span class="studio-tag">Design Lab</span>
+  <!-- Website Design Navigation Header -->
+  <header class="design-nav-header">
+    <div class="design-nav-left">
+      <a href="../index.html" class="design-logo" title="Back to Live Home">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+          <polyline points="2 17 12 22 22 17"/>
+          <polyline points="2 12 12 17 22 12"/>
+        </svg>
+        <span>The Unemployed Club</span>
+      </a>
+      <span class="design-preview-tag">Design Switcher</span>
     </div>
 
-    <!-- Page Switcher Tabs -->
-    <nav class="page-tabs-bar" aria-label="Page Selection">
-      <button class="page-tab-btn is-active" data-page="../index.html" data-title="Homepage Feed">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-          <polyline points="9 22 9 12 15 12 15 22"/>
-        </svg>
-        <span>Home</span>
-      </button>
-
-      <button class="page-tab-btn" data-page="../shorts.html" data-title="Shorts Viewer (3-Box & In-Player)">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="6 3 20 12 6 21 6 3"/>
-        </svg>
-        <span>Shorts</span>
-      </button>
-
-      <button class="page-tab-btn" data-page="../player.html" data-title="16:9 Cinema Player">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect width="20" height="15" x="2" y="4.5" rx="0"/>
-          <polygon points="10 9 15 12 10 15 10 9"/>
-        </svg>
-        <span>Player</span>
-      </button>
-
-      <button class="page-tab-btn" data-page="../admin.html" data-title="Content Admin Studio">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="7" height="7"/>
-          <rect x="14" y="3" width="7" height="7"/>
-          <rect x="14" y="14" width="7" height="7"/>
-          <rect x="3" y="14" width="7" height="7"/>
-        </svg>
-        <span>Admin Studio</span>
-      </button>
-
-      <button class="page-tab-btn" data-page="../upload.html" data-title="Upload Video Studio">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="17 8 12 3 7 8"/>
-          <line x1="12" x2="12" y1="3" y2="15"/>
-        </svg>
-        <span>Upload</span>
-      </button>
-
-      <button class="page-tab-btn" data-page="../login.html" data-title="User Authentication">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-          <polyline points="10 17 15 12 10 7"/>
-          <line x1="15" x2="3" y1="12" y2="12"/>
-        </svg>
-        <span>Login</span>
-      </button>
-
-      <button class="page-tab-btn" data-page="../register.html" data-title="Register Account">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-          <circle cx="9" cy="7" r="4"/>
-          <line x1="19" x2="19" y1="8" y2="14"/>
-          <line x1="22" x2="16" y1="11" y2="11"/>
-        </svg>
-        <span>Register</span>
-      </button>
-    </nav>
-
-    <!-- Viewport Resolution Presets & Tools -->
-    <div class="viewport-controls">
-      <div class="viewport-preset-group">
-        <button class="btn-vp is-active" data-w="1568" data-h="778" title="User Viewport Resolution">
-          <span>1568×778</span>
-        </button>
-        <button class="btn-vp" data-w="1440" data-h="900" title="Laptop">
-          <span>1440×900</span>
-        </button>
-        <button class="btn-vp" data-w="1200" data-h="680" title="Shorter Screen (Tests Adaptive In-Player Layout)">
-          <span>1200×680</span>
-        </button>
-        <button class="btn-vp" data-w="768" data-h="1024" title="Tablet">
-          <span>768×1024</span>
-        </button>
-        <button class="btn-vp" data-w="390" data-h="844" title="Mobile">
-          <span>390×844</span>
-        </button>
-        <button class="btn-vp" data-w="100%" data-h="100%" title="Full Fluid View">
-          <span>Full 100%</span>
-        </button>
+    <!-- Dropdown Menu for Switching Different Pages -->
+    <div class="design-page-dropdown-container">
+      <label for="page-select" class="design-dropdown-label">Switch Page:</label>
+      <div class="design-dropdown-wrapper">
+        <select id="page-select" class="design-page-select" aria-label="Select website page to view">
+          <option value="../index.html" selected>Home (index.html)</option>
+          <option value="../shorts.html">Shorts (shorts.html)</option>
+          <option value="../player.html">Video Player (player.html)</option>
+          <option value="../admin.html">Admin Studio (admin.html)</option>
+          <option value="../upload.html">Upload Video (upload.html)</option>
+          <option value="../login.html">Sign In (login.html)</option>
+          <option value="../register.html">Register (register.html)</option>
+        </select>
+        <div class="design-dropdown-arrow">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
       </div>
+    </div>
 
-      <button class="btn-action-tool" id="btn-toggle-drawer" title="Toggle Design Controls">
-        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="4" x2="20" y1="12" y2="12"/>
-          <line x1="4" x2="20" y1="6" y2="6"/>
-          <line x1="4" x2="20" y1="18" y2="18"/>
+    <!-- Right Header Actions -->
+    <div class="design-header-actions">
+      <button type="button" class="btn-design-action" id="btn-reload-page" title="Reload active page">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
         </svg>
-        <span>Controls</span>
+        <span>Reload</span>
       </button>
 
-      <a href="../index.html" target="_blank" class="btn-action-tool" id="btn-open-external" title="Open Current Page in New Tab">
-        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <a href="../index.html" target="_blank" class="btn-design-action" id="btn-open-direct" title="Open active page in standalone new tab">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
           <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
           <polyline points="15 3 21 3 21 9"/>
           <line x1="10" x2="21" y1="14" y2="3"/>
         </svg>
-        <span>Open</span>
+        <span>Open Standalone</span>
       </a>
     </div>
   </header>
 
-  <!-- Main Studio Workspace -->
-  <main class="studio-main">
-
-    <!-- Left Experimentation Drawer -->
-    <aside class="experiment-drawer" id="experiment-drawer">
-      <div class="drawer-section">
-        <div class="drawer-section-title">
-          <span>Accent Color Palette</span>
-        </div>
-        <div class="theme-swatches">
-          <button class="swatch-btn is-active" data-color="#2ebaae" style="background: #2ebaae;" title="Editorial Teal (Default)"></button>
-          <button class="swatch-btn" data-color="#ff4d28" style="background: #ff4d28;" title="International Orange"></button>
-          <button class="swatch-btn" data-color="#2b59ff" style="background: #2b59ff;" title="Cobalt Modern"></button>
-          <button class="swatch-btn" data-color="#111111" style="background: #111111;" title="Brutalist Onyx"></button>
-          <button class="swatch-btn" data-color="#8a3ffc" style="background: #8a3ffc;" title="Studio Purple"></button>
-        </div>
-      </div>
-
-      <div class="drawer-section">
-        <div class="drawer-section-title">
-          <span>Sidebar Simulation</span>
-        </div>
-        <div class="seg-group" id="sidebar-seg-group">
-          <button class="seg-btn is-active" data-sidebar="expanded">Expanded (220px)</button>
-          <button class="seg-btn" data-sidebar="collapsed">Collapsed (72px)</button>
-        </div>
-      </div>
-
-      <div class="drawer-section">
-        <div class="drawer-section-title">
-          <span>Shorts Stage Adaptive Check</span>
-        </div>
-        <div class="control-row">
-          <label class="control-label">
-            <span>Adaptive Mode</span>
-            <span id="label-adaptive-mode">Auto (Height Based)</span>
-          </label>
-          <div class="seg-group" id="adaptive-seg-group">
-            <button class="seg-btn is-active" data-force-adaptive="auto">Auto</button>
-            <button class="seg-btn" data-force-adaptive="3box">Force 3-Box</button>
-            <button class="seg-btn" data-force-adaptive="inplayer">Force In-Player</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="drawer-section">
-        <div class="drawer-section-title">
-          <span>Typography Pacing</span>
-        </div>
-        <div class="control-row">
-          <label class="control-label">
-            <span>Font Scaling</span>
-            <span id="label-font-scale">1.00x</span>
-          </label>
-          <input type="range" id="slider-font-scale" min="0.85" max="1.2" step="0.05" value="1.0" style="width: 100%;" />
-        </div>
-      </div>
-
-      <div class="drawer-section" style="margin-top: auto;">
-        <div class="drawer-section-title">
-          <span>All Pages Checklist</span>
-        </div>
-        <ul style="list-style: none; font-size: 0.74rem; display: flex; flex-direction: column; gap: 6px; color: var(--color-fg);">
-          <li>• <a href="../index.html" style="color: inherit;">index.html</a> — 5-tier shelves, top 20, dynamic tags</li>
-          <li>• <a href="../shorts.html" style="color: inherit;">shorts.html</a> — 3-box stage, adaptive in-player, under construction</li>
-          <li>• <a href="../player.html" style="color: inherit;">player.html</a> — 16:9 cinema player, comments, modal</li>
-          <li>• <a href="../admin.html" style="color: inherit;">admin.html</a> — Studio deck, duplicate detection</li>
-          <li>• <a href="../upload.html" style="color: inherit;">upload.html</a> — Direct drag-and-drop video upload</li>
-          <li>• <a href="../login.html" style="color: inherit;">login.html</a> — Minimal auth login</li>
-          <li>• <a href="../register.html" style="color: inherit;">register.html</a> — Account registration</li>
-        </ul>
-      </div>
-    </aside>
-
-    <!-- Viewport Stage -->
-    <div class="viewport-stage" id="viewport-stage">
-      <div class="viewport-meta-bar">
-        <span>Active Page: <strong id="meta-page-title" style="color: var(--color-fg-bold);">Homepage Feed</strong></span>
-        <span>•</span>
-        <span>Resolution: <span class="viewport-meta-badge" id="meta-resolution">1568 × 778 px</span></span>
-      </div>
-
-      <div class="viewport-frame-wrapper" id="frame-wrapper" style="width: 1568px; height: 778px;">
-        <iframe src="../index.html" class="preview-iframe" id="preview-iframe" title="Design Preview"></iframe>
-      </div>
-    </div>
-
+  <!-- Edge-to-Edge 100% Screen View (Zero Margins) -->
+  <main class="design-full-frame-container">
+    <iframe src="../index.html" class="design-full-iframe" id="design-iframe" title="Website Page Preview"></iframe>
   </main>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const iframe = document.getElementById('preview-iframe');
-      const frameWrapper = document.getElementById('frame-wrapper');
-      const metaTitle = document.getElementById('meta-page-title');
-      const metaRes = document.getElementById('meta-resolution');
-      const openBtn = document.getElementById('btn-open-external');
-      const drawer = document.getElementById('experiment-drawer');
-      const drawerToggle = document.getElementById('btn-toggle-drawer');
+      const select = document.getElementById('page-select');
+      const iframe = document.getElementById('design-iframe');
+      const openBtn = document.getElementById('btn-open-direct');
+      const reloadBtn = document.getElementById('btn-reload-page');
 
-      // 1. Page Tab Switching
-      const pageTabs = document.querySelectorAll('.page-tab-btn');
-      pageTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-          pageTabs.forEach(t => t.classList.remove('is-active'));
-          tab.classList.add('is-active');
+      // Check URL query param for default page e.g. ?page=shorts
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryPage = urlParams.get('page');
+      if (queryPage) {
+        const option = Array.from(select.options).find(opt => opt.value.includes(queryPage));
+        if (option) {
+          select.value = option.value;
+          iframe.src = option.value;
+          openBtn.href = option.value;
+        }
+      }
 
-          const pageUrl = tab.getAttribute('data-page');
-          const title = tab.getAttribute('data-title');
+      // Handle Dropdown Change
+      select.addEventListener('change', () => {
+        const pageUrl = select.value;
+        iframe.src = pageUrl;
+        openBtn.href = pageUrl;
 
-          iframe.src = pageUrl;
-          metaTitle.textContent = title;
-          openBtn.href = pageUrl;
-        });
+        // Cleanly update URL without full page reload
+        try {
+          const pageName = pageUrl.replace('../', '').replace('.html', '');
+          const newUrl = new URL(window.location.href);
+          newUrl.searchParams.set('page', pageName);
+          window.history.replaceState({}, '', newUrl.toString());
+        } catch (e) {}
       });
 
-      // 2. Viewport Switching
-      const vpButtons = document.querySelectorAll('.btn-vp');
-      vpButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          vpButtons.forEach(b => b.classList.remove('is-active'));
-          btn.classList.add('is-active');
-
-          const w = btn.getAttribute('data-w');
-          const h = btn.getAttribute('data-h');
-
-          if (w.endsWith('%')) {
-            frameWrapper.style.width = '100%';
-            frameWrapper.style.height = '100%';
-            metaRes.textContent = 'Fluid 100%';
-          } else {
-            frameWrapper.style.width = `${w}px`;
-            frameWrapper.style.height = `${h}px`;
-            metaRes.textContent = `${w} × ${h} px`;
+      // Handle Reload
+      if (reloadBtn) {
+        reloadBtn.addEventListener('click', () => {
+          try {
+            iframe.contentWindow.location.reload();
+          } catch (e) {
+            iframe.src = select.value;
           }
         });
-      });
-
-      // 3. Toggle Drawer
-      if (drawerToggle && drawer) {
-        drawerToggle.addEventListener('click', () => {
-          drawer.classList.toggle('is-collapsed');
-        });
       }
-
-      // 4. Accent Color Switcher (Injects CSS variable into active iframe)
-      const swatches = document.querySelectorAll('.swatch-btn');
-      swatches.forEach(btn => {
-        btn.addEventListener('click', () => {
-          swatches.forEach(s => s.classList.remove('is-active'));
-          btn.classList.add('is-active');
-
-          const color = btn.getAttribute('data-color');
-          try {
-            if (iframe.contentDocument) {
-              iframe.contentDocument.documentElement.style.setProperty('--color-accent', color);
-            }
-          } catch (e) {}
-        });
-      });
-
-      // 5. Sidebar Simulation
-      const sidebarBtns = document.querySelectorAll('#sidebar-seg-group .seg-btn');
-      sidebarBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          sidebarBtns.forEach(b => b.classList.remove('is-active'));
-          btn.classList.add('is-active');
-
-          const mode = btn.getAttribute('data-sidebar');
-          try {
-            if (iframe.contentDocument && iframe.contentDocument.body) {
-              if (mode === 'collapsed') {
-                iframe.contentDocument.body.classList.add('sidebar-collapsed');
-              } else {
-                iframe.contentDocument.body.classList.remove('sidebar-collapsed');
-              }
-            }
-          } catch (e) {}
-        });
-      });
-
-      // 6. Font Scale Slider
-      const fontSlider = document.getElementById('slider-font-scale');
-      const fontLabel = document.getElementById('label-font-scale');
-      if (fontSlider && fontLabel) {
-        fontSlider.addEventListener('input', () => {
-          const val = fontSlider.value;
-          fontLabel.textContent = `${parseFloat(val).toFixed(2)}x`;
-          try {
-            if (iframe.contentDocument) {
-              iframe.contentDocument.documentElement.style.fontSize = `${16 * parseFloat(val)}px`;
-            }
-          } catch (e) {}
-        });
-      }
-
-      // 7. Force Adaptive Mode (for testing Shorts layout specifically)
-      const adaptiveBtns = document.querySelectorAll('#adaptive-seg-group .seg-btn');
-      adaptiveBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          adaptiveBtns.forEach(b => b.classList.remove('is-active'));
-          btn.classList.add('is-active');
-
-          const mode = btn.getAttribute('data-force-adaptive');
-          try {
-            if (!iframe.contentDocument) return;
-            const doc = iframe.contentDocument;
-            const comments = doc.getElementById('shorts-companion-panel');
-            const info = doc.getElementById('shorts-info-panel');
-            const overlay = doc.getElementById('shorts-player-overlay-info');
-            const stage = doc.getElementById('shorts-stage');
-
-            if (!comments || !overlay) return;
-
-            if (mode === '3box') {
-              comments.style.setProperty('display', 'flex', 'important');
-              if (info) info.style.setProperty('display', 'flex', 'important');
-              overlay.style.setProperty('display', 'none', 'important');
-              if (stage) stage.style.setProperty('justify-content', 'space-between', 'important');
-            } else if (mode === 'inplayer') {
-              comments.style.setProperty('display', 'none', 'important');
-              if (info) info.style.setProperty('display', 'none', 'important');
-              overlay.style.setProperty('display', 'flex', 'important');
-              if (stage) stage.style.setProperty('justify-content', 'center', 'important');
-            } else {
-              comments.style.removeProperty('display');
-              if (info) info.removeProperty('display');
-              overlay.style.removeProperty('display');
-              if (stage) stage.style.removeProperty('justify-content');
-            }
-          } catch (e) {}
-        });
-      });
-
-      // Re-apply live settings whenever iframe loads
-      iframe.addEventListener('load', () => {
-        const activeSwatch = document.querySelector('.swatch-btn.is-active');
-        if (activeSwatch) {
-          const color = activeSwatch.getAttribute('data-color');
-          try {
-            iframe.contentDocument.documentElement.style.setProperty('--color-accent', color);
-          } catch (e) {}
-        }
-      });
     });
   </script>
 </body>
