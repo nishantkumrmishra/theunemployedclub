@@ -146,6 +146,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const infoViews = document.getElementById("shorts-info-views");
   const infoAvatar = document.getElementById("shorts-info-avatar");
   const soundTitle = document.getElementById("shorts-sound-title");
+  // In-Player Video Details Elements (for compact / shorter screen views)
+  const playerTitle = document.getElementById("shorts-player-title");
+  const playerDesc = document.getElementById("shorts-player-desc");
+  const playerAuthor = document.getElementById("shorts-player-author");
+  const playerAvatar = document.getElementById("shorts-player-avatar");
+  const playerSound = document.getElementById("shorts-player-sound-title");
+  const btnSubPlayer = document.getElementById("btn-shorts-subscribe");
   const infoTags = document.getElementById("shorts-info-tags");
   const btnSub = document.getElementById("btn-shorts-sub");
 
@@ -373,6 +380,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (infoViews) infoViews.textContent = currentShort.views || "520K views";
     if (infoAvatar) infoAvatar.src = currentShort.avatar || "images/avatar.jpg";
     if (soundTitle) soundTitle.textContent = `${currentShort.author || "The Unemployed Club"} • Original Sound`;
+    
+    // Also sync in-player video details overlay
+    if (playerTitle) playerTitle.textContent = currentShort.title;
+    if (playerDesc) playerDesc.textContent = currentShort.description || "Everyday minimalism in editorial design.";
+    if (playerAuthor) playerAuthor.textContent = `@${(currentShort.author || "theunemployedclub").toLowerCase().replace(/[^a-z0-9]/g, "")}`;
+    if (playerAvatar) playerAvatar.src = currentShort.avatar || "images/avatar.jpg";
+    if (playerSound) playerSound.textContent = `${currentShort.author || "The Unemployed Club"} • Original Sound`;
 
     if (infoTags) {
       infoTags.innerHTML = "";
