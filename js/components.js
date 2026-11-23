@@ -226,18 +226,25 @@
     renderAdminSidebar(active) {
       this.innerHTML = `
         <aside id="sidebar-nav">
-          <div class="sidebar-section-header">Studio</div>
+          <div class="sidebar-section-header">Studio Views</div>
           <ul class="side-links">
             <li>
-              <a href="#admin-video-form" id="admin-nav-add" class="${active === 'add' || !active ? 'active' : ''}" title="Upload / Add Video">
-                ${ICONS.videoPlus}
-                <span>Upload Video</span>
+              <a href="#view-review" id="admin-nav-review" class="${active === 'review' || !active ? 'active' : ''}" title="Review Queue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                <span>Review Inbox</span>
+                <span class="sidebar-pending-badge" id="sidebar-review-badge">0</span>
               </a>
             </li>
             <li>
-              <a href="#catalog-list-container" id="admin-nav-catalog" class="${active === 'catalog' ? 'active' : ''}" title="Video Catalog">
+              <a href="#view-catalog" id="admin-nav-catalog" class="${active === 'catalog' ? 'active' : ''}" title="Video Catalog Manager">
                 ${ICONS.catalogGrid}
                 <span>Video Catalog</span>
+              </a>
+            </li>
+            <li>
+              <a href="#view-upload" id="admin-nav-add" class="${active === 'add' ? 'active' : ''}" title="Upload / Add Video">
+                ${ICONS.videoPlus}
+                <span>Upload Video</span>
               </a>
             </li>
           </ul>
@@ -246,25 +253,25 @@
           <div class="sidebar-section-header">Categories & Shelves</div>
           <ul class="side-links">
             <li>
-              <a href="#catalog-list-container" id="admin-nav-top" title="Top 2 Rows (Featured)">
+              <a href="#view-catalog" id="admin-nav-top" title="Top 2 Rows (Featured)">
                 ${ICONS.star}
                 <span>Top 2 Rows</span>
               </a>
             </li>
             <li>
-              <a href="#catalog-list-container" id="admin-nav-mid" title="Middle Row (Curated)">
+              <a href="#view-catalog" id="admin-nav-mid" title="Middle Row (Curated)">
                 ${ICONS.layers}
                 <span>Middle Row</span>
               </a>
             </li>
             <li>
-              <a href="#catalog-list-container" id="admin-nav-shorts" title="Shorts Shelf (9:16)">
+              <a href="#view-catalog" id="admin-nav-shorts" title="Shorts Shelf (9:16)">
                 ${ICONS.shorts}
                 <span>Shorts Shelf</span>
               </a>
             </li>
             <li>
-              <a href="#catalog-list-container" id="admin-nav-bottom" title="Bottom Feed">
+              <a href="#view-catalog" id="admin-nav-bottom" title="Bottom Feed">
                 ${ICONS.trending}
                 <span>Bottom Feed</span>
               </a>
@@ -287,7 +294,7 @@
               </a>
             </li>
             <li>
-              <a href="#" id="admin-nav-logout" title="Sign out of Administrator" style="color: #e0245e;">
+              <a href="#" id="admin-nav-logout" title="Sign Out of Admin Studio" style="color: #b91c1c;">
                 ${ICONS.logOut}
                 <span>Sign Out</span>
               </a>
@@ -300,57 +307,55 @@
     }
 
     initAdminEvents() {
-      // 1. Upload Video link -> smooth scroll to form & focus title
+      const navReview = this.querySelector('#admin-nav-review');
+      const navCatalog = this.querySelector('#admin-nav-catalog');
       const navAdd = this.querySelector('#admin-nav-add');
-      if (navAdd) {
-        navAdd.addEventListener('click', (e) => {
+
+      if (navReview) {
+        navReview.addEventListener('click', (e) => {
           e.preventDefault();
-          this.setActiveLink(navAdd);
-          const formCard = document.querySelector('.admin-form-card') || document.getElementById('admin-video-form');
-          if (formCard) {
-            window.scrollTo({ top: Math.max(0, formCard.offsetTop - 80), behavior: 'smooth' });
-          }
-          const titleInput = document.getElementById('video-title');
-          if (titleInput) {
-            setTimeout(() => titleInput.focus(), 300);
-          }
+          this.setActiveLink(navReview);
+          if (window.switchAdminView) window.switchAdminView('review');
         });
       }
 
-      // 2. Video Catalog link -> switch to 'all' & smooth scroll
-      const navCatalog = this.querySelector('#admin-nav-catalog');
       if (navCatalog) {
         navCatalog.addEventListener('click', (e) => {
           e.preventDefault();
           this.setActiveLink(navCatalog);
-          const allTab = document.querySelector('.catalog-tab-btn[data-filter="all"]');
-          if (allTab) allTab.click();
-          this.scrollToCatalog();
+          if (window.switchAdminView) window.switchAdminView('catalog');
         });
       }
 
-      // 3. Category shelf filters
-      const filterMappings = [
+      if (navAdd) {
+        navAdd.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.setActiveLink(navAdd);
+          if (window.switchAdminView) window.switchAdminView('upload');
+        });
+      }
+
+      // Shelf filter shortcuts
+      const shelves = [
         { id: '#admin-nav-top', filter: 'top' },
         { id: '#admin-nav-mid', filter: 'mid' },
         { id: '#admin-nav-shorts', filter: 'shorts' },
         { id: '#admin-nav-bottom', filter: 'bottom' }
       ];
-
-      filterMappings.forEach(item => {
-        const link = this.querySelector(item.id);
-        if (link) {
-          link.addEventListener('click', (e) => {
+      shelves.forEach(sh => {
+        const a = this.querySelector(sh.id);
+        if (a) {
+          a.addEventListener('click', (e) => {
             e.preventDefault();
-            this.setActiveLink(link);
-            const tabBtn = document.querySelector(`.catalog-tab-btn[data-filter="${item.filter}"]`);
-            if (tabBtn) tabBtn.click();
-            this.scrollToCatalog();
+            this.setActiveLink(a);
+            if (window.switchAdminView) window.switchAdminView('catalog');
+            const catBtn = document.querySelector(`.catalog-tab-btn[data-filter="${sh.filter}"]`);
+            if (catBtn) catBtn.click();
           });
         }
       });
 
-      // 4. Export for GitHub
+      // Export for GitHub
       const navExport = this.querySelector('#admin-nav-export');
       if (navExport) {
         navExport.addEventListener('click', (e) => {
@@ -360,7 +365,7 @@
         });
       }
 
-      // 5. Sign Out
+      // Sign Out
       const navLogout = this.querySelector('#admin-nav-logout');
       if (navLogout) {
         navLogout.addEventListener('click', (e) => {

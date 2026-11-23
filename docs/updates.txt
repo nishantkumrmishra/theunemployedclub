@@ -1,34 +1,29 @@
 # The Unemployed Club — Progress Report
 
-> **Title:** Shorts Video Engine Fix & Editorial Staging Pipeline
+> **Title:** Dedicated Review Inbox & Smart Auto-Placement Pipeline
 > **Repository:** `nishantkumrmishra/theunemployedclub`
 > **Live Site:** `https://nishantkumrmishra.github.io/theunemployedclub/`
 
 ```diff
 + WORK DONE
-+ [Shorts Playback] Integrated Hls.js in `shorts.html` for native `.m3u8` desktop stream decoding.
-+ [Shorts Playback] Solved browser autoplay blockage by initializing playback with `muted = true`.
-+ [Shorts Playback] Added full-screen click handler on `#shorts-box` to toggle play and pause.
-+ [Shorts Playback] Synchronized play overlay visibility with native HTML5 `play` and `pause` events.
-+ [Shorts Playback] Replaced fake interval timeline with real-time video `timeupdate` tracking.
-+ [Shorts UX] Replaced standard music note with animated spinning CD / Vinyl disc logo for Original Sound.
-+ [Shorts UX] Added flyout volume slider popup with percentage readout and real-time audio volume control.
-+ [Shorts UX] Added mouse wheel scroll and touch swipe up/down navigation to flick between shorts.
-+ [Shorts UX] Removed mock comments: reset counter to 0 and added editorial under-construction reminder notice.
-+ [Extractor] Updated `tools/extractor.bat` and `tools/main.py` to save items as Drafts (`pending_review`).
-+ [Extractor] Configured extractor to avoid direct publishing to public feeds without authentication.
-+ [Admin Studio] Added Amber `Editorial Review Queue` card in `admin.html` with pending count badges.
-+ [Admin Studio] Added Stream Preview modal to test video playback directly inside Admin Studio.
-+ [Admin Studio] Built 1-click placement selector for `Top 2 Rows`, `Middle Row`, `Shorts`, and `Bottom Feed`.
-+ [Admin Studio] Added `Approve & Publish`, `Edit in Form`, and `Dismiss` draft controls.
-+ [Security] Added `js/staging-feed.js` and `tools/extracted/` to `.gitignore` to prevent repository suspensions.
-+ [Deployment] Pushed clean updates to `origin main` and updated GitHub Pages live build.
++ [Review Inbox] Created dedicated primary view tab in Admin Studio (`admin.html`) separating Review, Catalog, and Upload.
++ [Sidebar Navigation] Added Review Inbox link with dynamic pending count badge (`#sidebar-review-badge`) in `<site-sidebar>`.
++ [Review Cards] Designed modern Pro Review Cards with 210px thumbnail column, hover play overlay, and direct stream type indicators.
++ [Inline Editing] Enabled instant in-place title and description editing directly on the review card without opening secondary forms.
++ [Auto-Detection] Built smart detection to auto-identify vertical shorts (`/shorts/`, `/reel/`, `#shorts`) and pre-select Shorts Shelf.
++ [Section Dropdown] Provided clean override dropdown for manual routing to Top 2 Rows (Featured), Middle Row, or Bottom Feed.
++ [Instant Deletion] Configured `Approve & Publish` and `Dismiss` to automatically delete reviewed drafts from queue with exit animation.
++ [Permanent Purge] Implemented processed draft registry (`webvideo_staging_processed_v1`) to prevent reviewed items from lingering on refresh.
++ [Empty State] Added dedicated "All Caught Up!" empty state with direct URL staging button when review queue reaches 0.
++ [Shorts Playback] Integrated Hls.js in `shorts.html` for native `.m3u8` desktop stream decoding with muted autoplay fix.
++ [Shorts UX] Added spinning CD vinyl icon, flyout volume slider, mouse wheel / touch swipe navigation, and 0-comment notice.
++ [Security] Maintained `js/staging-feed.js` and `tools/extracted/` in `.gitignore` to prevent repository suspensions.
 ```
 
 ```diff
 - NOT DONE / NEXT STEPS
-- [Scraper] Aspect ratio auto-detection: Scraper does not yet auto-detect 9:16 vertical resolution to pre-select Shorts shelf.
-- [Stream Health] Link liveness monitor: No automated background script to ping external CDN URLs and alert on expired links.
-- [Cloud Sync] In-browser GitHub API token commit: Approvals save to local storage/feed file; direct GitHub API commit from browser is not yet wired.
-- [Video Player] Quality switcher for Shorts: Manual resolution selector (1080p, 720p, 480p) exists on `player.html` but is not yet added to `shorts.html`.
+- [Stream Health] Link liveness monitor: Automated background script to ping external CDN URLs and alert on expired links.
+- [Cloud Sync] In-browser GitHub API token commit: Option to push catalog updates directly via GitHub API without downloading file.
+- [Video Player] Quality switcher for Shorts: Manual resolution selector (1080p, 720p, 480p) exists on `player.html` but not yet on `shorts.html`.
+- [Bulk Operations] Multi-select batch approve or batch dismiss for high-volume extractor batches.
 ```

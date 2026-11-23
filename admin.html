@@ -7,7 +7,7 @@
   <!-- Google Fonts: Manrope Thin -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js"></script>
   <script src="js/components.js"></script>
@@ -32,8 +32,8 @@
       background: var(--bg-card);
       border: solid 1px var(--color-border);
       border-left: 4px solid var(--color-accent);
-      padding: 20px 24px;
-      margin-bottom: 28px;
+      padding: 18px 24px;
+      margin-bottom: 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -41,13 +41,13 @@
       flex-wrap: wrap;
     }
     .admin-banner-info h3 {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       color: var(--color-fg-bold);
       margin-bottom: 4px;
       font-weight: 400 !important;
     }
     .admin-banner-info p {
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       color: var(--color-fg);
       max-width: 680px;
       line-height: 1.5;
@@ -58,30 +58,36 @@
       align-items: center;
     }
 
-    /* Editorial Review Queue / Staged Drafts Card */
-    .admin-review-card {
+    /* Studio Main View Tabs */
+    .admin-view-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 26px;
+      border-bottom: solid 1px var(--color-border);
+      padding-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .admin-view-tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
       background: var(--bg-card);
       border: solid 1px var(--color-border);
-      border-left: 4px solid #f59e0b; /* Amber tone for pending review */
-      padding: 28px 32px;
-      margin-bottom: 32px;
-    }
-    .admin-review-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--color-border);
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .admin-review-header h2 {
-      font-size: 1.25rem;
       color: var(--color-fg-bold);
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      font-size: 0.86rem;
+      cursor: pointer;
+      border-radius: 0 !important;
+      transition: all 0.15s ease;
+    }
+    .admin-view-tab-btn:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+    .admin-view-tab-btn.is-active {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+      color: #ffffff;
     }
     .staged-badge-count {
       background: #f59e0b;
@@ -89,61 +95,139 @@
       padding: 2px 8px;
       font-size: 0.72rem;
       font-weight: 500;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
+      border-radius: 0 !important;
     }
-    .staged-item-card {
+    .admin-view-tab-btn.is-active .staged-badge-count {
       background: #ffffff;
-      border: 1px solid var(--color-border);
-      padding: 16px;
-      margin-bottom: 14px;
-      display: grid;
-      grid-template-columns: 140px 1fr auto;
-      gap: 20px;
-      align-items: center;
-      transition: border-color 0.15s ease;
+      color: #1e1e24;
     }
-    .staged-item-card:hover {
+    .count-pill {
+      background: rgba(160, 160, 160, 0.15);
+      color: var(--color-fg-bold);
+      padding: 2px 7px;
+      font-size: 0.72rem;
+      border-radius: 0 !important;
+    }
+    .admin-view-tab-btn.is-active .count-pill {
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+    }
+
+    /* Pro Review Card - Comfortable size, balanced proportions */
+    .review-card-pro {
+      background: #ffffff;
+      border: solid 1px var(--color-border);
+      border-left: 4px solid #f59e0b;
+      padding: 22px;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: 210px 1fr 260px;
+      gap: 24px;
+      align-items: start;
+      transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.15s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+    .review-card-pro:hover {
       border-color: var(--color-accent);
     }
-    .staged-thumb-box {
-      width: 140px;
+    .review-thumb-col {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .review-thumb-box {
+      width: 100%;
       aspect-ratio: 16 / 9;
-      background: #eaeaea;
+      background: #111111;
       overflow: hidden;
       position: relative;
+      cursor: pointer;
+      border: solid 1px var(--color-border);
     }
-    .staged-thumb-box img {
+    .review-thumb-box.is-short {
+      aspect-ratio: 9 / 14;
+      max-width: 150px;
+      margin: 0 auto;
+    }
+    .review-thumb-box img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
     }
-    .staged-thumb-box.is-short-thumb {
-      width: 75px;
-      aspect-ratio: 9 / 14;
+    .review-thumb-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.38);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
     }
-    .staged-details {
+    .review-thumb-box:hover .review-thumb-overlay {
+      opacity: 1;
+    }
+    .review-play-badge {
+      background: var(--color-accent);
+      color: #ffffff;
+      padding: 6px 10px;
+      font-size: 0.74rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .review-edit-col {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 12px;
       min-width: 0;
     }
-    .staged-title {
-      font-size: 0.95rem;
+    .review-input-group label {
+      font-size: 0.72rem;
+      color: var(--color-fg-light);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+      display: block;
+    }
+    .review-title-input {
+      width: 100%;
+      font-size: 0.96rem;
+      font-weight: 500;
       color: var(--color-fg-bold);
-      font-weight: 400 !important;
-      line-height: 1.3;
+      padding: 9px 12px;
+      border: solid 1px var(--color-border);
+      background: #fafafa;
+      outline: none;
+      font-family: inherit;
+      border-radius: 0 !important;
+      transition: border-color 0.2s ease, background 0.2s ease;
     }
-    .staged-desc {
-      font-size: 0.8rem;
+    .review-title-input:focus {
+      border-color: var(--color-accent);
+      background: #ffffff;
+    }
+    .review-desc-input {
+      width: 100%;
+      font-size: 0.82rem;
       color: var(--color-fg);
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      line-height: 1.4;
+      padding: 8px 12px;
+      border: solid 1px var(--color-border);
+      background: #fafafa;
+      outline: none;
+      font-family: inherit;
+      resize: vertical;
+      line-height: 1.45;
+      border-radius: 0 !important;
+      transition: border-color 0.2s ease, background 0.2s ease;
     }
-    .staged-meta {
+    .review-desc-input:focus {
+      border-color: var(--color-accent);
+      background: #ffffff;
+    }
+    .review-meta-row {
       font-size: 0.74rem;
       color: var(--color-fg-light);
       display: flex;
@@ -151,63 +235,107 @@
       align-items: center;
       flex-wrap: wrap;
     }
-    .staged-actions-col {
+    .review-actions-col {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      min-width: 190px;
-    }
-    .select-staged-placement {
-      height: 32px;
-      padding: 0 8px;
-      background: #fbfbfb;
+      gap: 12px;
+      background: rgba(160, 160, 160, 0.05);
       border: solid 1px var(--color-border);
-      font-size: 0.78rem;
+      padding: 16px;
+    }
+    .review-placement-label {
+      font-size: 0.75rem;
       color: var(--color-fg-bold);
-      border-radius: 0 !important;
+      font-weight: 500;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .auto-detected-tag {
+      font-size: 0.68rem;
+      color: #b45309;
+      background: rgba(245, 158, 11, 0.15);
+      padding: 1px 6px;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .select-review-placement {
+      height: 38px;
+      padding: 0 10px;
+      background: #ffffff;
+      border: solid 1px var(--color-border);
+      font-size: 0.82rem;
+      color: var(--color-fg-bold);
       outline: none;
       width: 100%;
+      cursor: pointer;
+      border-radius: 0 !important;
     }
-    .btn-approve-staged {
-      height: 32px;
-      padding: 0 12px;
+    .btn-approve-pro {
+      height: 40px;
+      padding: 0 16px;
       background: var(--color-accent);
       color: #ffffff;
       border: solid 1px var(--color-accent);
-      font-size: 0.78rem;
+      font-size: 0.84rem;
+      font-weight: 500;
       cursor: pointer;
       border-radius: 0 !important;
-      transition: opacity 0.15s ease;
-      display: inline-flex;
+      display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 8px;
+      transition: opacity 0.15s ease;
     }
-    .btn-approve-staged:hover {
+    .btn-approve-pro:hover {
       opacity: 0.9;
     }
-    .staged-btn-row {
+    .review-sub-actions {
       display: flex;
       gap: 6px;
     }
-    .staged-sub-btn {
+    .review-sub-btn {
       flex: 1;
-      height: 28px;
-      border: 1px solid var(--color-border);
-      background: transparent;
-      font-size: 0.74rem;
-      color: var(--color-fg);
+      height: 34px;
+      background: #ffffff;
+      border: solid 1px var(--color-border);
+      color: var(--color-fg-bold);
+      font-size: 0.78rem;
       cursor: pointer;
       border-radius: 0 !important;
       transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
     }
-    .staged-sub-btn:hover {
+    .review-sub-btn:hover {
       border-color: var(--color-accent);
       color: var(--color-accent);
     }
-    .staged-sub-btn.btn-dismiss:hover {
+    .review-sub-btn.btn-dismiss:hover {
       border-color: #e0245e;
       color: #e0245e;
+    }
+
+    /* Empty state */
+    .review-empty-state {
+      padding: 48px 24px;
+      text-align: center;
+      background: #ffffff;
+      border: 1px dashed var(--color-border);
+    }
+    .review-empty-state h3 {
+      font-size: 1.15rem;
+      color: var(--color-fg-bold);
+      margin-bottom: 6px;
+      font-weight: 400 !important;
+    }
+    .review-empty-state p {
+      font-size: 0.84rem;
+      color: var(--color-fg-light);
+      margin: 0 auto;
+      max-width: 520px;
+      line-height: 1.5;
     }
 
     /* Video Add / Edit Card */
@@ -451,7 +579,7 @@
     .stream-preview-modal {
       background: #ffffff;
       width: 90%;
-      max-width: 800px;
+      max-width: 820px;
       border: 1px solid var(--color-border);
       box-shadow: 0 8px 32px rgba(0,0,0,0.3);
       display: flex;
@@ -476,18 +604,16 @@
       display: block;
     }
 
-    @media screen and (max-width: 900px) {
+    @media screen and (max-width: 960px) {
+      .review-card-pro {
+        grid-template-columns: 1fr;
+      }
       .admin-grid-layout {
         grid-template-columns: 1fr;
       }
-      .catalog-item-row, .staged-item-card {
-        grid-template-columns: 1fr;
-        display: flex;
+      .catalog-item-row {
         flex-direction: column;
         align-items: flex-start;
-      }
-      .staged-actions-col {
-        width: 100%;
       }
     }
   </style>
@@ -499,14 +625,14 @@
 
   <div id="wrapper">
     <!-- Modular Zero-Build Sidebar -->
-    <site-sidebar mode="admin" active="add"></site-sidebar>
+    <site-sidebar mode="admin" active="review"></site-sidebar>
 
     <!-- Main Content Area -->
     <main id="main-content">
       
       <div class="content-header">
         <h2>Content Admin Studio</h2>
-        <p>Curate, index, review, and organize video streams across all website sections</p>
+        <p>Curate, review, and organize video streams across website sections</p>
       </div>
 
       <!-- Zero-Technical-Knowledge GitHub Update Banner -->
@@ -514,7 +640,7 @@
         <div class="admin-banner-info">
           <h3>Zero-Knowledge 1-Click Update for GitHub</h3>
           <p>
-            When you add or approve videos below, they save instantly to your browser. To push updates live to <strong>GitHub Pages</strong> for all visitors, click <strong>Download Catalog File</strong> and drag the single file into your GitHub repo's <code>js/</code> folder. Done!
+            When you approve or edit videos below, they save instantly to your browser. To push updates live to <strong>GitHub Pages</strong> for all visitors, click <strong>Download Catalog File</strong> and drag the single file into your GitHub repo's <code>js/</code> folder. Done!
           </p>
         </div>
         <div class="admin-banner-actions">
@@ -530,160 +656,184 @@
         </div>
       </div>
 
+      <!-- Studio Primary View Navigation Tabs -->
+      <div class="admin-view-tabs">
+        <button class="admin-view-tab-btn is-active" data-view="review" id="tab-nav-review">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span>Review Inbox</span>
+          <span class="staged-badge-count" id="tab-review-count">0</span>
+        </button>
+
+        <button class="admin-view-tab-btn" data-view="catalog" id="tab-nav-catalog">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Catalog Stream Manager</span>
+          <span class="count-pill" id="tab-catalog-count">0</span>
+        </button>
+
+        <button class="admin-view-tab-btn" data-view="upload" id="tab-nav-upload">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Direct Video Upload</span>
+        </button>
+      </div>
+
       <!-- ============================================================== -->
-      <!-- EDITORIAL REVIEW QUEUE (STAGED DRAFTS FROM EXTRACTOR) -->
+      <!-- VIEW 1: DEDICATED EDITORIAL REVIEW INBOX -->
       <!-- ============================================================== -->
-      <div class="admin-review-card" id="admin-review-section">
-        <div class="admin-review-header">
-          <h2>
-            <span>Editorial Review Queue</span>
-            <span class="staged-badge-count" id="staged-badge-count">0 Pending</span>
-          </h2>
+      <section class="admin-view-pane is-active" id="view-review-pane">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h3 style="font-size: 1.15rem; color: var(--color-fg-bold); margin-bottom: 4px; font-weight: 400;">
+              Drafts Waiting for Review (<span id="staged-count-header">0</span>)
+            </h3>
+            <p style="font-size: 0.82rem; color: var(--color-fg-light); margin: 0;">
+              Review stream preview, edit title/description, select target section, and click Approve to publish live. Reviewed drafts are automatically deleted from this queue.
+            </p>
+          </div>
           <div style="display: flex; gap: 8px;">
-            <button class="btn-secondary" id="btn-import-stage-url" style="height: 32px; font-size: 0.78rem;">
+            <button class="btn-secondary" id="btn-import-stage-url" style="height: 36px; font-size: 0.8rem;">
               + Stage URL Directly
             </button>
-            <button class="btn-secondary" id="btn-clear-staging" style="height: 32px; font-size: 0.78rem;">
-              Clear All Staged
+            <button class="btn-secondary" id="btn-clear-staging" style="height: 36px; font-size: 0.8rem; border-color: #fecaca; color: #b91c1c;">
+              Clear All Drafts
             </button>
           </div>
         </div>
 
-        <p style="font-size: 0.84rem; color: var(--color-fg); margin-bottom: 20px; line-height: 1.5;">
-          Videos extracted via <code>tools/extractor.bat</code> or URL staging appear here first as <strong>Drafts</strong>. They are <strong>NOT live</strong> on the public website until you preview the stream, assign which section they belong to (Top 2 Rows, Middle Row, Shorts Shelf, or Bottom Feed), and click <strong>Approve & Publish</strong>.
-        </p>
-
-        <!-- Staged Items Container -->
+        <!-- Staged Items Review Container -->
         <div id="staged-items-container">
           <!-- Rendered dynamically by js/admin.js -->
         </div>
-      </div>
+      </section>
 
-      <!-- Video Add / Edit Card -->
-      <div class="admin-form-card">
-        <div class="admin-form-header">
-          <h2 id="form-heading">Add Video to Stream</h2>
-          <span style="font-size: 0.82rem; color: var(--color-fg-light);" id="edit-indicator">New Entry</span>
+      <!-- ============================================================== -->
+      <!-- VIEW 2: ACTIVE CATALOG STREAM MANAGER -->
+      <!-- ============================================================== -->
+      <section class="admin-view-pane" id="view-catalog-pane" style="display: none;">
+        <div class="content-header" style="margin-bottom: 20px;">
+          <h3>Published Catalog Stream (<span id="total-video-count">0</span> Videos)</h3>
+          <p>Re-order, move between sections, or edit currently published videos</p>
         </div>
 
-        <form id="admin-video-form">
-          <input type="hidden" id="edit-video-id" value="" />
-
-          <div class="admin-grid-layout">
-            
-            <!-- Left Inputs Column -->
-            <div style="display: flex; flex-direction: column; gap: 18px;">
-              
-              <div class="form-group">
-                <label for="video-title">Video Title *</label>
-                <input type="text" id="video-title" placeholder="e.g. Architectural Shadows in Brutalist Concrete" required />
-              </div>
-
-              <div class="form-group">
-                <label for="video-cdn-url">Video Stream CDN URL *</label>
-                <input type="url" id="video-cdn-url" placeholder="https://cdn.example.com/videos/stream.mp4 or HLS .m3u8" required />
-                <span class="form-hint">Direct CDN stream link, MP4 video file, or HLS .m3u8 streaming URL.</span>
-              </div>
-
-              <div class="form-group">
-                <label for="video-artwork-url">Photo / Artwork CDN URL</label>
-                <input type="url" id="video-artwork-url" placeholder="https://cdn.example.com/images/cover.jpg" />
-                <span class="form-hint">Direct link to cover photo, poster, or thumbnail.</span>
-              </div>
-
-              <!-- Drag & Drop Artwork Selector -->
-              <div class="drop-zone" id="artwork-drop-zone" style="padding: 16px; margin-top: -6px; cursor: pointer;">
-                <input type="file" id="artwork-file-input" accept="image/*" style="display: none;" />
-                <div style="font-size: 0.82rem; color: var(--color-fg);">
-                  <strong style="color: var(--color-accent);">Choose local image</strong> or drop photo here to preview & embed
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="video-desc">Description</label>
-                <textarea id="video-desc" rows="3" placeholder="Curated stream matching the classic editorial aesthetic..."></textarea>
-              </div>
-
-              <!-- Placement Selector -->
-              <div class="form-group">
-                <label>Website Section Placement *</label>
-                <div class="placement-pills">
-                  <label class="placement-pill-btn is-active">
-                    <input type="radio" name="video-placement" value="top" checked />
-                    <span>Top 2 Rows (Featured Grid)</span>
-                  </label>
-                  <label class="placement-pill-btn">
-                    <input type="radio" name="video-placement" value="mid" />
-                    <span>Middle Row (Curated Break)</span>
-                  </label>
-                  <label class="placement-pill-btn">
-                    <input type="radio" name="video-placement" value="shorts" />
-                    <span>Shorts Shelf (9:14 Vertical)</span>
-                  </label>
-                  <label class="placement-pill-btn">
-                    <input type="radio" name="video-placement" value="bottom" />
-                    <span>Bottom Feed (Endless Scroll)</span>
-                  </label>
-                </div>
-              </div>
-
-              <!-- Action Buttons -->
-              <div style="display: flex; gap: 12px; margin-top: 10px;">
-                <button type="submit" class="btn-primary" id="btn-submit-form" style="height: 42px; padding: 0 24px;">
-                  <span>+ Add Video to Stream</span>
-                </button>
-                <button type="button" class="btn-secondary" id="btn-cancel-edit" style="height: 42px;">Clear</button>
-              </div>
-
-            </div>
-
-            <!-- Right Artwork Preview Column -->
-            <div style="display: flex; flex-direction: column; gap: 14px;">
-              <div style="font-size: 0.84rem; color: var(--color-fg-bold);">Artwork Live Preview:</div>
-              <div class="artwork-preview-box" id="artwork-preview-box">
-                <img id="artwork-preview-img" src="" alt="Artwork Preview" style="display: none;" />
-                <div class="artwork-empty-label" id="artwork-empty-label">
-                  Paste a Photo CDN link or choose a photo file to preview cover art here
-                </div>
-              </div>
-
-              <div style="background: rgba(160, 160, 160, 0.05); border: 1px solid var(--color-border); padding: 14px; font-size: 0.78rem; color: var(--color-fg); line-height: 1.5;">
-                <div style="font-weight: 400; color: var(--color-fg-bold); margin-bottom: 4px;">Editorial Placement Guide:</div>
-                &bull; <strong>Top 2 Rows</strong>: Highest priority curated cards on index.html.<br/>
-                &bull; <strong>Middle Row</strong>: Appears directly between the two Shorts shelves.<br/>
-                &bull; <strong>Shorts Shelf</strong>: Formatted as 9:14 vertical cards.<br/>
-                &bull; <strong>Bottom Feed</strong>: Endless stream that loads automatically on scroll.
-              </div>
-            </div>
-
+        <!-- Section Filter Tabs & In-Page Search -->
+        <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; justify-content: space-between; align-items: center;">
+          <div class="catalog-filter-tabs" style="margin-bottom: 0;">
+            <button class="catalog-tab-btn is-active" data-filter="all">All Videos (<span id="count-all">0</span>)</button>
+            <button class="catalog-tab-btn" data-filter="top">Top 2 Rows (<span id="count-top">0</span>)</button>
+            <button class="catalog-tab-btn" data-filter="mid">Middle Row (<span id="count-mid">0</span>)</button>
+            <button class="catalog-tab-btn" data-filter="shorts">Shorts (<span id="count-shorts">0</span>)</button>
+            <button class="catalog-tab-btn" data-filter="bottom">Bottom Feed (<span id="count-bottom">0</span>)</button>
           </div>
-        </form>
-      </div>
-
-      <!-- Active Stream Catalog Manager -->
-      <div class="content-header" style="margin-top: 48px;">
-        <h2>Catalog Stream Manager (<span id="total-video-count">0</span> Videos)</h2>
-        <p>Manage, re-order, move between sections, or edit indexed videos</p>
-      </div>
-
-      <!-- Section Filter Tabs & In-Page Search -->
-      <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; justify-content: space-between; align-items: center;">
-        <div class="catalog-filter-tabs" style="margin-bottom: 0;">
-          <button class="catalog-tab-btn is-active" data-filter="all">All Videos (<span id="count-all">0</span>)</button>
-          <button class="catalog-tab-btn" data-filter="top">Top 2 Rows (<span id="count-top">0</span>)</button>
-          <button class="catalog-tab-btn" data-filter="mid">Middle Row (<span id="count-mid">0</span>)</button>
-          <button class="catalog-tab-btn" data-filter="shorts">Shorts (<span id="count-shorts">0</span>)</button>
-          <button class="catalog-tab-btn" data-filter="bottom">Bottom Feed (<span id="count-bottom">0</span>)</button>
+          <div style="min-width: 240px;">
+            <input type="text" id="admin-search-input" placeholder="Search catalog videos..." style="height: 34px; padding: 0 10px; font-size: 0.8rem; border: 1px solid var(--color-border); background: #ffffff; width: 100%; outline: none;" />
+          </div>
         </div>
-        <div style="min-width: 240px;">
-          <input type="text" id="admin-search-input" placeholder="Search catalog videos..." style="height: 34px; padding: 0 10px; font-size: 0.8rem; border: 1px solid var(--color-border); background: #ffffff; width: 100%; outline: none;" />
-        </div>
-      </div>
 
-      <!-- Catalog List Container -->
-      <div id="catalog-list-container">
-        <!-- Rendered by js/admin.js -->
-      </div>
+        <!-- Catalog List Container -->
+        <div id="catalog-list-container">
+          <!-- Rendered by js/admin.js -->
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- VIEW 3: DIRECT VIDEO UPLOAD FORM -->
+      <!-- ============================================================== -->
+      <section class="admin-view-pane" id="view-upload-pane" style="display: none;">
+        <div class="admin-form-card">
+          <div class="admin-form-header">
+            <h2 id="form-heading">Add Video to Stream</h2>
+            <span style="font-size: 0.82rem; color: var(--color-fg-light);" id="edit-indicator">New Entry</span>
+          </div>
+
+          <form id="admin-video-form">
+            <input type="hidden" id="edit-video-id" value="" />
+
+            <div class="admin-grid-layout">
+              <!-- Left Inputs Column -->
+              <div style="display: flex; flex-direction: column; gap: 18px;">
+                <div class="form-group">
+                  <label for="video-title">Video Title *</label>
+                  <input type="text" id="video-title" placeholder="e.g. Architectural Shadows in Brutalist Concrete" required />
+                </div>
+
+                <div class="form-group">
+                  <label for="video-cdn-url">Video Stream CDN URL *</label>
+                  <input type="url" id="video-cdn-url" placeholder="https://cdn.example.com/videos/stream.mp4 or HLS .m3u8" required />
+                  <span class="form-hint">Direct CDN stream link, MP4 video file, or HLS .m3u8 streaming URL.</span>
+                </div>
+
+                <div class="form-group">
+                  <label for="video-artwork-url">Photo / Artwork CDN URL</label>
+                  <input type="url" id="video-artwork-url" placeholder="https://cdn.example.com/images/cover.jpg" />
+                  <span class="form-hint">Direct link to cover photo, poster, or thumbnail.</span>
+                </div>
+
+                <!-- Drag & Drop Artwork Selector -->
+                <div class="drop-zone" id="artwork-drop-zone" style="padding: 16px; margin-top: -6px; cursor: pointer;">
+                  <input type="file" id="artwork-file-input" accept="image/*" style="display: none;" />
+                  <div style="font-size: 0.82rem; color: var(--color-fg);">
+                    <strong style="color: var(--color-accent);">Choose local image</strong> or drop photo here to preview & embed
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="video-desc">Description</label>
+                  <textarea id="video-desc" rows="3" placeholder="Curated stream matching the classic editorial aesthetic..."></textarea>
+                </div>
+
+                <!-- Placement Selector -->
+                <div class="form-group">
+                  <label>Website Section Placement *</label>
+                  <div class="placement-pills">
+                    <label class="placement-pill-btn is-active">
+                      <input type="radio" name="video-placement" value="top" checked />
+                      <span>Top 2 Rows (Featured Grid)</span>
+                    </label>
+                    <label class="placement-pill-btn">
+                      <input type="radio" name="video-placement" value="mid" />
+                      <span>Middle Row (Curated Break)</span>
+                    </label>
+                    <label class="placement-pill-btn">
+                      <input type="radio" name="video-placement" value="shorts" />
+                      <span>Shorts Shelf (9:14 Vertical)</span>
+                    </label>
+                    <label class="placement-pill-btn">
+                      <input type="radio" name="video-placement" value="bottom" />
+                      <span>Bottom Feed (Endless Scroll)</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 12px; margin-top: 10px;">
+                  <button type="submit" class="btn-primary" id="btn-submit-form" style="height: 42px; padding: 0 24px;">
+                    <span>+ Add Video to Stream</span>
+                  </button>
+                  <button type="button" class="btn-secondary" id="btn-cancel-edit" style="height: 42px;">Clear</button>
+                </div>
+              </div>
+
+              <!-- Right Artwork Preview Column -->
+              <div style="display: flex; flex-direction: column; gap: 14px;">
+                <div style="font-size: 0.84rem; color: var(--color-fg-bold);">Artwork Live Preview:</div>
+                <div class="artwork-preview-box" id="artwork-preview-box">
+                  <img id="artwork-preview-img" src="" alt="Artwork Preview" style="display: none;" />
+                  <div class="artwork-empty-label" id="artwork-empty-label">
+                    Paste a Photo CDN link or choose a photo file to preview cover art here
+                  </div>
+                </div>
+
+                <div style="background: rgba(160, 160, 160, 0.05); border: 1px solid var(--color-border); padding: 14px; font-size: 0.78rem; color: var(--color-fg); line-height: 1.5;">
+                  <div style="font-weight: 400; color: var(--color-fg-bold); margin-bottom: 4px;">Editorial Placement Guide:</div>
+                  &bull; <strong>Top 2 Rows</strong>: Highest priority curated cards on index.html.<br/>
+                  &bull; <strong>Middle Row</strong>: Appears directly between the two Shorts shelves.<br/>
+                  &bull; <strong>Shorts Shelf</strong>: Formatted as 9:14 vertical cards.<br/>
+                  &bull; <strong>Bottom Feed</strong>: Endless stream that loads automatically on scroll.
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
 
     </main>
   </div>

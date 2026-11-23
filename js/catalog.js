@@ -9,6 +9,7 @@
 
   const STORAGE_KEY = 'webvideo_catalog_v1';
   const STAGING_KEY = 'webvideo_staging_v1';
+  const PROCESSED_KEY = 'webvideo_staging_processed_v1';
 
   function initCatalog() {
     let items = [];
@@ -43,12 +44,34 @@
     }
   }
 
+  // --- Processed / Dismissed Draft Tracking ---
+  function getProcessedSet() {
+    try {
+      const stored = localStorage.getItem(PROCESSED_KEY);
+      if (stored) {
+        const arr = JSON.parse(stored);
+        if (Array.isArray(arr)) return new Set(arr);
+      }
+    } catch(e) {}
+    return new Set();
+  }
+
+  function markDraftProcessed(id, videoUrl, sourceUrl) {
+    try {
+      const set = getProcessedSet();
+      if (id) set.add(String(id));
+      if (videoUrl) set.add(String(videoUrl));
+      if (sourceUrl) set.add(String(sourceUrl));
+      localStorage.setItem(PROCESSED_KEY, JSON.stringify([...set]));
+    } catch(e) {}
+  }
+
   // --- Staging Queue Storage & Synchronization ---
   function initStaging() {
     let staged = [];
     try {
       const stored = localStorage.getItem(STAGING_KEY);
-      if (stored) {
+      if (stored !== null) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) staged = parsed;
       }
@@ -56,9 +79,23 @@
       console.warn('[Catalog] Staging LocalStorage parse error:', e);
     }
 
-    // Merge static feed window.WEBVIDEO_STAGING if present
+    const processed = getProcessedSet();
+    const publishedUrls = new Set((catalogItems || []).map(v => v.videoUrl).filter(Boolean));
+
+    // Merge static feed window.WEBVIDEO_STAGING only for genuinely new unreviewed drafts
     if (Array.isArray(window.WEBVIDEO_STAGING)) {
       window.WEBVIDEO_STAGING.forEach(item => {
+        const id = String(item.id || '');
+        const vUrl = String(item.videoUrl || '');
+        const sUrl = String(item.sourceUrl || '');
+
+        if (processed.has(id) || (vUrl && processed.has(vUrl)) || (sUrl && processed.has(sUrl))) {
+          return; // Already approved, reviewed, or dismissed
+        }
+        if (vUrl && publishedUrls.has(vUrl)) {
+          return; // Already in live public catalog
+        }
+
         const exists = staged.some(s => s.id === item.id || (s.videoUrl && s.videoUrl === item.videoUrl));
         if (!exists) {
           staged.push(item);
@@ -205,6 +242,8 @@
       if (idx === -1) return null;
 
       const staged = stagingItems[idx];
+      markDraftProcessed(staged.id, staged.videoUrl, staged.sourceUrl);
+
       const videoData = {
         title: overrides.title !== undefined ? overrides.title : staged.title,
         description: overrides.description !== undefined ? overrides.description : staged.description,
@@ -219,7 +258,7 @@
 
       const published = this.addVideo(videoData);
 
-      // Remove from staging
+      // Permanently remove from staging
       stagingItems.splice(idx, 1);
       saveStagingToStorage(stagingItems);
 
@@ -227,12 +266,19 @@
     },
 
     rejectStaged(id) {
+      const target = stagingItems.find(s => String(s.id) === String(id));
+      if (target) {
+        markDraftProcessed(target.id, target.videoUrl, target.sourceUrl);
+      }
       stagingItems = stagingItems.filter(s => String(s.id) !== String(id));
       saveStagingToStorage(stagingItems);
       return true;
     },
 
     clearStaging() {
+      stagingItems.forEach(s => {
+        markDraftProcessed(s.id, s.videoUrl, s.sourceUrl);
+      });
       stagingItems = [];
       saveStagingToStorage(stagingItems);
     },

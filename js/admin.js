@@ -1,9 +1,29 @@
 // The Unemployed Club - Admin Studio Controller
-// Matches the exact editorial styling, manages the Editorial Staging Review Queue,
-// and provides zero-technical-knowledge GitHub catalog export.
+// Dedicated Review Inbox View, Pro Review Cards with Inline Editing,
+// Auto-Detected Section Placement,, manages the Editorial Staging Review Queue,
+// and Instant Deletion on Approval/Dismiss.
 
 document.addEventListener('DOMContentLoaded', () => {
-  // DOM Elements - Main Form
+  // Primary Studio View Tabs
+  const tabViewReview = document.getElementById('tab-nav-review');
+  const tabViewCatalog = document.getElementById('tab-nav-catalog');
+  const tabViewUpload = document.getElementById('tab-nav-upload');
+
+  const paneReview = document.getElementById('view-review-pane');
+  const paneCatalog = document.getElementById('view-catalog-pane');
+  const paneUpload = document.getElementById('view-upload-pane');
+
+  const stagedBadge = document.getElementById('tab-review-count');
+  const stagedCountHeader = document.getElementById('staged-count-header');
+  const catalogCountPill = document.getElementById('tab-catalog-count');
+  const sidebarReviewBadge = document.getElementById('sidebar-review-badge');
+
+  // Staging Review Queue Elements
+  const stagedContainer = document.getElementById('staged-items-container');
+  const btnImportStageUrl = document.getElementById('btn-import-stage-url');
+  const btnClearStaging = document.getElementById('btn-clear-staging');
+
+  // Main Form Elements (Upload / Edit)
   const form = document.getElementById('admin-video-form');
   const formHeading = document.getElementById('form-heading');
   const editIndicator = document.getElementById('edit-indicator');
@@ -24,12 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('admin-search-input') || document.getElementById('header-search-input');
   const listContainer = document.getElementById('catalog-list-container');
 
-  // Staging Review Queue Elements
-  const stagedContainer = document.getElementById('staged-items-container');
-  const stagedBadge = document.getElementById('staged-badge-count');
-  const btnImportStageUrl = document.getElementById('btn-import-stage-url');
-  const btnClearStaging = document.getElementById('btn-clear-staging');
-
   // Preview Modal Elements
   const previewModal = document.getElementById('stream-preview-modal');
   const modalVideo = document.getElementById('modal-video-player');
@@ -37,11 +51,363 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnCloseModal = document.getElementById('btn-close-modal');
   let modalHls = null;
 
+  let currentView = 'review';
   let currentFilter = 'all';
 
   // ==============================================================
-  // 1. PLACEMENT RADIO PILLS
+  // 1. DEDICATED STUDIO VIEW SWITCHER
   // ==============================================================
+  function switchAdminView(view) {
+    currentView = view;
+
+    // Toggle Tab Buttons
+    [tabViewReview, tabViewCatalog, tabViewUpload].forEach(btn => {
+      if (btn) btn.classList.remove('is-active');
+    });
+
+    if (view === 'review' && tabViewReview) tabViewReview.classList.add('is-active');
+    if (view === 'catalog' && tabViewCatalog) tabViewCatalog.classList.add('is-active');
+    if (view === 'upload' && tabViewUpload) tabViewUpload.classList.add('is-active');
+
+    // Toggle Panes
+    if (paneReview) paneReview.style.display = view === 'review' ? 'block' : 'none';
+    if (paneCatalog) paneCatalog.style.display = view === 'catalog' ? 'block' : 'none';
+    if (paneUpload) paneUpload.style.display = view === 'upload' ? 'block' : 'none';
+
+    // Sync Sidebar
+    const sideReview = document.getElementById('admin-nav-review');
+    const sideCatalog = document.getElementById('admin-nav-catalog');
+    const sideAdd = document.getElementById('admin-nav-add');
+    [sideReview, sideCatalog, sideAdd].forEach(a => a && a.classList.remove('active'));
+
+    if (view === 'review' && sideReview) sideReview.classList.add('active');
+    if (view === 'catalog' && sideCatalog) sideCatalog.classList.add('active');
+    if (view === 'upload' && sideAdd) sideAdd.classList.add('active');
+
+    if (view === 'catalog') renderCatalogList();
+    if (view === 'review') renderReviewQueue();
+  }
+
+  window.switchAdminView = switchAdminView;
+
+  if (tabViewReview) tabViewReview.addEventListener('click', () => switchAdminView('review'));
+  if (tabViewCatalog) tabViewCatalog.addEventListener('click', () => switchAdminView('catalog'));
+  if (tabViewUpload) tabViewUpload.addEventListener('click', () => switchAdminView('upload'));
+
+  // ==============================================================
+  // 2. SMART SECTION AUTO-DETECTION HELPER
+  // ==============================================================
+  function detectDefaultSection(item) {
+    const url = (item.videoUrl || item.sourceUrl || '').toLowerCase();
+    const title = (item.title || '').toLowerCase();
+    const desc = (item.description || '').toLowerCase();
+
+    // Auto-detect Shorts (9:16 vertical video keywords or aspect indicators)
+    if (
+      item.isShort || item.is_short ||
+      item.section === 'shorts' ||
+      url.includes('/shorts/') || url.includes('/reel/') || url.includes('/tiktok/') ||
+      title.includes('#short') || title.includes('shorts') ||
+      desc.includes('#shorts') || desc.includes('9:16')
+    ) {
+      return 'shorts';
+    }
+
+    // Default to Top 2 Rows for standard landscape video
+    return 'top';
+  }
+
+  // ==============================================================
+  // 3. EDITORIAL REVIEW QUEUE WITH INLINE EDIT & INSTANT DELETION
+  // ==============================================================
+  function updateStagingCounts() {
+    const staged = Catalog.getStaging();
+    const count = staged.length;
+
+    if (stagedBadge) stagedBadge.textContent = `${count} Pending`;
+    if (stagedCountHeader) stagedCountHeader.textContent = count;
+    if (sidebarReviewBadge) {
+      sidebarReviewBadge.textContent = count;
+      sidebarReviewBadge.style.display = count > 0 ? 'inline-block' : 'none';
+    }
+  }
+
+  function checkReviewEmptyState() {
+    const staged = Catalog.getStaging();
+    if (staged.length === 0 && stagedContainer) {
+      stagedContainer.innerHTML = `
+        <div class="review-empty-state">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px;">
+            <circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/>
+          </svg>
+          <h3>All Caught Up!</h3>
+          <p>There are currently zero video drafts waiting for review.</p>
+          <p style="font-size: 0.8rem; color: var(--color-fg-light); margin-top: 6px;">
+            Run <code>tools/extractor.bat</code> to extract new videos, or click below to stage a video stream link directly.
+          </p>
+          <div style="margin-top: 18px;">
+            <button class="btn-primary" id="btn-empty-stage-url" style="height: 38px; padding: 0 20px;">
+              + Stage URL Directly
+            </button>
+          </div>
+        </div>
+      `;
+      const btnEmpty = document.getElementById('btn-empty-stage-url');
+      if (btnEmpty) {
+        btnEmpty.addEventListener('click', () => {
+          if (btnImportStageUrl) btnImportStageUrl.click();
+        });
+      }
+    }
+  }
+
+  function renderReviewQueue() {
+    if (!stagedContainer) return;
+    updateStagingCounts();
+
+    const staged = Catalog.getStaging();
+    stagedContainer.innerHTML = '';
+
+    if (staged.length === 0) {
+      checkReviewEmptyState();
+      return;
+    }
+
+    staged.forEach((item) => {
+      const detectedSection = detectDefaultSection(item);
+      const isShortDetected = detectedSection === 'shorts';
+
+      const card = document.createElement('div');
+      card.className = 'review-card-pro';
+      card.setAttribute('data-draft-id', item.id);
+
+      card.innerHTML = `
+        <!-- Left Column: Video Thumbnail & Stream Preview -->
+        <div class="review-thumb-col">
+          <div class="review-thumb-box ${isShortDetected ? 'is-short' : ''}" title="Click to test live video stream">
+            <img src="${item.artworkUrl || 'images/pic01.jpg'}" alt="${escapeHtml(item.title)}" />
+            <div class="review-thumb-overlay">
+              <div class="review-play-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                <span>Preview Stream</span>
+              </div>
+            </div>
+          </div>
+          <div style="font-size: 0.72rem; color: var(--color-fg-light); text-align: center; word-break: break-all;">
+            <code>${item.videoUrl.includes('.m3u8') ? 'Adaptive HLS (.m3u8)' : 'Direct MP4 Stream'}</code>
+          </div>
+        </div>
+
+        <!-- Center Column: Inline Editing (Title & Description) -->
+        <div class="review-edit-col">
+          <div class="review-input-group">
+            <label>Video Title (Click to edit):</label>
+            <input type="text" class="review-title-input" value="${escapeHtml(item.title)}" placeholder="Enter video title..." />
+          </div>
+
+          <div class="review-input-group">
+            <label>Description:</label>
+            <textarea class="review-desc-input" rows="2" placeholder="Video description...">${escapeHtml(item.description || 'Direct CDN video stream.')}</textarea>
+          </div>
+
+          <div class="review-meta-row">
+            <span>Staged: ${escapeHtml(item.extractedAt || 'Recent')}</span>
+            <span>&bull;</span>
+            <span style="max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              CDN: <a href="${item.videoUrl}" target="_blank" style="color: var(--color-accent); text-decoration: none;">${escapeHtml(item.videoUrl)}</a>
+            </span>
+            ${item.sourceUrl ? `<span>&bull;</span><a href="${item.sourceUrl}" target="_blank" style="color: var(--color-fg-light); text-decoration: none;">Original Source</a>` : ''}
+          </div>
+        </div>
+
+        <!-- Right Column: Section Placement Dropdown & Action Buttons -->
+        <div class="review-actions-col">
+          <div class="review-placement-label">
+            <span>Where should this go?</span>
+            ${isShortDetected ? '<span class="auto-detected-tag">Auto: Shorts</span>' : '<span class="auto-detected-tag">Auto: Top Grid</span>'}
+          </div>
+
+          <select class="select-review-placement" title="Select website section">
+            <option value="shorts" ${detectedSection === 'shorts' ? 'selected' : ''}>📱 Shorts Shelf (9:14 Vertical)</option>
+            <option value="top" ${detectedSection === 'top' ? 'selected' : ''}>⭐ Top 2 Rows (Featured Grid)</option>
+            <option value="mid">🎬 Middle Row (Curated Break)</option>
+            <option value="bottom">📜 Bottom Feed (Endless Scroll)</option>
+          </select>
+
+          <!-- 40px High-Contrast Approve & Publish Button -->
+          <button class="btn-approve-pro" title="Publish live and immediately remove from review queue">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Approve &amp; Publish</span>
+          </button>
+
+          <!-- Sub-Actions: Preview & Dismiss -->
+          <div class="review-sub-actions">
+            <button class="review-sub-btn btn-preview-stream" title="Watch stream in modal">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+              <span>Preview</span>
+            </button>
+            <button class="review-sub-btn btn-dismiss-pro" title="Delete draft immediately">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              <span>Dismiss</span>
+            </button>
+          </div>
+        </div>
+      `;
+
+      // Elements inside card
+      const thumbBox = card.querySelector('.review-thumb-box');
+      const btnPreview = card.querySelector('.btn-preview-stream');
+      const btnApprove = card.querySelector('.btn-approve-pro');
+      const btnDismiss = card.querySelector('.btn-dismiss-pro');
+      const titleInputCard = card.querySelector('.review-title-input');
+      const descInputCard = card.querySelector('.review-desc-input');
+      const selectPlacement = card.querySelector('.select-review-placement');
+
+      // 1. Preview Stream Handlers
+      const triggerPreview = () => openStreamPreview(titleInputCard.value.trim() || item.title, item.videoUrl);
+      thumbBox.addEventListener('click', triggerPreview);
+      btnPreview.addEventListener('click', triggerPreview);
+
+      // 2. Placement Dropdown Change: adjust thumbnail aspect ratio if user selects Shorts
+      selectPlacement.addEventListener('change', () => {
+        if (selectPlacement.value === 'shorts') {
+          thumbBox.classList.add('is-short');
+        } else {
+          thumbBox.classList.remove('is-short');
+        }
+      });
+
+      // 3. Approve & Publish: Saves to Catalog & AUTOMATICALLY DELETES FROM REVIEW QUEUE
+      btnApprove.addEventListener('click', () => {
+        const chosenSec = selectPlacement.value;
+        const finalTitle = titleInputCard.value.trim() || item.title;
+        const finalDesc = descInputCard.value.trim() || item.description;
+
+        // Publish into active catalog and purge from staging
+        const published = Catalog.approveStaged(item.id, chosenSec, {
+          title: finalTitle,
+          description: finalDesc
+        });
+
+        if (published) {
+          // Animate card removal smoothly
+          card.style.opacity = '0';
+          card.style.transform = 'translateX(24px)';
+          setTimeout(() => {
+            card.remove();
+            updateStagingCounts();
+            checkReviewEmptyState();
+          }, 220);
+
+          showToast(`Approved "${finalTitle}" to ${getPlacementLabel(chosenSec)}! Draft deleted from review.`);
+          renderCatalogList();
+        }
+      });
+
+      // 4. Dismiss / Delete Draft: Permanently deletes from review queue on the spot
+      btnDismiss.addEventListener('click', () => {
+        if (confirm(`Delete draft "${item.title}" from review queue?`)) {
+          Catalog.rejectStaged(item.id);
+
+          card.style.opacity = '0';
+          card.style.transform = 'translateX(24px)';
+          setTimeout(() => {
+            card.remove();
+            updateStagingCounts();
+            checkReviewEmptyState();
+          }, 220);
+
+          showToast(`Deleted draft "${item.title}"`);
+        }
+      });
+
+      stagedContainer.appendChild(card);
+    });
+  }
+
+  // Quick Stage URL Direct prompt
+  if (btnImportStageUrl) {
+    btnImportStageUrl.addEventListener('click', () => {
+      const url = prompt('Enter video stream CDN URL (.mp4 or .m3u8):');
+      if (!url || !url.trim()) return;
+      const title = prompt('Enter video title:', 'Curated Video Stream') || 'Curated Video Stream';
+      const artwork = prompt('Enter artwork cover photo CDN URL (optional):', 'images/pic01.jpg') || 'images/pic01.jpg';
+
+      Catalog.addStaged({
+        title: title.trim(),
+        videoUrl: url.trim(),
+        artworkUrl: artwork.trim(),
+        description: 'Directly staged stream waiting for section review.',
+        author: 'The Unemployed Club'
+      });
+
+      showToast(`Staged "${title}" in Review Queue!`);
+      renderReviewQueue();
+      switchAdminView('review');
+    });
+  }
+
+  // Clear all staged
+  if (btnClearStaging) {
+    btnClearStaging.addEventListener('click', () => {
+      if (confirm('Clear all pending drafts from the review queue?')) {
+        Catalog.clearStaging();
+        showToast('Cleared review queue');
+        renderReviewQueue();
+      }
+    });
+  }
+
+  // ==============================================================
+  // 4. STREAM PREVIEW MODAL
+  // ==============================================================
+  function openStreamPreview(title, streamUrl) {
+    if (!previewModal || !modalVideo) return;
+    modalTitle.textContent = `Preview: ${title}`;
+    previewModal.classList.add('is-open');
+
+    if (modalHls) {
+      modalHls.destroy();
+      modalHls = null;
+    }
+
+    const isHls = streamUrl && streamUrl.includes('.m3u8');
+    if (isHls && window.Hls && Hls.isSupported()) {
+      modalHls = new Hls({ autoStartLoad: true });
+      modalHls.loadSource(streamUrl);
+      modalHls.attachMedia(modalVideo);
+      modalHls.on(Hls.Events.MANIFEST_PARSED, () => {
+        modalVideo.play().catch(() => {});
+      });
+    } else {
+      modalVideo.src = streamUrl;
+      modalVideo.load();
+      modalVideo.play().catch(() => {});
+    }
+  }
+
+  function closeStreamPreview() {
+    if (!previewModal || !modalVideo) return;
+    previewModal.classList.remove('is-open');
+    modalVideo.pause();
+    modalVideo.src = '';
+    if (modalHls) {
+      modalHls.destroy();
+      modalHls = null;
+    }
+  }
+
+  if (btnCloseModal) btnCloseModal.addEventListener('click', closeStreamPreview);
+  if (previewModal) {
+    previewModal.addEventListener('click', (e) => {
+      if (e.target === previewModal) closeStreamPreview();
+    });
+  }
+
+  // ==============================================================
+  // 5. DIRECT UPLOAD / EDIT FORM SUBMIT
+  // ==============================================================
+  // Placement Pills in Upload View
   const placementPills = document.querySelectorAll('.placement-pill-btn');
   placementPills.forEach(pill => {
     pill.addEventListener('click', () => {
@@ -50,7 +416,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const radio = pill.querySelector('input[type="radio"]');
       if (radio) radio.checked = true;
 
-      // Adjust artwork preview aspect ratio if shorts selected
       const selectedVal = getSelectedPlacement();
       if (selectedVal === 'shorts') {
         artworkPreviewBox.classList.add('is-short');
@@ -82,9 +447,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ==============================================================
-  // 2. ARTWORK LIVE PREVIEW & FILE DRAG-AND-DROP
-  // ==============================================================
   if (artworkUrlInput) {
     ['input', 'change'].forEach(evt => {
       artworkUrlInput.addEventListener(evt, () => {
@@ -150,214 +512,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==============================================================
-  // 3. EDITORIAL REVIEW QUEUE (STAGED DRAFTS)
-  // ==============================================================
-  function renderReviewQueue() {
-    if (!stagedContainer) return;
-
-    const staged = Catalog.getStaging();
-    if (stagedBadge) {
-      stagedBadge.textContent = `${staged.length} Pending`;
-      stagedBadge.style.background = staged.length > 0 ? '#f59e0b' : '#6b7280';
-    }
-
-    stagedContainer.innerHTML = '';
-
-    if (staged.length === 0) {
-      stagedContainer.innerHTML = `
-        <div style="padding: 32px; text-align: center; color: var(--color-fg-light); background: #ffffff; border: 1px dashed var(--color-border);">
-          <div style="font-size: 0.95rem; margin-bottom: 6px; color: var(--color-fg-bold);">No Videos Waiting in Review Queue</div>
-          <p style="font-size: 0.8rem; margin: 0; max-width: 500px; margin: 0 auto;">
-            Run <code>tools/extractor.bat</code> and paste any video link to automatically stage drafts here for your review and section placement.
-          </p>
-        </div>
-      `;
-      return;
-    }
-
-    staged.forEach((item) => {
-      const card = document.createElement('div');
-      card.className = 'staged-item-card';
-
-      card.innerHTML = `
-        <div class="staged-thumb-box" style="cursor: pointer;" title="Click to preview stream">
-          <img src="${item.artworkUrl || 'images/pic01.jpg'}" alt="${escapeHtml(item.title)}" />
-          <div style="position: absolute; bottom: 4px; right: 4px; background: rgba(0,0,0,0.7); color: #fff; font-size: 0.65rem; padding: 1px 4px;">DRAFT</div>
-        </div>
-
-        <div class="staged-details">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <h4 class="staged-title">${escapeHtml(item.title)}</h4>
-            <span style="background: rgba(245, 158, 11, 0.15); color: #b45309; padding: 1px 6px; font-size: 0.7rem; border: 1px solid rgba(245, 158, 11, 0.3);">Pending Review</span>
-          </div>
-          <div class="staged-desc">${escapeHtml(item.description || 'Extracted video stream draft. Ready for editorial review.')}</div>
-          <div class="staged-meta">
-            <span>Staged: ${escapeHtml(item.extractedAt || 'Recent')}</span>
-            <span>&bull;</span>
-            <span style="max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-              Stream: <a href="${item.videoUrl}" target="_blank" style="color: var(--color-accent); text-decoration: none;">${escapeHtml(item.videoUrl)}</a>
-            </span>
-            ${item.sourceUrl ? `<span>&bull;</span><a href="${item.sourceUrl}" target="_blank" style="color: var(--color-fg-light); text-decoration: none;">Source Link</a>` : ''}
-          </div>
-        </div>
-
-        <div class="staged-actions-col">
-          <label style="font-size: 0.72rem; color: var(--color-fg-light); margin-bottom: -4px;">Target Section:</label>
-          <select class="select-staged-placement" data-id="${item.id}">
-            <option value="top">Top 2 Rows (Featured Grid)</option>
-            <option value="mid">Middle Row (Curated Break)</option>
-            <option value="shorts" selected>Shorts Shelf (9:14 Vertical)</option>
-            <option value="bottom">Bottom Feed (Endless Scroll)</option>
-          </select>
-
-          <button class="btn-approve-staged" data-id="${item.id}" title="Approve and publish to public website">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>Approve &amp; Publish</span>
-          </button>
-
-          <div class="staged-btn-row">
-            <button class="staged-sub-btn btn-preview-stream" data-id="${item.id}" title="Test stream playback">Preview</button>
-            <button class="staged-sub-btn btn-refine-staged" data-id="${item.id}" title="Edit in form above">Edit</button>
-            <button class="staged-sub-btn btn-dismiss" data-id="${item.id}" title="Discard draft">Dismiss</button>
-          </div>
-        </div>
-      `;
-
-      // Event: Thumbnail or Preview button clicks
-      const thumbBox = card.querySelector('.staged-thumb-box');
-      const btnPreview = card.querySelector('.btn-preview-stream');
-      const previewHandler = () => openStreamPreview(item.title, item.videoUrl);
-      thumbBox.addEventListener('click', previewHandler);
-      btnPreview.addEventListener('click', previewHandler);
-
-      // Event: Approve & Publish
-      const btnApprove = card.querySelector('.btn-approve-staged');
-      const selectPlacement = card.querySelector('.select-staged-placement');
-      btnApprove.addEventListener('click', () => {
-        const chosenSec = selectPlacement.value;
-        const published = Catalog.approveStaged(item.id, chosenSec);
-        if (published) {
-          showToast(`Approved "${item.title}" to ${getPlacementLabel(chosenSec)}!`);
-          renderReviewQueue();
-          renderCatalogList();
-        }
-      });
-
-      // Event: Edit in main form
-      const btnRefine = card.querySelector('.btn-refine-staged');
-      btnRefine.addEventListener('click', () => {
-        titleInput.value = item.title || '';
-        descInput.value = item.description || '';
-        videoUrlInput.value = item.videoUrl || '';
-        artworkUrlInput.value = item.artworkUrl || '';
-        setSelectedPlacement(selectPlacement.value);
-        updateArtworkPreview(item.artworkUrl || '');
-        editIdInput.value = ''; // Will publish as new video
-        formHeading.textContent = `Review Draft: ${item.title}`;
-        editIndicator.textContent = `From Staging Queue`;
-        btnSubmit.innerHTML = '<span>Approve &amp; Publish to Stream</span>';
-
-        // Scroll to form smoothly
-        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        titleInput.focus();
-
-        // Optional: remove from staging once user saves
-        form._stagedIdToDismiss = item.id;
-      });
-
-      // Event: Dismiss draft
-      const btnDismiss = card.querySelector('.btn-dismiss');
-      btnDismiss.addEventListener('click', () => {
-        if (confirm(`Dismiss draft "${item.title}"?`)) {
-          Catalog.rejectStaged(item.id);
-          showToast(`Dismissed draft "${item.title}"`);
-          renderReviewQueue();
-        }
-      });
-
-      stagedContainer.appendChild(card);
-    });
-  }
-
-  // Quick Stage URL Direct prompt
-  if (btnImportStageUrl) {
-    btnImportStageUrl.addEventListener('click', () => {
-      const url = prompt('Enter video stream CDN URL (.mp4 or .m3u8):');
-      if (!url || !url.trim()) return;
-      const title = prompt('Enter video title:', 'Curated Video Stream') || 'Curated Video Stream';
-      const artwork = prompt('Enter artwork cover photo CDN URL (optional):', 'images/pic01.jpg') || 'images/pic01.jpg';
-
-      Catalog.addStaged({
-        title: title.trim(),
-        videoUrl: url.trim(),
-        artworkUrl: artwork.trim(),
-        description: 'Directly staged stream waiting for section review.',
-        author: 'The Unemployed Club'
-      });
-
-      showToast(`Staged "${title}" in Review Queue!`);
-      renderReviewQueue();
-    });
-  }
-
-  // Clear all staged
-  if (btnClearStaging) {
-    btnClearStaging.addEventListener('click', () => {
-      if (confirm('Clear all pending drafts from the review queue?')) {
-        Catalog.clearStaging();
-        showToast('Cleared review queue');
-        renderReviewQueue();
-      }
-    });
-  }
-
-  // ==============================================================
-  // 4. STREAM PREVIEW MODAL
-  // ==============================================================
-  function openStreamPreview(title, streamUrl) {
-    if (!previewModal || !modalVideo) return;
-    modalTitle.textContent = `Preview: ${title}`;
-    previewModal.classList.add('is-open');
-
-    if (modalHls) {
-      modalHls.destroy();
-      modalHls = null;
-    }
-
-    const isHls = streamUrl && streamUrl.includes('.m3u8');
-    if (isHls && window.Hls && Hls.isSupported()) {
-      modalHls = new Hls({ autoStartLoad: true });
-      modalHls.loadSource(streamUrl);
-      modalHls.attachMedia(modalVideo);
-      modalHls.on(Hls.Events.MANIFEST_PARSED, () => {
-        modalVideo.play().catch(() => {});
-      });
-    } else {
-      modalVideo.src = streamUrl;
-      modalVideo.load();
-      modalVideo.play().catch(() => {});
-    }
-  }
-
-  function closeStreamPreview() {
-    if (!previewModal || !modalVideo) return;
-    previewModal.classList.remove('is-open');
-    modalVideo.pause();
-    modalVideo.src = '';
-    if (modalHls) {
-      modalHls.destroy();
-      modalHls = null;
-    }
-  }
-
-  if (btnCloseModal) btnCloseModal.addEventListener('click', closeStreamPreview);
-  if (previewModal) {
-    previewModal.addEventListener('click', (e) => {
-      if (e.target === previewModal) closeStreamPreview();
-    });
-  }
-
-  // ==============================================================
   // 5. MAIN FORM SUBMIT (ADD OR UPDATE)
   // ==============================================================
   form.addEventListener('submit', (e) => {
@@ -376,7 +530,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (editId) {
-      // Update existing
       Catalog.updateVideo(editId, {
         title,
         description: desc,
@@ -387,7 +540,6 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast(`Updated "${title}" successfully`);
       resetForm();
     } else {
-      // Add new
       Catalog.addVideo({
         title,
         description: desc,
@@ -409,6 +561,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     renderCatalogList();
+    switchAdminView('catalog');
   });
 
   if (btnCancel) {
@@ -427,7 +580,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==============================================================
-  // 6. RENDER CATALOG MANAGEMENT LIST
+  // 6==============================================================
+  // 6. RENDERRENDER CATALOGCATALOG MANAGEMENTMANAGEMENT LIST
+  // ==============================================================LIST
   // ==============================================================
   function renderCatalogList() {
     if (!listContainer) return;
@@ -435,7 +590,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let items = Catalog.getAll();
     updateCounts(items);
 
-    // Apply Filter
     if (currentFilter !== 'all') {
       if (currentFilter === 'shorts') {
         items = items.filter(v => v.section === 'shorts' || v.type === 'short');
@@ -444,7 +598,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Apply Search
     const searchVal = searchInput ? searchInput.value.trim().toLowerCase() : '';
     if (searchVal) {
       items = items.filter(v => 
@@ -459,7 +612,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (items.length === 0) {
       listContainer.innerHTML = `
         <div style="padding: 40px; text-align: center; color: var(--color-fg-light); background: var(--bg-card); border: 1px solid var(--color-border);">
-          No videos found for this filter. Click "+ Add Video" above or approve from the Review Queue.
+          No published videos found for this filter.
         </div>
       `;
       return;
@@ -510,10 +663,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const thumb = row.querySelector('.catalog-item-thumb');
       const btnPrev = row.querySelector('.btn-preview-cat');
       const prevHandler = () => openStreamPreview(v.title, v.videoUrl);
-      thumb.addEventListener('click', prevHandler);
-      btnPrev.addEventListener('click', prevHandler);
+      if (thumb) thumb.addEventListener('click', prevHandler);
+      if (btnPrev) btnPrev.addEventListener('click', prevHandler);
 
-      // Event: Move section
       const selectMove = row.querySelector('.select-section-move');
       selectMove.addEventListener('change', (e) => {
         const newSec = e.target.value;
@@ -522,13 +674,12 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCatalogList();
       });
 
-      // Event: Edit
       const btnEdit = row.querySelector('.btn-edit');
       btnEdit.addEventListener('click', () => {
         loadVideoIntoForm(v);
+        switchAdminView('upload');
       });
 
-      // Event: Delete
       const btnDel = row.querySelector('.btn-del');
       btnDel.addEventListener('click', () => {
         if (confirm(`Delete "${v.title}" from catalog?`)) {
@@ -555,7 +706,6 @@ document.addEventListener('DOMContentLoaded', () => {
     editIndicator.textContent = `Editing ID: ${v.id}`;
     btnSubmit.innerHTML = '<span>Save Changes</span>';
 
-    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
     titleInput.focus();
   }
 
@@ -578,9 +728,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (countMid) countMid.textContent = midCount;
     if (countShorts) countShorts.textContent = shortsCount;
     if (countBottom) countBottom.textContent = bottomCount;
+    if (catalogCountPill) catalogCountPill.textContent = allVideos.length;
   }
 
-  // Filter tabs
+  // Filter tabstabs
   document.querySelectorAll('.catalog-tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.catalog-tab-btn').forEach(b => b.classList.remove('is-active'));
@@ -590,12 +741,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Search input filter
   if (searchInput) {
     searchInput.addEventListener('input', renderCatalogList);
   }
 
-  // Zero-Knowledge 1-Click Download for GitHub Pages
+  // Export& Reset
   if (btnExport) {
     btnExport.addEventListener('click', () => {
       const jsContent = Catalog.exportFeedJS();
@@ -613,7 +763,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Reset to defaults
   if (btnReset) {
     btnReset.addEventListener('click', () => {
       if (confirm('Reset catalog back to initial defaults?')) {
@@ -624,7 +773,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Admin Logout
+  // Logout
   const btnLogout = document.getElementById('btn-admin-logout');
   if (btnLogout) {
     btnLogout.addEventListener('click', () => {
@@ -637,7 +786,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Helper labels
   function getPlacementLabel(sec) {
     switch (sec) {
       case 'top': return 'Top 2 Rows';
@@ -671,5 +819,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initial renders
   renderReviewQueue();
-  renderCatalogList();
+  switchAdminView('review');
+  window.renderReviewQueue = renderReviewQueue;
+  window.updateStagingCounts = updateStagingCounts;
 });
