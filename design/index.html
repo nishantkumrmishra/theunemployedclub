@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Unemployed Club</title>
+  <!-- Google Fonts: Manrope Thin -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/components.js"></script>
+</head>
+<body>
+  <!-- Modular Zero-Build Header -->
+  <site-header></site-header>
+
+  <div id="wrapper">
+    <!-- Modular Zero-Build Sidebar -->
+    <site-sidebar active="home"></site-sidebar>
+
+    <!-- Main Content Area: Fluid Full Width Auto Adjust Grid -->
+    <main id="main-content">
+      <!-- Dynamic Content Header with Active Tag Filter Bar -->
+      <div class="content-header-row">
+        <div class="content-header-title">
+          <h2>Featured Videos</h2>
+        </div>
+        <div class="content-tags-bar" id="content-tags-bar">
+          <!-- Populated dynamically from approved video stream tags -->
+        </div>
+      </div>
+
+      <!-- Tier 1: Top 20 Entries Video Grid -->
+      <section class="video-grid" id="video-grid-top">
+        <!-- Rendered dynamically by js/app.js -->
+      </section>
+
+      <!-- Tier 2: First Shorts Shelf -->
+      <section class="shorts-section" id="shorts-section-1">
+        <div class="shorts-header">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e0245e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+            <polygon points="6 3 20 12 6 21 6 3"/>
+          </svg>
+          <h2>Shorts</h2>
+        </div>
+        <div class="shorts-grid" id="shorts-grid-1">
+          <!-- Rendered dynamically by js/app.js -->
+        </div>
+      </section>
+
+      <!-- Tier 3: Curated Video Stream (Mid-Tier) -->
+      <section class="video-grid" id="video-grid-mid">
+        <!-- Rendered dynamically by js/app.js -->
+      </section>
+
+      <!-- Tier 4: Trending Shorts Shelf 2 -->
+      <section class="shorts-section" id="shorts-section-2">
+        <div class="shorts-header">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e0245e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+            <polygon points="6 3 20 12 6 21 6 3"/>
+          </svg>
+          <h2>Trending Shorts</h2>
+        </div>
+        <div class="shorts-grid" id="shorts-grid-2">
+          <!-- Rendered dynamically by js/app.js -->
+        </div>
+      </section>
+
+      <!-- Tier 5: Endless Default Video Feed (Fallback Pool) -->
+      <section class="video-grid" id="video-grid-bottom">
+        <!-- Endless video cards rendered dynamically by js/app.js -->
+      </section>
+      <div id="infinite-sentinel" class="infinite-sentinel"></div>
+      <div id="infinite-loader" class="infinite-loader" style="display: none;">
+        <span>Loading more videos...</span>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/catalog-feed.js"></script>
+  <script src="js/catalog.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

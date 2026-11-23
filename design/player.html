@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Unemployed Club - Player</title>
+  <!-- Google Fonts: Manrope Thin -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js"></script>
+  <script src="js/components.js"></script>
+</head>
+<body class="player-page">
+  <!-- Modular Zero-Build Header -->
+  <site-header></site-header>
+
+  <div id="wrapper">
+    <!-- Modular Zero-Build Sidebar -->
+    <site-sidebar></site-sidebar>
+
+    <!-- Player Viewport Layout -->
+    <main class="player-container">
+      <section class="player-main-col">
+        <!-- 16:9 Video Box arranged for embedding CDN links -->
+        <div class="video-screen-box" id="video-screen-box">
+          <!-- HTML5 Video element configured for CDN stream playback -->
+          <video id="player-video" class="cdn-video-element" poster="images/pic01.jpg" playsinline preload="metadata">
+            <source id="video-source" src="" type="video/mp4" />
+            Your browser does not support HTML5 video playback.
+          </video>
+
+          <!-- Poster & Initial Play Overlay -->
+          <div class="player-screen-overlay" id="screen-overlay">
+            <button class="screen-play-btn" id="play-btn" aria-label="Play Video" title="Play Video">
+              <!-- Lucide: play (20px, 1.25px stroke) -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+                <polygon points="6 3 20 12 6 21 6 3"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Minimal In-Design Controls Bar matching editorial theme -->
+          <div class="player-controls-bar" id="player-controls-bar">
+            <!-- Minimal Scrub Timeline -->
+            <div class="scrub-timeline" id="scrub-timeline" title="Seek timeline">
+              <div class="scrub-progress" id="scrub-progress"></div>
+            </div>
+
+            <!-- Controls row with 20px aligned Lucide icons -->
+            <div class="controls-row">
+              <div class="controls-left">
+                <!-- Play / Pause Button -->
+                <button class="control-btn" id="ctrl-play-btn" aria-label="Play/Pause" title="Play / Pause (Space or K)">
+                  <svg id="icon-play-state" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+                    <polygon points="6 3 20 12 6 21 6 3"/>
+                  </svg>
+                </button>
+
+                <!-- Mute & Volume Slider Group -->
+                <div class="volume-control-group" id="volume-control-group">
+                  <button class="control-btn" id="ctrl-volume-btn" aria-label="Mute/Unmute" title="Mute / Unmute (M)">
+                    <svg id="icon-volume-state" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+                      <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/>
+                      <path d="M16 9a5 5 0 0 1 0 6"/>
+                      <path d="M19.364 18.364a9 9 0 0 0 0-12.728"/>
+                    </svg>
+                  </button>
+                  <div class="volume-slider-wrapper" id="volume-slider-wrapper">
+                    <div class="volume-track-container" id="volume-track-container">
+                      <div class="volume-track-bg">
+                        <div class="volume-track-fill" id="volume-track-fill" style="width: 100%;"></div>
+                        <div class="volume-track-thumb" id="volume-track-thumb" style="left: 100%;"></div>
+                      </div>
+                      <input type="range" class="volume-range-input" id="volume-slider" min="0" max="1" step="0.02" value="1" aria-label="Volume level" title="Volume Slider" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Minimal Time Counter -->
+                <span class="control-time" id="control-time">00:00 / 00:00</span>
+              </div>
+
+              <div class="controls-right">
+                <!-- Picture-in-Picture / Floating Miniplayer Button -->
+                <button class="control-btn" id="ctrl-pip-btn" aria-label="Miniplayer" title="Miniplayer: Return to Home while watching (P)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+                    <rect x="3" y="5" width="18" height="13" rx="0"/>
+                    <rect x="12" y="11" width="7" height="5" rx="0" fill="currentColor" fill-opacity="0.25"/>
+                  </svg>
+                </button>
+
+                <!-- Settings Popover Wrapper -->
+                <div class="settings-control-wrapper" id="settings-control-wrapper">
+                  <button class="control-btn" id="ctrl-settings-btn" aria-label="Settings" title="Playback Settings" aria-haspopup="true" aria-expanded="false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+                      <circle cx="12" cy="12" r="3"/>
+                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                  </button>
+
+                  <!-- Settings Popover Menu -->
+                  <div class="player-settings-menu" id="player-settings-menu" role="menu">
+                    <!-- Main Settings Menu -->
+                    <div class="settings-panel is-active" id="settings-main-panel">
+                      <div class="settings-header">Playback Settings</div>
+                      <button class="settings-row" id="settings-btn-quality" role="menuitem">
+                        <span class="settings-row-label">Quality</span>
+                        <span class="settings-row-value" id="current-quality-label">Auto (720p) &rsaquo;</span>
+                      </button>
+                      <button class="settings-row" id="settings-btn-speed" role="menuitem">
+                        <span class="settings-row-label">Speed</span>
+                        <span class="settings-row-value" id="current-speed-label">Normal &rsaquo;</span>
+                      </button>
+                    </div>
+
+                    <!-- Quality Submenu -->
+                    <div class="settings-panel" id="settings-quality-panel">
+                      <div class="settings-header settings-header-back" id="quality-back-btn">
+                        &lsaquo; Quality
+                      </div>
+                      <div class="settings-options" id="quality-options-list">
+                        <button class="settings-option-btn is-selected" data-quality="auto">Auto <span class="badge-auto-res" id="auto-detected-res">(720p)</span></button>
+                        <button class="settings-option-btn" data-quality="1080p">1080p <span>HD</span></button>
+                        <button class="settings-option-btn" data-quality="720p">720p</button>
+                        <button class="settings-option-btn" data-quality="480p">480p</button>
+                        <button class="settings-option-btn" data-quality="360p">360p</button>
+                      </div>
+                    </div>
+
+                    <!-- Speed Submenu -->
+                    <div class="settings-panel" id="settings-speed-panel">
+                      <div class="settings-header settings-header-back" id="speed-back-btn">
+                        &lsaquo; Playback Speed
+                      </div>
+                      <div class="settings-options" id="speed-options-list">
+                        <button class="settings-option-btn" data-speed="0.5">0.5x</button>
+                        <button class="settings-option-btn" data-speed="0.75">0.75x</button>
+                        <button class="settings-option-btn is-selected" data-speed="1">Normal (1x)</button>
+                        <button class="settings-option-btn" data-speed="1.25">1.25x</button>
+                        <button class="settings-option-btn" data-speed="1.5">1.5x</button>
+                        <button class="settings-option-btn" data-speed="2">2x</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Fullscreen Button -->
+                <button class="control-btn" id="ctrl-fullscreen-btn" aria-label="Fullscreen" title="Fullscreen">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
+                    <path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
+                    <path d="M3 16v3a2 2 0 0 0 2 2h3"/>
+                    <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Video Metadata Area -->
+        <div class="video-meta-box">
+          <h1 id="player-title" class="player-video-title">Vitae sed condimentum</h1>
+          
+          <!-- Subrow: Stats on Left, Aligned Action Buttons on Right -->
+          <div class="player-subrow">
+            <span id="player-date" class="player-stats">October 20, 2015 &bull; 1,420,890 views</span>
+            
+            <div class="player-action-btns">
+              <!-- Lucide: thumbs-up (20px, 1.25px stroke) -->
+              <button class="action-btn-pill" id="btn-like" aria-label="Like Video">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+                  <path d="M7 10v12"/>
+                  <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h3"/>
+                  <path d="M14 10V4.5a2.5 2.5 0 0 0-5 0v1.5"/>
+                </svg>
+                <span>Like (12K)</span>
+              </button>
+
+              <!-- Lucide: share-2 (20px, 1.25px stroke) -->
+              <button class="action-btn-pill" id="btn-share" aria-label="Share Video">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+                  <circle cx="18" cy="5" r="3"/>
+                  <circle cx="6" cy="12" r="3"/>
+                  <circle cx="18" cy="19" r="3"/>
+                  <line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/>
+                  <line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/>
+                </svg>
+                <span>Share</span>
+              </button>
+
+              <!-- Lucide: bookmark (20px, 1.25px stroke) -->
+              <button class="action-btn-pill" id="btn-save" aria-label="Save to Playlist">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                </svg>
+                <span>Save</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Channel / Author Row -->
+          <div class="author-channel-bar">
+            <div class="author-channel-left">
+              <img src="images/avatar.jpg" alt="Channel Avatar" class="channel-avatar" />
+              <div class="channel-info">
+                <h3 class="channel-name" id="player-channel-name">The Unemployed Club</h3>
+                <span class="channel-subs">184,000 subscribers</span>
+              </div>
+            </div>
+            <button class="btn-subscribe" id="btn-subscribe" aria-label="Subscribe to channel">Subscribe</button>
+          </div>
+
+          <!-- Editorial Video Description -->
+          <div class="player-description-box" id="player-description-box">
+            An exploration of minimal editorial aesthetics and atmospheric rhythm. Curated stream matching the classic Future Imperfect philosophy &bull; Zero compression degradation &bull; High fidelity audio pacing.
+          </div>
+        </div>
+      </section>
+
+      <!-- Up Next Column - Generous Editorial Cards (Restored Aesthetic) -->
+      <aside class="player-side-col">
+        <div class="side-col-header">Up Next</div>
+        <div class="related-list" id="related-list"></div>
+      </aside>
+    </main>
+  </div>
+
+  <script src="js/catalog-feed.js"></script>
+  <script src="js/catalog.js"></script>
+  <script src="js/player.js"></script>
+</body>
+</html>

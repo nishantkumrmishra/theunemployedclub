@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upload Video - The Unemployed Club</title>
+  <!-- Google Fonts: Manrope Thin -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/components.js"></script>
+</head>
+<body>
+  <!-- Modular Zero-Build Header -->
+  <site-header></site-header>
+
+  <div id="wrapper">
+    <!-- Modular Zero-Build Sidebar -->
+    <site-sidebar></site-sidebar>
+
+    <!-- Main Content Area: Upload Card -->
+    <main id="main-content">
+      <div class="upload-card">
+        <!-- Form View -->
+        <div id="upload-form-container">
+          <div class="upload-card-header">
+            <h2>Upload Video</h2>
+            <p>Publish video streams or files to The Unemployed Club</p>
+          </div>
+
+          <form class="upload-form" id="video-upload-form">
+            <!-- 1. Preferred Option: Direct Video / Stream URL -->
+            <div class="form-group">
+              <label for="video-url">
+                <span>Video Stream URL</span>
+                <span class="badge-pref">Preferred</span>
+              </label>
+              <input type="url" id="video-url" placeholder="https://cdn.example.com/videos/stream.mp4 or HLS (.m3u8)" />
+              <span class="form-hint">Direct CDN stream, MP4, or media embed link for instant playback.</span>
+            </div>
+
+            <!-- Divider -->
+            <div class="divider-or">or upload local file</div>
+
+            <!-- 2. Drag & Drop File Zone -->
+            <div class="drop-zone" id="drop-zone">
+              <input type="file" id="video-file-input" accept="video/*" />
+              <div class="drop-zone-icon">
+                <!-- Lucide: upload-cloud (24px, 1.5px stroke) -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+                  <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>
+                  <path d="M12 12v9"/>
+                  <path d="m16 16-4-4-4 4"/>
+                </svg>
+              </div>
+              <div class="drop-zone-text">Drag & drop your video file here, or click to browse</div>
+              <div class="drop-zone-hint">Supports MP4, WebM, MOV (up to 2GB)</div>
+              <div class="file-selected-name" id="selected-file-label"></div>
+            </div>
+
+            <!-- 3. Title -->
+            <div class="form-group">
+              <label for="video-title">Video Title *</label>
+              <input type="text" id="video-title" placeholder="Give your video a clean, descriptive title" required />
+            </div>
+
+            <!-- 4. Description -->
+            <div class="form-group">
+              <label for="video-desc">Description</label>
+              <textarea id="video-desc" placeholder="Tell viewers what your video is about..."></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn-upload-submit">Submit Video for Review</button>
+          </form>
+        </div>
+
+        <!-- Submission Success / Review Confirmation Box -->
+        <div class="upload-confirmation-box" id="upload-confirmation-box">
+          <!-- Lucide: check-circle (48px) -->
+          <svg class="confirmation-icon" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          <h2 class="confirmation-title">Thanks for submitting!</h2>
+          <p class="confirmation-msg">Your video submission has been successfully received and placed into the review queue. Our editorial team will review and approve it shortly.</p>
+          <div class="confirmation-actions">
+            <button class="btn-secondary" id="btn-upload-another">Upload Another Video</button>
+            <a href="index.html" class="btn-primary">Go to Home Feed</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/upload.js"></script>
+</body>
+</html>

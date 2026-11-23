@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Unemployed Club - Shorts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+      <link rel="stylesheet" href="css/style.css?v=6.0">
+  <style>
+    /* Exact Responsive 3-Box Stage & Adaptive In-Player Overlay Lock */
+    html, body.page-shorts {
+      height: 100% !important;
+      overflow-y: hidden !important;
+    }
+    .page-shorts #wrapper {
+      min-height: calc(100vh - var(--header-height)) !important;
+      height: calc(100vh - var(--header-height)) !important;
+      overflow: hidden !important;
+    }
+    .page-shorts #main-content,
+    .shorts-main-content {
+      margin-left: var(--sidebar-width) !important;
+      width: calc(100% - var(--sidebar-width)) !important;
+      max-width: none !important;
+      height: calc(100vh - var(--header-height)) !important;
+      min-height: calc(100vh - var(--header-height)) !important;
+      max-height: calc(100vh - var(--header-height)) !important;
+      padding: 6px 20px 18px 12px !important;
+      box-sizing: border-box !important;
+      display: flex !important;
+      align-items: flex-end !important;
+      justify-content: stretch !important;
+      overflow: hidden !important;
+    }
+    body.sidebar-collapsed #main-content {
+      margin-left: 72px !important;
+      width: calc(100% - 72px) !important;
+    }
+    .shorts-stage {
+      display: flex !important;
+      align-items: flex-end !important;
+      justify-content: space-between !important;
+      gap: 22px !important;
+      position: relative !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      height: calc(100vh - var(--header-height) - 16px) !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      box-sizing: border-box !important;
+    }
+    /* 1. Left Box: Video Details (Width: 360px, Height: 130px, anchored bottom-left) */
+    .shorts-info-panel {
+      width: 360px !important;
+      min-width: 360px !important;
+      max-width: 360px !important;
+      height: 130px !important;
+      min-height: 130px !important;
+      max-height: 130px !important;
+      flex: 0 0 360px !important;
+      padding: 14px 18px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      gap: 6px !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
+      background: var(--bg-card) !important;
+      border: 1px solid var(--color-border) !important;
+      border-radius: 0 !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+      margin: 0 !important;
+    }
+    .shorts-info-title {
+      font-size: 1.05rem !important;
+      font-weight: 600 !important;
+      color: var(--color-fg-bold) !important;
+      line-height: 1.3 !important;
+      margin: 0 !important;
+      display: -webkit-box !important;
+      -webkit-line-clamp: 2 !important;
+      -webkit-box-orient: vertical !important;
+      overflow: hidden !important;
+    }
+    .shorts-info-desc {
+      font-size: 0.82rem !important;
+      color: var(--color-fg) !important;
+      line-height: 1.45 !important;
+      margin: 0 !important;
+      display: -webkit-box !important;
+      -webkit-line-clamp: 2 !important;
+      -webkit-box-orient: vertical !important;
+      overflow: hidden !important;
+      word-break: break-word !important;
+    }
+    /* 2. Middle Box: Tall 9:16 Video Player (420px wide, fills top-to-bottom) */
+    .shorts-center-container {
+      display: flex !important;
+      align-items: flex-end !important;
+      justify-content: center !important;
+      position: relative !important;
+      height: 100% !important;
+      flex: 0 0 420px !important;
+      width: 420px !important;
+      margin: 0 !important;
+    }
+    .shorts-screen-box {
+      width: 420px !important;
+      min-width: 420px !important;
+      max-width: 420px !important;
+      height: calc(100vh - var(--header-height) - 18px) !important;
+      max-height: calc(100vh - var(--header-height) - 18px) !important;
+      background: #000000 !important;
+      border: 1px solid var(--color-border) !important;
+      position: relative !important;
+      overflow: hidden !important;
+      border-radius: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: flex-end !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+      box-sizing: border-box !important;
+      margin: 0 !important;
+    }
+    /* 3. Right Box: Comments & Up Next Queue (~480px-540px wide, 380px tall) */
+    .shorts-companion-panel {
+      flex: 1 1 auto !important;
+      max-width: 520px !important;
+      min-width: 380px !important;
+      height: 380px !important;
+      min-height: 380px !important;
+      max-height: calc(100vh - var(--header-height) - 30px) !important;
+      background: var(--bg-card) !important;
+      border: 1px solid var(--color-border) !important;
+      border-radius: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      overflow: hidden !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+      box-sizing: border-box !important;
+      margin: 0 !important;
+    }
+
+    /* In-Player Video Details Overlay */
+    .shorts-player-overlay-info {
+      position: absolute !important;
+      left: 0 !important;
+      bottom: 0 !important;
+      right: 64px !important;
+      padding: 16px 14px 22px 16px !important;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.45) 60%, transparent 100%) !important;
+      display: none;
+      flex-direction: column !important;
+      gap: 8px !important;
+      z-index: 18 !important;
+      pointer-events: none !important;
+      text-align: left !important;
+    }
+    .shorts-player-overlay-info * {
+      pointer-events: auto !important;
+    }
+    .shorts-player-author-row {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+    }
+    .shorts-player-author-avatar {
+      width: 32px !important;
+      height: 32px !important;
+      border-radius: 50% !important;
+      object-fit: cover !important;
+      border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    }
+    .shorts-player-author-name {
+      font-size: 0.88rem !important;
+      font-weight: 600 !important;
+      color: #ffffff !important;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8) !important;
+    }
+    .btn-shorts-subscribe {
+      padding: 4px 12px !important;
+      background: #ffffff !important;
+      color: #111111 !important;
+      font-size: 0.76rem !important;
+      font-weight: 600 !important;
+      border: none !important;
+      cursor: pointer !important;
+      border-radius: 0 !important;
+      transition: opacity 0.15s ease !important;
+    }
+    .btn-shorts-subscribe:hover {
+      opacity: 0.9 !important;
+    }
+    .shorts-player-title {
+      margin: 0 !important;
+      font-size: 0.92rem !important;
+      font-weight: 500 !important;
+      color: #ffffff !important;
+      line-height: 1.35 !important;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8) !important;
+      display: -webkit-box !important;
+      -webkit-line-clamp: 2 !important;
+      -webkit-box-orient: vertical !important;
+      overflow: hidden !important;
+    }
+    .shorts-player-desc {
+      margin: 0 !important;
+      font-size: 0.78rem !important;
+      color: rgba(255, 255, 255, 0.85) !important;
+      line-height: 1.4 !important;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8) !important;
+      display: -webkit-box !important;
+      -webkit-line-clamp: 2 !important;
+      -webkit-box-orient: vertical !important;
+      overflow: hidden !important;
+    }
+    .shorts-player-sound-pill {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      background: rgba(0, 0, 0, 0.4) !important;
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      padding: 4px 10px !important;
+      color: #ffffff !important;
+      font-size: 0.74rem !important;
+      width: fit-content !important;
+      max-width: 100% !important;
+    }
+    .shorts-player-sound-pill svg {
+      flex-shrink: 0 !important;
+      color: var(--color-accent) !important;
+    }
+    .shorts-player-sound-pill span {
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    /* Responsive Adaptation: When screen goes shorter OR narrower */
+    @media screen and (max-height: 740px), screen and (max-width: 1250px) {
+      .shorts-companion-panel {
+        display: none !important;
+      }
+      .shorts-info-panel {
+        display: none !important;
+      }
+      .shorts-stage {
+        justify-content: center !important;
+        gap: 0 !important;
+      }
+      .shorts-center-container {
+        margin: 0 auto !important;
+      }
+      .shorts-screen-box {
+        height: calc(100vh - var(--header-height) - 16px) !important;
+        max-height: calc(100vh - var(--header-height) - 16px) !important;
+        width: min(420px, calc((100vh - var(--header-height) - 16px) * 9 / 16)) !important;
+        min-width: 0 !important;
+      }
+      .shorts-player-overlay-info {
+        display: flex !important;
+      }
+    }
+  
+    /* Under-Construction Notice on Video Player */
+    .shorts-player-construction-banner {
+      position: absolute !important;
+      top: 14px !important;
+      left: 14px !important;
+      right: 14px !important;
+      z-index: 35 !important;
+      padding: 8px 12px !important;
+      background: rgba(18, 18, 18, 0.78) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      border: 1px solid rgba(46, 186, 174, 0.45) !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      font-size: 0.75rem !important;
+      color: #ffffff !important;
+      pointer-events: auto !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+      letter-spacing: 0.01em !important;
+      transition: all 0.2s ease !important;
+    }
+    .shorts-player-construction-banner svg {
+      color: var(--color-accent) !important;
+      flex-shrink: 0 !important;
+    }
+    .shorts-player-construction-banner.notice-flash {
+      border-color: var(--color-accent) !important;
+      background: rgba(46, 186, 174, 0.3) !important;
+      transform: scale(1.02) !important;
+    }
+    .shorts-playback-toast {
+      position: absolute !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) scale(0.95) !important;
+      background: rgba(18, 18, 18, 0.94) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+      border: 1px solid var(--color-accent) !important;
+      padding: 12px 18px !important;
+      color: #ffffff !important;
+      font-size: 0.8rem !important;
+      text-align: center !important;
+      z-index: 50 !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+      max-width: 82% !important;
+    }
+    .shorts-playback-toast.is-active {
+      opacity: 1 !important;
+      transform: translate(-50%, -50%) scale(1) !important;
+    }
+  </style>
+  <script src="js/components.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7/dist/hls.min.js"></script>
+</head>
+<body class="page-shorts">
+  <!-- Modular Zero-Build Header -->
+  <site-header></site-header>
+
+  <div id="wrapper">
+    <!-- Modular Zero-Build Sidebar -->
+    <site-sidebar active="shorts"></site-sidebar>
+
+    <!-- Main Content Area: 3-Box Shorts Stage (Exact Layout & Sizing from User Annotated Screenshot) -->
+    <main id="main-content" class="shorts-main-content">
+      <div class="shorts-stage" id="shorts-stage">
+
+        <!-- 1. Left Box: Video Title & Description Only (Sits at Bottom-Left, Width 370px, Height 130px) -->
+        <aside class="shorts-info-panel" id="shorts-info-panel">
+          <h2 class="shorts-info-title" id="shorts-info-title">
+            Everyday minimalism in editorial design
+          </h2>
+          <div class="shorts-info-desc" id="shorts-info-desc">
+            How clean spacing and typography make all the difference in under 60 seconds.
+          </div>
+        </aside>
+
+        <!-- 2. Middle Box: Tall 9:16 Video Player with Translucent Dynamic Actions & Bottom Hover Scrubber -->
+        <div class="shorts-center-container">
+          <div class="shorts-screen-box" id="shorts-box" style="cursor: pointer;">
+            <!-- Under-Construction Notice Banner at Top of Player -->
+            <div class="shorts-player-construction-banner" id="shorts-player-construction-banner" title="Shorts player is currently under construction">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <span>Shorts player is currently under construction</span>
+            </div>
+
+            <!-- Under-Construction Playback Toast Notification -->
+            <div class="shorts-playback-toast" id="shorts-playback-toast">
+              <span>Shorts player is currently under construction. Preview stream active.</span>
+            </div>
+
+            <!-- Video element ready for CDN stream or local loop -->
+            <video id="shorts-video" class="shorts-video-element" poster="images/pic03.jpg" playsinline loop preload="metadata" muted>
+              Your browser does not support HTML5 video playback.
+            </video>
+
+            <!-- Click to play/pause overlay -->
+            <div class="shorts-overlay-play" id="shorts-play-overlay">
+              <button class="shorts-screen-play-btn" id="shorts-screen-play-btn" aria-label="Play Short">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="6 3 20 12 6 21 6 3"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Vertical Action Toolbar on the Right Edge of Video (Translucent Frosted Glass) -->
+            <div class="shorts-actions-column">
+              <!-- Like -->
+              <div class="shorts-action-item">
+                <button class="shorts-action-btn" id="btn-short-like" aria-label="Like Short">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 10v12"/>
+                    <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h3"/>
+                    <path d="M14 10V4.5a2.5 2.5 0 0 0-5 0v1.5"/>
+                  </svg>
+                </button>
+                <span class="shorts-action-count" id="shorts-like-count">42K</span>
+              </div>
+
+              <!-- Dislike -->
+              <div class="shorts-action-item">
+                <button class="shorts-action-btn" id="btn-short-dislike" aria-label="Dislike Short">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 14V2"/>
+                    <path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-3"/>
+                    <path d="M10 14v5.5a2.5 2.5 0 0 0 5 0V18"/>
+                  </svg>
+                </button>
+                <span class="shorts-action-count">Dislike</span>
+              </div>
+
+              <!-- Comment Button -->
+              <div class="shorts-action-item">
+                <button class="shorts-action-btn" id="btn-short-comment" aria-label="Open Comments">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                </button>
+                <span class="shorts-action-count" id="shorts-comment-count">0</span>
+              </div>
+
+              <!-- Share Button -->
+              <div class="shorts-action-item">
+                <button class="shorts-action-btn" id="btn-short-share" aria-label="Share Short">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="18" cy="5" r="3"/>
+                    <circle cx="6" cy="12" r="3"/>
+                    <circle cx="18" cy="19" r="3"/>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                  </svg>
+                </button>
+                <span class="shorts-action-count">Share</span>
+              </div>
+
+              <!-- Volume Control Button with Flyout Slider -->
+              <div class="shorts-action-item shorts-volume-container" id="shorts-volume-wrapper">
+                <button class="shorts-action-btn" id="btn-short-volume" aria-label="Mute / Unmute Short">
+                  <svg id="shorts-vol-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/>
+                    <line x1="22" x2="16" y1="9" y2="15"/>
+                    <line x1="16" x2="22" y1="9" y2="15"/>
+                  </svg>
+                </button>
+                <div class="shorts-volume-slider-box" id="shorts-volume-slider-box">
+                  <input type="range" class="shorts-vol-slider" id="shorts-volume-slider" min="0" max="1" step="0.02" value="0.8" aria-label="Volume level" />
+                  <span class="shorts-vol-pct" id="shorts-vol-pct">80%</span>
+                </div>
+              </div>
+
+              <!-- Prev/Next Up/Down Navigation Arrows -->
+              <div class="shorts-nav-arrows">
+                <button class="btn-short-arrow" id="btn-short-prev" aria-label="Previous Short" title="Previous Short (Up Arrow / Scroll Up)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m18 15-6-6-6 6"/>
+                  </svg>
+                </button>
+                <button class="btn-short-arrow" id="btn-short-next" aria-label="Next Short" title="Next Short (Down Arrow / Scroll Down)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m6 9 6 6 6-6"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+                        <!-- In-Player Video Details Overlay (Appears directly inside the video player when screen is shorter / compact) -->
+            <div class="shorts-player-overlay-info" id="shorts-player-overlay-info">
+              <div class="shorts-player-author-row">
+                <img src="images/avatar.jpg" alt="Author avatar" class="shorts-player-author-avatar" id="shorts-player-avatar" />
+                <span class="shorts-player-author-name" id="shorts-player-author">@theunemployedclub</span>
+                <button type="button" class="btn-shorts-subscribe" id="btn-shorts-subscribe">Subscribe</button>
+              </div>
+              <h3 class="shorts-player-title" id="shorts-player-title">Everyday minimalism in editorial design</h3>
+              <p class="shorts-player-desc" id="shorts-player-desc">How clean spacing and typography make all the difference in under 60 seconds.</p>
+              <div class="shorts-player-sound-pill" id="shorts-player-sound">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 18V5l12-2v13"/>
+                  <circle cx="6" cy="18" r="3"/>
+                  <circle cx="18" cy="16" r="3"/>
+                </svg>
+                <span id="shorts-player-sound-title">The Unemployed Club • Original Sound</span>
+              </div>
+            </div>
+
+            <!-- Bottom Hover Controls: Scrubber Timeline Bar (Only shows when user hovered) -->
+            <div class="shorts-hover-controls" id="shorts-hover-controls">
+              <div class="shorts-scrubber-track" id="shorts-scrubber-track" role="slider" aria-label="Seek video">
+                <div class="shorts-scrubber-buffered" id="shorts-scrubber-buffered"></div>
+                <div class="shorts-scrubber-fill" id="shorts-scrubber-fill"></div>
+                <div class="shorts-scrubber-handle" id="shorts-scrubber-handle"></div>
+              </div>
+              <div class="shorts-hover-controls-row">
+                <div class="shorts-hover-left">
+                  <button type="button" class="shorts-mini-ctrl-btn" id="shorts-mini-play-btn" aria-label="Toggle Play">
+                    <svg id="shorts-mini-play-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                  </button>
+                  <div class="shorts-time-display">
+                    <span id="shorts-current-time">0:00</span> / <span id="shorts-duration">0:00</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slim persistent bottom progress line (when not hovering) -->
+            <div class="shorts-timeline-progress" id="shorts-timeline-progress">
+              <div class="shorts-progress-bar" id="shorts-progress-bar"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Right Box: Comments & Up Next Queue (Sits at Bottom-Right, Width 530px, Height 275px) -->
+        <aside class="shorts-companion-panel" id="shorts-companion-panel">
+          <div class="shorts-tabs-header">
+            <button class="shorts-tab-btn is-active" id="tab-btn-comments" data-tab="comments">
+              Comments (0)
+            </button>
+            <button class="shorts-tab-btn" id="tab-btn-queue" data-tab="queue">
+              Up Next (14)
+            </button>
+          </div>
+
+          <!-- Tab 1: Comments -->
+          <div class="shorts-tab-content is-active" id="tab-content-comments">
+            <!-- Under Construction Notice -->
+            <div class="comment-construction-notice" id="comment-notice">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <span>Community comments are currently under construction. Live discussions are launching soon.</span>
+            </div>
+
+            <div class="shorts-comment-input-row">
+              <img src="images/avatar.jpg" alt="User Avatar" class="comment-author-avatar" />
+              <div class="comment-input-box">
+                <input type="text" id="new-comment-input" placeholder="Comments under construction..." />
+                <button class="btn-post-comment" id="btn-post-comment">Post</button>
+              </div>
+            </div>
+            <ul class="shorts-comments-list" id="comments-list"></ul>
+          </div>
+
+          <!-- Tab 2: Up Next Queue -->
+          <div class="shorts-tab-content" id="tab-content-queue">
+            <ul class="shorts-queue-list" id="shorts-queue-list"></ul>
+          </div>
+        </aside>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="js/catalog-feed.js"></script>
+  <script src="js/catalog.js"></script>
+  <script src="js/shorts.js"></script>
+</body>
+</html>

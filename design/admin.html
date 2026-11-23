@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Studio - The Unemployed Club</title>
+  <!-- Google Fonts: Manrope Thin -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js"></script>
+  <script src="js/components.js"></script>
+  <script>
+    // Strict authentication guard for Admin Studio
+    try {
+      const q = new URLSearchParams(window.location.search);
+      if (q.get('auth') === 'admin' || q.get('preview') === 'admin') {
+        sessionStorage.setItem('tuc_admin_auth', 'true');
+        localStorage.setItem('tuc_admin_auth', 'true');
+      }
+      var isAuth = sessionStorage.getItem('tuc_admin_auth') === 'true' || localStorage.getItem('tuc_admin_auth') === 'true';
+      if (!isAuth) {
+        window.location.replace('login.html?notice=admin_required');
+      }
+    } catch(e) {}
+  </script>
+
+  <style>
+    /* Admin specific helper styles matching exact site rules */
+    .admin-update-banner {
+      background: var(--bg-card);
+      border: solid 1px var(--color-border);
+      border-left: 4px solid var(--color-accent);
+      padding: 16px 22px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .admin-banner-info h3 {
+      font-size: 1.05rem;
+      color: var(--color-fg-bold);
+      margin-bottom: 4px;
+      font-weight: 400 !important;
+    }
+    .admin-banner-info p {
+      font-size: 0.82rem;
+      color: var(--color-fg);
+      max-width: 680px;
+      line-height: 1.5;
+    }
+    .admin-banner-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    /* Studio Main View Tabs */
+    .admin-view-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 22px;
+      border-bottom: solid 1px var(--color-border);
+      padding-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .admin-view-tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      background: var(--bg-card);
+      border: solid 1px var(--color-border);
+      color: var(--color-fg-bold);
+      font-size: 0.85rem;
+      cursor: pointer;
+      border-radius: 0 !important;
+      transition: all 0.15s ease;
+    }
+    .admin-view-tab-btn:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+    .admin-view-tab-btn.is-active {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+      color: #ffffff;
+    }
+    .staged-badge-count {
+      background: #f59e0b;
+      color: #ffffff;
+      padding: 2px 7px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.4px;
+      border-radius: 0 !important;
+    }
+    .admin-view-tab-btn.is-active .staged-badge-count {
+      background: #ffffff;
+      color: #1e1e24;
+    }
+    .count-pill {
+      background: rgba(160, 160, 160, 0.15);
+      color: var(--color-fg-bold);
+      padding: 2px 7px;
+      font-size: 0.72rem;
+      border-radius: 0 !important;
+    }
+    .admin-view-tab-btn.is-active .count-pill {
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+    }
+
+    /* Sequential 1-by-1 Review Deck Styles */
+    .deck-status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 18px;
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .deck-counter-label {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--color-fg-bold);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .deck-nav-btn {
+      height: 32px;
+      padding: 0 12px;
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      color: var(--color-fg-bold);
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 0 !important;
+      transition: all 0.15s ease;
+    }
+    .deck-nav-btn:hover:not(:disabled) {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+    .deck-nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .deck-card-container {
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      border-left: 4px solid var(--color-accent);
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 28px;
+      padding: 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+      margin-bottom: 24px;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .deck-media-col {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .deck-player-box {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000000;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+    }
+    .deck-player-box.is-vertical {
+      aspect-ratio: 9 / 14;
+      max-width: 280px;
+      margin: 0 auto;
+    }
+    .deck-player-box video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .deck-badges-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .deck-badge-pill {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      background: rgba(160, 160, 160, 0.12);
+      border: 1px solid var(--color-border);
+      color: var(--color-fg-bold);
+    }
+    .deck-badge-pill.is-live {
+      background: rgba(46, 186, 174, 0.12);
+      border-color: rgba(46, 186, 174, 0.35);
+      color: var(--color-accent);
+    }
+    .deck-thumb-preview-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      background: rgba(160, 160, 160, 0.05);
+      border: 1px solid var(--color-border);
+    }
+    .deck-thumb-preview-box img {
+      width: 72px;
+      height: 48px;
+      object-fit: cover;
+      display: block;
+      border: 1px solid var(--color-border);
+    }
+
+    .deck-form-col {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .deck-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .deck-field-group label {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--color-fg-bold);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .auto-detected-tag {
+      font-size: 0.7rem;
+      color: #b45309;
+      background: rgba(245, 158, 11, 0.15);
+      padding: 2px 7px;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .deck-input-text {
+      height: 38px;
+      padding: 0 12px;
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      font-size: 0.86rem;
+      color: var(--color-fg-bold);
+      outline: none;
+      width: 100%;
+      border-radius: 0 !important;
+    }
+    .deck-input-text:focus {
+      border-color: var(--color-accent);
+    }
+    .deck-select {
+      height: 40px;
+      padding: 0 12px;
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      font-size: 0.86rem;
+      color: var(--color-fg-bold);
+      outline: none;
+      width: 100%;
+      cursor: pointer;
+      border-radius: 0 !important;
+    }
+    .deck-textarea {
+      padding: 10px 12px;
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      font-size: 0.82rem;
+      color: var(--color-fg-bold);
+      outline: none;
+      width: 100%;
+      resize: vertical;
+      min-height: 64px;
+      border-radius: 0 !important;
+    }
+    .deck-textarea:focus {
+      border-color: var(--color-accent);
+    }
+    .deck-tag-quick-bar {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    .deck-tag-chip {
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      background: rgba(160, 160, 160, 0.1);
+      border: 1px solid var(--color-border);
+      color: var(--color-fg);
+      cursor: pointer;
+    }
+    .deck-tag-chip:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+
+    .deck-action-bar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 10px;
+      padding-top: 16px;
+      border-top: 1px solid var(--color-border);
+    }
+    .btn-deck-dismiss {
+      height: 42px;
+      padding: 0 18px;
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      color: #b91c1c;
+      font-size: 0.84rem;
+      cursor: pointer;
+      border-radius: 0 !important;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-deck-dismiss:hover {
+      background: #fee2e2;
+      border-color: #ef4444;
+    }
+    .btn-deck-approve {
+      height: 42px;
+      padding: 0 24px;
+      background: var(--color-accent);
+      border: 1px solid var(--color-accent);
+      color: #ffffff;
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 0 !important;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: opacity 0.15s ease;
+    }
+    .btn-deck-approve:hover {
+      opacity: 0.9;
+    }
+
+    /* Review Deck Duplicate Detection Banner */
+    .deck-duplicate-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-left: 4px solid #ef4444;
+      padding: 12px 18px;
+      margin-bottom: 16px;
+      border-radius: 0;
+      box-sizing: border-box;
+    }
+    .deck-duplicate-banner.hidden {
+      display: none !important;
+    }
+    .duplicate-banner-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .duplicate-banner-icon {
+      color: #ef4444;
+      flex-shrink: 0;
+    }
+    .duplicate-banner-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #991b1b;
+      letter-spacing: 0.04em;
+      margin-bottom: 2px;
+    }
+    .duplicate-banner-desc {
+      font-size: 0.8rem;
+      color: #7f1d1d;
+      line-height: 1.4;
+    }
+
+    /* Deck Empty State */
+    .deck-empty-state {
+      padding: 60px 24px;
+      text-align: center;
+      background: #ffffff;
+      border: 1px dashed var(--color-border);
+      margin-bottom: 24px;
+    }
+    .deck-empty-state h3 {
+      font-size: 1.25rem;
+      color: var(--color-fg-bold);
+      margin-bottom: 6px;
+      font-weight: 400;
+    }
+    .deck-empty-state p {
+      font-size: 0.85rem;
+      color: var(--color-fg-light);
+      margin: 0;
+    }
+
+    /* Compact Catalog Table Layout */
+    .catalog-table-wrap {
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      overflow-x: auto;
+      margin-bottom: 24px;
+    }
+    .catalog-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      text-align: left;
+    }
+    .catalog-table th {
+      background: rgba(160, 160, 160, 0.08);
+      padding: 12px 14px;
+      font-weight: 500;
+      color: var(--color-fg-bold);
+      border-bottom: 1px solid var(--color-border);
+      white-space: nowrap;
+    }
+    .catalog-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--color-border);
+      vertical-align: middle;
+      color: var(--color-fg);
+    }
+    .catalog-table tr:hover td {
+      background: rgba(46, 186, 174, 0.03);
+    }
+    .catalog-thumb-cell {
+      width: 76px;
+      position: relative;
+      cursor: pointer;
+    }
+    .catalog-thumb-cell img {
+      width: 72px;
+      height: 44px;
+      object-fit: cover;
+      display: block;
+      border: 1px solid var(--color-border);
+    }
+    .catalog-thumb-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 72px; height: 44px;
+      background: rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      color: #fff;
+    }
+    .catalog-thumb-cell:hover .catalog-thumb-overlay {
+      opacity: 1;
+    }
+    .catalog-title-link {
+      font-weight: 500;
+      color: var(--color-fg-bold);
+      text-decoration: none;
+      cursor: pointer;
+      display: block;
+      max-width: 320px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .catalog-title-link:hover {
+      color: var(--color-accent);
+    }
+    .shelf-badge-pill {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border: 1px solid var(--color-border);
+      background: rgba(160,160,160,0.08);
+      white-space: nowrap;
+      color: var(--color-fg-bold);
+    }
+    .shelf-badge-pill.shelf-top20 {
+      border-color: rgba(46, 186, 174, 0.4);
+      background: rgba(46, 186, 174, 0.08);
+      color: var(--color-accent);
+    }
+    .shelf-badge-pill.shelf-shorts1, .shelf-badge-pill.shelf-shorts2 {
+      border-color: rgba(224, 36, 94, 0.4);
+      background: rgba(224, 36, 94, 0.08);
+      color: #e0245e;
+    }
+    .shelf-badge-pill.shelf-mid {
+      border-color: rgba(59, 130, 246, 0.4);
+      background: rgba(59, 130, 246, 0.08);
+      color: #2563eb;
+    }
+    .tag-chip-sm {
+      display: inline-block;
+      font-size: 0.68rem;
+      padding: 1px 6px;
+      background: rgba(160, 160, 160, 0.1);
+      border: 1px solid var(--color-border);
+      margin-right: 4px;
+      margin-bottom: 2px;
+      white-space: nowrap;
+    }
+    .table-action-btn {
+      height: 30px;
+      padding: 0 10px;
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      font-size: 0.76rem;
+      color: var(--color-fg-bold);
+      cursor: pointer;
+      border-radius: 0 !important;
+      margin-right: 4px;
+      transition: all 0.15s ease;
+    }
+    .table-action-btn:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+    .table-action-btn.btn-del:hover {
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+
+    /* Slide-out Edit Drawer */
+    .edit-drawer-backdrop {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.5);
+      z-index: 9998;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .edit-drawer-backdrop.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .edit-drawer-panel {
+      position: fixed;
+      top: 0; right: 0; width: 540px; max-width: 95vw; height: 100vh;
+      background: #ffffff;
+      z-index: 9999;
+      box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .edit-drawer-backdrop.is-open .edit-drawer-panel {
+      transform: translateX(0);
+    }
+    .edit-drawer-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .edit-drawer-body {
+      padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .edit-drawer-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      background: #fafafa;
+    }
+
+    /* Shelves & Tags Metric Grid */
+    .shelves-metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .shelf-stat-card {
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      padding: 18px 20px;
+    }
+    .shelf-stat-card h4 {
+      font-size: 0.85rem;
+      color: var(--color-fg-light);
+      font-weight: 400;
+      margin-bottom: 8px;
+    }
+    .shelf-stat-card .stat-number {
+      font-size: 1.6rem;
+      font-weight: 300;
+      color: var(--color-fg-bold);
+    }
+
+    /* Stream Preview Modal */
+    .stream-preview-backdrop {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .stream-preview-backdrop.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .stream-preview-modal {
+      background: #ffffff;
+      width: 90%;
+      max-width: 820px;
+      border: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+    }
+    .stream-preview-modal-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .stream-preview-modal-body {
+      background: #000000;
+      aspect-ratio: 16 / 9;
+      width: 100%;
+      position: relative;
+    }
+    .stream-preview-modal-body video {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    @media screen and (max-width: 960px) {
+      .deck-card-container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Modular Zero-Build Header -->
+  <site-header></site-header>
+
+  <div id="wrapper">
+    <!-- Simplified Modular Sidebar -->
+    <site-sidebar mode="admin" active="review"></site-sidebar>
+
+    <!-- Main Content Area -->
+    <main id="main-content">
+      
+      <div class="content-header">
+        <h2>Content Admin Studio</h2>
+        <p>Curate, review, and organize video streams across website sections</p>
+      </div>
+
+      <!-- Zero-Technical-Knowledge GitHub Update Banner -->
+      <div class="admin-update-banner">
+        <div class="admin-banner-info">
+          <h3>Zero-Knowledge 1-Click Update for GitHub</h3>
+          <p>
+            When you approve or edit videos below, they save instantly to your browser. To push updates live to <strong>GitHub Pages</strong> for all visitors, click <strong>Download Catalog File</strong> and drag the single file into your GitHub repo's <code>js/</code> folder. Done!
+          </p>
+        </div>
+        <div class="admin-banner-actions">
+          <button class="btn-primary" id="btn-export-feed" title="Download updated catalog-feed.js">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Download Catalog File</span>
+          </button>
+          <button class="btn-secondary" id="btn-reset-catalog" title="Reset to default feed">Reset</button>
+          <button class="btn-secondary" id="btn-admin-logout" title="Sign out of Admin Studio" style="border-color: #fecaca; color: #b91c1c;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span>Sign Out</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Studio Primary View Navigation Tabs -->
+      <div class="admin-view-tabs">
+        <button class="admin-view-tab-btn is-active" data-view="review" id="tab-nav-review">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span>Review Deck</span>
+          <span class="staged-badge-count" id="tab-review-count">0</span>
+        </button>
+
+        <button class="admin-view-tab-btn" data-view="catalog" id="tab-nav-catalog">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Videos Catalog</span>
+          <span class="count-pill" id="tab-catalog-count">0</span>
+        </button>
+
+        <button class="admin-view-tab-btn" data-view="shelves" id="tab-nav-shelves">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          <span>Tags &amp; Shelves</span>
+        </button>
+
+        <button class="admin-view-tab-btn" data-view="upload" id="tab-nav-upload">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>+ Upload Video</span>
+        </button>
+      </div>
+
+      <!-- ============================================================== -->
+      <!-- VIEW 1: SEQUENTIAL 1-BY-1 REVIEW DECK -->
+      <!-- ============================================================== -->
+      <section class="admin-view-pane is-active" id="view-review-pane">
+        
+        <!-- Deck Status & Navigation Bar -->
+        <div class="deck-status-bar">
+          <div class="deck-counter-label">
+            <span>Draft</span>
+            <span id="deck-current-num" style="color: var(--color-accent); font-weight: 600;">1</span>
+            <span>of</span>
+            <span id="deck-total-num">0</span>
+            <span>Pending Review</span>
+          </div>
+
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="deck-nav-btn" id="btn-deck-prev" title="Previous draft">
+              &larr; Prev
+            </button>
+            <button class="deck-nav-btn" id="btn-deck-next" title="Next draft">
+              Next &rarr;
+            </button>
+            <span style="color: var(--color-border); margin: 0 4px;">|</span>
+            <button class="deck-nav-btn" id="btn-import-stage-url" style="color: var(--color-accent);">
+              + Stage URL
+            </button>
+            <button class="deck-nav-btn" id="btn-clear-staging" style="color: #b91c1c;">
+              Clear All
+            </button>
+          </div>
+        </div>
+
+        <!-- Duplicate Detection Warning Banner -->
+        <div id="deck-duplicate-banner" class="deck-duplicate-banner hidden">
+          <div class="duplicate-banner-content">
+            <svg class="duplicate-banner-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <div class="duplicate-banner-text">
+              <div class="duplicate-banner-title">Duplicate Content Detected</div>
+              <div id="deck-duplicate-desc" class="duplicate-banner-desc">This video stream is already present in the catalog.</div>
+            </div>
+          </div>
+          <div class="duplicate-banner-actions">
+            <button type="button" id="btn-deck-delete-duplicate" class="btn btn-sm" style="background: #ef4444; color: #fff; border: 1px solid #dc2626; border-radius: 0; padding: 6px 14px; font-size: 0.78rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+              <span>Delete Duplicate Draft</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- The 1-Item Sequential Review Deck Card -->
+        <div class="deck-card-container" id="deck-card">
+          <!-- Left: Media Player Box -->
+          <div class="deck-media-col">
+            <div class="deck-player-box" id="deck-player-box">
+              <video id="deck-video-player" playsinline controls></video>
+            </div>
+
+            <div class="deck-badges-row">
+              <span class="deck-badge-pill is-live" id="deck-stream-type">Direct Stream</span>
+              <span class="deck-badge-pill" id="deck-aspect-badge">16:9 Landscape</span>
+            </div>
+
+            <div class="deck-thumb-preview-box">
+              <img id="deck-thumb-img" src="images/pic01.jpg" alt="Thumbnail" />
+              <div style="flex: 1;">
+                <label style="font-size: 0.72rem; color: var(--color-fg-light); display: block; margin-bottom: 2px;">Artwork Thumbnail URL:</label>
+                <input type="text" id="deck-thumb-input" class="deck-input-text" style="height: 32px; font-size: 0.78rem;" placeholder="https://..." />
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Inline Edit Form -->
+          <div class="deck-form-col">
+            <div class="deck-field-group">
+              <label for="deck-title-input">Video Title (Click to edit):</label>
+              <input type="text" id="deck-title-input" class="deck-input-text" style="font-size: 0.95rem; font-weight: 500;" placeholder="Enter video title..." />
+            </div>
+
+            <div class="deck-field-group">
+              <label for="deck-section-select">
+                <span>Destination Shelf:</span>
+                <span class="auto-detected-tag" id="deck-autodetect-badge">Auto-Detected: Shorts Shelf 1</span>
+              </label>
+              <select id="deck-section-select" class="deck-select">
+                <option value="top20">Top 20 Entries (Featured Grid)</option>
+                <option value="shorts1">Shorts Shelf 1 (9:14 Vertical)</option>
+                <option value="mid">Curated Video Stream (Mid-Tier)</option>
+                <option value="shorts2">Trending Shorts Shelf 2 (9:14 Vertical)</option>
+                <option value="default">Endless Default Video Feed (Fallback Pool)</option>
+              </select>
+            </div>
+
+            <div class="deck-field-group">
+              <label for="deck-tags-input">Content Tags (Comma-separated):</label>
+              <input type="text" id="deck-tags-input" class="deck-input-text" placeholder="e.g. Tokyo, Drift, Nightlife, 4K" />
+              <div class="deck-tag-quick-bar" id="deck-tag-quick-bar">
+                <!-- Dynamically populated chips of existing tags for 1-click addition -->
+              </div>
+            </div>
+
+            <div class="deck-field-group">
+              <label for="deck-desc-input">Description:</label>
+              <textarea id="deck-desc-input" class="deck-textarea" placeholder="Editorial description..."></textarea>
+            </div>
+
+            <div style="font-size: 0.75rem; color: var(--color-fg-light); margin-top: 4px; display: flex; gap: 10px; flex-wrap: wrap;">
+              <span>Staged: <span id="deck-staged-date">Recent</span></span>
+              <span>&bull;</span>
+              <a id="deck-source-link" href="#" target="_blank" style="color: var(--color-accent); text-decoration: none;">Original Source</a>
+            </div>
+
+            <!-- Bottom Action Rail -->
+            <div class="deck-action-bar">
+              <button class="btn-deck-dismiss" id="btn-deck-dismiss" title="Permanently delete this draft and show next">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <span>Dismiss &amp; Discard</span>
+              </button>
+
+              <button class="btn-deck-approve" id="btn-deck-approve" title="Save to public catalog and immediately show next draft">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Approve &amp; Advance to Next &rarr;</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clean Empty State when 0 Drafts Pending -->
+        <div class="deck-empty-state" id="deck-empty-state" style="display: none;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 14px;">
+            <circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/>
+          </svg>
+          <h3>All Caught Up!</h3>
+          <p>There are currently zero video drafts waiting in the review queue.</p>
+          <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+            <button class="btn-primary" id="btn-empty-stage">
+              + Stage URL Directly
+            </button>
+            <button class="btn-secondary" id="btn-empty-catalog">
+              Browse Videos Catalog
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- VIEW 2: COMPACT CATALOG TABLE & INLINE EDIT DRAWER -->
+      <!-- ============================================================== -->
+      <section class="admin-view-pane" id="view-catalog-pane" style="display: none;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h3 style="font-size: 1.15rem; color: var(--color-fg-bold); margin-bottom: 4px; font-weight: 400;">
+              Published Catalog Stream (<span id="total-catalog-count">0</span> Videos)
+            </h3>
+            <p style="font-size: 0.8rem; color: var(--color-fg-light); margin: 0;">
+              Click any title to edit inside content, click thumbnail to preview stream, or re-route between shelves.
+            </p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-secondary" id="btn-purge-placeholders" style="font-size: 0.78rem; height: 34px;">
+              Purge Demo Placeholders
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Tabs & Quick Search -->
+        <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; justify-content: space-between; align-items: center;">
+          <div class="catalog-filter-tabs" style="display: flex; gap: 6px; overflow-x: auto; margin-bottom: 0;">
+            <button class="catalog-tab-btn is-active" data-filter="all">All (<span id="count-all">0</span>)</button>
+            <button class="catalog-tab-btn" data-filter="top20">Top 20 Entries (<span id="count-top20">0</span>)</button>
+            <button class="catalog-tab-btn" data-filter="shorts1">Shorts Shelf 1 (<span id="count-shorts1">0</span>)</button>
+            <button class="catalog-tab-btn" data-filter="mid">Curated Mid (<span id="count-mid">0</span>)</button>
+            <button class="catalog-tab-btn" data-filter="shorts2">Trending Shorts 2 (<span id="count-shorts2">0</span>)</button>
+            <button class="catalog-tab-btn" data-filter="default">Endless Default (<span id="count-default">0</span>)</button>
+          </div>
+          <div style="min-width: 240px;">
+            <input type="text" id="catalog-search-input" placeholder="Search title or tag..." style="height: 34px; padding: 0 10px; font-size: 0.8rem; border: 1px solid var(--color-border); background: #ffffff; width: 100%; outline: none;" />
+          </div>
+        </div>
+
+        <!-- High-Density Table Layout -->
+        <div class="catalog-table-wrap">
+          <table class="catalog-table" id="catalog-table">
+            <thead>
+              <tr>
+                <th style="width: 80px;">Thumbnail</th>
+                <th>Title</th>
+                <th style="width: 140px;">Destination Shelf</th>
+                <th style="width: 90px;">Type</th>
+                <th>Tags</th>
+                <th style="width: 160px; text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="catalog-table-body">
+              <!-- Dynamically populated by js/admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- VIEW 3: TAGS & SHELVES OVERVIEW -->
+      <!-- ============================================================== -->
+      <section class="admin-view-pane" id="view-shelves-pane" style="display: none;">
+        <div class="content-header" style="margin-bottom: 20px;">
+          <h3>Shelves &amp; Dynamic Content Tags</h3>
+          <p>Overview of the 5-tier editorial architecture and active content tag cloud</p>
+        </div>
+
+        <div class="shelves-metric-grid" id="shelves-metric-grid">
+          <div class="shelf-stat-card">
+            <h4>Tier 1: Top 20 Entries</h4>
+            <div class="stat-number" id="stat-count-top20">0 / 20</div>
+          </div>
+          <div class="shelf-stat-card">
+            <h4>Tier 2: Shorts Shelf 1</h4>
+            <div class="stat-number" id="stat-count-shorts1">0</div>
+          </div>
+          <div class="shelf-stat-card">
+            <h4>Tier 3: Curated Video Stream</h4>
+            <div class="stat-number" id="stat-count-mid">0</div>
+          </div>
+          <div class="shelf-stat-card">
+            <h4>Tier 4: Trending Shorts Shelf 2</h4>
+            <div class="stat-number" id="stat-count-shorts2">0</div>
+          </div>
+          <div class="shelf-stat-card">
+            <h4>Tier 5: Endless Default Feed</h4>
+            <div class="stat-number" id="stat-count-default">0</div>
+          </div>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid var(--color-border); padding: 22px;">
+          <h4 style="font-size: 0.95rem; font-weight: 500; color: var(--color-fg-bold); margin-bottom: 12px;">
+            Active Content Tags (Extracted from Approved Streams)
+          </h4>
+          <p style="font-size: 0.8rem; color: var(--color-fg-light); margin-bottom: 16px;">
+            These tags automatically render as clickable filter chips on the homepage header next to "Featured Videos".
+          </p>
+          <div id="overview-tag-cloud" style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- VIEW 4: DIRECT MANUAL UPLOAD / ADD VIDEO -->
+      <!-- ============================================================== -->
+      <section class="admin-view-pane" id="view-upload-pane" style="display: none;">
+        <div class="content-header" style="margin-bottom: 20px;">
+          <h3>Direct Video Entry</h3>
+          <p>Manually publish any video directly into any of the 5 shelf tiers</p>
+        </div>
+
+        <div style="max-width: 680px; background: #ffffff; border: 1px solid var(--color-border); padding: 24px;">
+          <form id="direct-upload-form">
+            <div class="deck-field-group" style="margin-bottom: 16px;">
+              <label for="upload-title">Video Title:</label>
+              <input type="text" id="upload-title" class="deck-input-text" required placeholder="Enter video title..." />
+            </div>
+
+            <div class="deck-field-group" style="margin-bottom: 16px;">
+              <label for="upload-cdn-url">Video Stream CDN URL (.mp4 or .m3u8):</label>
+              <input type="url" id="upload-cdn-url" class="deck-input-text" required placeholder="https://cdn.example.com/video.mp4" />
+            </div>
+
+            <div class="deck-field-group" style="margin-bottom: 16px;">
+              <label for="upload-artwork-url">Artwork Thumbnail URL:</label>
+              <input type="text" id="upload-artwork-url" class="deck-input-text" placeholder="images/pic01.jpg" />
+            </div>
+
+            <div class="deck-field-group" style="margin-bottom: 16px;">
+              <label for="upload-shelf-select">Destination Shelf:</label>
+              <select id="upload-shelf-select" class="deck-select">
+                <option value="top20">Top 20 Entries (Featured Grid)</option>
+                <option value="shorts1">Shorts Shelf 1 (9:14 Vertical)</option>
+                <option value="mid">Curated Video Stream (Mid-Tier)</option>
+                <option value="shorts2">Trending Shorts Shelf 2 (9:14 Vertical)</option>
+                <option value="default" selected>Endless Default Video Feed (Fallback Pool)</option>
+              </select>
+            </div>
+
+            <div class="deck-field-group" style="margin-bottom: 16px;">
+              <label for="upload-tags">Content Tags (Comma-separated):</label>
+              <input type="text" id="upload-tags" class="deck-input-text" placeholder="e.g. Tokyo, Drift, Nightlife, 4K" />
+            </div>
+
+            <div class="deck-field-group" style="margin-bottom: 20px;">
+              <label for="upload-desc">Description:</label>
+              <textarea id="upload-desc" class="deck-textarea" placeholder="Editorial summary..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary" style="height: 40px; padding: 0 24px;">
+              Publish to Stream
+            </button>
+          </form>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Slide-out Inline Edit Drawer -->
+  <div class="edit-drawer-backdrop" id="edit-drawer-backdrop">
+    <div class="edit-drawer-panel" id="edit-drawer-panel">
+      <div class="edit-drawer-header">
+        <h3 style="font-size: 1.05rem; font-weight: 500; color: var(--color-fg-bold); margin: 0;">Edit Video Content</h3>
+        <button id="btn-close-drawer" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--color-fg-light);">&times;</button>
+      </div>
+      <div class="edit-drawer-body">
+        <input type="hidden" id="drawer-video-id" />
+
+        <div class="deck-field-group">
+          <label for="drawer-title">Video Title:</label>
+          <input type="text" id="drawer-title" class="deck-input-text" />
+        </div>
+
+        <div class="deck-field-group">
+          <label for="drawer-video-url">Video Stream CDN URL:</label>
+          <input type="text" id="drawer-video-url" class="deck-input-text" />
+        </div>
+
+        <div class="deck-field-group">
+          <label for="drawer-artwork-url">Artwork Thumbnail URL:</label>
+          <input type="text" id="drawer-artwork-url" class="deck-input-text" />
+          <div style="width: 100%; aspect-ratio: 16/9; background: #000; overflow: hidden; margin-top: 6px; border: 1px solid var(--color-border);">
+            <img id="drawer-artwork-preview" src="images/pic01.jpg" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;" />
+          </div>
+        </div>
+
+        <div class="deck-field-group">
+          <label for="drawer-shelf-select">Destination Shelf:</label>
+          <select id="drawer-shelf-select" class="deck-select">
+            <option value="top20">Top 20 Entries (Featured Grid)</option>
+            <option value="shorts1">Shorts Shelf 1 (9:14 Vertical)</option>
+            <option value="mid">Curated Video Stream (Mid-Tier)</option>
+            <option value="shorts2">Trending Shorts Shelf 2 (9:14 Vertical)</option>
+            <option value="default">Endless Default Video Feed (Fallback Pool)</option>
+          </select>
+        </div>
+
+        <div class="deck-field-group">
+          <label for="drawer-tags">Tags (Comma-separated):</label>
+          <input type="text" id="drawer-tags" class="deck-input-text" />
+        </div>
+
+        <div class="deck-field-group">
+          <label for="drawer-desc">Description:</label>
+          <textarea id="drawer-desc" class="deck-textarea" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="edit-drawer-footer">
+        <button class="btn-secondary" id="btn-cancel-drawer">Cancel</button>
+        <button class="btn-primary" id="btn-save-drawer">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stream Preview Modal -->
+  <div class="stream-preview-backdrop" id="stream-preview-modal">
+    <div class="stream-preview-modal">
+      <div class="stream-preview-modal-header">
+        <h4 id="modal-stream-title" style="margin: 0; font-size: 0.95rem; font-weight: 500; max-width: 700px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Stream Preview</h4>
+        <button id="btn-close-modal" style="background: transparent; border: none; font-size: 1.25rem; cursor: pointer; color: var(--color-fg-light);">&times;</button>
+      </div>
+      <div class="stream-preview-modal-body">
+        <video id="modal-video-player" controls playsinline></video>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Toast Notification -->
+  <div id="admin-toast" class="admin-toast" style="position: fixed; bottom: 24px; right: 24px; background: #1e1e24; color: #fff; padding: 12px 20px; font-size: 0.84rem; opacity: 0; pointer-events: none; transition: all 0.25s ease; transform: translateY(12px); z-index: 10001; border-left: 3px solid var(--color-accent);"></div>
+
+  <script src="js/staging-feed.js"></script>
+  <script src="js/catalog-feed.js"></script>
+  <script src="js/catalog.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
