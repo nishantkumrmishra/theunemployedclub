@@ -1939,18 +1939,18 @@ body.sidebar-collapsed .shorts-grid > .short-card:nth-child(n+7) {
    ======================================================== */
 .shorts-page #main-content,
 /* ========================================================
-   SHORTS 3-BOX STAGE: EXACT PROPORTIONS & SIZING
-   Left: Video Title & Desc (350x220)
-   Middle: Video Player (400x690) with Hover Scrubber & Translucent Buttons
-   Right: Comments & Up Next Queue (560x320)
-   All 3 boxes bottom-aligned to the same baseline
+   SHORTS 3-BOX STAGE: EXACT RED-MARKED DIMENSIONS & SHAPES
+   Left: Video Title & Desc (370px x 130px, anchored bottom-left)
+   Middle: Video Player (420px x 705px tall, fills top-to-bottom)
+   Right: Comments & Up Next Queue (530px x 275px, anchored bottom-right)
+   All 3 boxes bottom-aligned, spanning full width across the content canvas
    ======================================================== */
 .shorts-main-content {
   display: flex;
   justify-content: center;
   align-items: flex-end;
   min-height: calc(100vh - var(--header-height));
-  padding: 16px 24px 30px 24px;
+  padding: 10px 20px 22px 20px;
   box-sizing: border-box;
   overflow-x: hidden;
 }
@@ -1958,67 +1958,70 @@ body.sidebar-collapsed .shorts-grid > .short-card:nth-child(n+7) {
 .shorts-stage {
   display: flex;
   align-items: flex-end;
-  justify-content: center;
-  gap: 20px;
+  justify-content: space-between;
+  gap: 18px;
   position: relative;
-  max-width: 1400px;
+  max-width: 1420px;
   width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
 }
 
-/* 1. LEFT BOX: VIDEO TITLE & DESCRIPTION ONLY (Matching user drawing) */
+/* 1. LEFT BOX: VIDEO TITLE & DESCRIPTION ONLY (Exact: ~370px x 130px) */
 .shorts-info-panel {
-  width: clamp(260px, 22vw, 340px);
-  height: 210px;
-  flex-shrink: 1;
+  width: clamp(280px, 24vw, 375px);
+  height: 130px;
+  flex-shrink: 0;
   background: var(--bg-card);
   border: 1px solid var(--color-border);
   border-radius: 0 !important;
-  padding: 22px 24px;
+  padding: 14px 18px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  gap: 12px;
+  justify-content: center;
+  gap: 6px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
   box-sizing: border-box;
   overflow: hidden;
 }
 
 .shorts-info-title {
-  font-size: 1.15rem;
+  font-size: 1.02rem;
   font-weight: 600;
   color: var(--color-fg-bold);
-  line-height: 1.35;
+  line-height: 1.3;
   margin: 0;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
 .shorts-info-desc {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: var(--color-fg);
-  line-height: 1.55;
+  line-height: 1.45;
   margin: 0;
-  overflow-y: auto;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
   word-break: break-word;
 }
 
-/* 2. MIDDLE BOX: 9:16 VERTICAL VIDEO PLAYER (Matching user drawing) */
+/* 2. MIDDLE BOX: TALL 9:16 VERTICAL VIDEO PLAYER (Exact: 420px x 705px) */
 .shorts-center-container {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   position: relative;
   flex-shrink: 0;
 }
 
 .shorts-screen-box {
-  width: 380px;
-  height: 660px;
-  max-height: calc(100vh - 100px);
+  width: clamp(380px, 28vw, 420px);
+  height: clamp(650px, calc(100vh - var(--header-height) - 34px), 710px);
+  max-height: calc(100vh - 75px);
   background: #000000;
   border: 1px solid var(--color-border);
   position: relative;
@@ -2293,11 +2296,11 @@ body.sidebar-collapsed .shorts-grid > .short-card:nth-child(n+7) {
   background: var(--color-accent);
 }
 
-/* 3. RIGHT BOX: COMMENTS & UP NEXT QUEUE (Matching user drawing) */
+/* 3. RIGHT BOX: COMMENTS & UP NEXT QUEUE (Exact: ~530px x 275px) */
 .shorts-companion-panel {
-  width: clamp(340px, 35vw, 540px);
-  height: 320px;
-  flex-shrink: 1;
+  width: clamp(360px, 35vw, 530px);
+  height: 275px;
+  flex-shrink: 0;
   background: var(--bg-card);
   border: 1px solid var(--color-border);
   border-radius: 0 !important;

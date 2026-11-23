@@ -1,17 +1,19 @@
 # The Unemployed Club — Progress Report
 
-> **Title:** Single-Row Homepage Shorts Shelves (5 Uncollapsed, 6 Collapsed), Full 7-Short Seed & Proper Visual Hierarchy
+> **Title:** Exact Red-Marked 3-Box Stage Shapes & Dimensions (Left 370x130, Middle 420x705, Right 530x275)
 > **Repository:** `nishantkumrmishra/theunemployedclub`
-> **Live Site:** `https://nishantkumrmishra.github.io/theunemployedclub/`
+> **Live Site:** `https://nishantkumrmishra.github.io/theunemployedclub/shorts.html`
 
 ```diff
 + WORK DONE
-+ [Single-Row Dynamic Shorts Shelf] Restored exact dynamic single-row layout on `index.html`: Displays strictly 5 compact shorts when sidebar is uncollapsed (`body:not(.sidebar-collapsed)`), and automatically expands to 6 compact shorts when sidebar is collapsed (`body.sidebar-collapsed`).
-+ [Card Over-Expansion Eradicated] Replaced unconstrained `auto-fit` with strictly proportioned 5-column / 6-column grid (`repeat(5, minmax(0, 1fr))` / `repeat(6, minmax(0, 1fr))`), completely eliminating giant billboard thumbnails and keeping cards to neat, uniform ~190px widths.
-+ [Full 14-Item Curated Shorts Feed] Expanded `js/catalog-feed.js` from 6 to 14 curated vertical streams: 7 items in Shelf 1 ("Shorts") and 7 items in Shelf 2 ("Trending Shorts"), ensuring each shelf always fills full rows without wrapping.
-+ [Storage Key Migration] Bumped `js/catalog.js` to `webvideo_catalog_v6` ensuring instant zero-cache refresh across all visitor browsers.
-+ [Visual Hierarchy Restored] Homepage shorts thumbnails are now compact (~190px width), while the actual shorts video player on `shorts.html` is commanding (380px-420px width x 680px height), completely resolving the inverted sizing issue.
-+ [Exact 3-Box Shorts Stage] Left video title & description box, center tall vertical video player with hover scrubber & translucent buttons, right comments & up next queue box, all bottom-aligned.
++ [Exact Red-Marked Box Geometry] Measured and implemented the exact pixel coordinates from user's annotated screenshot across `css/style.css`:
++   - Left Box (Video Details): Width 370px, Height 130px. Anchored to the bottom-left immediately adjacent to the sidebar.
++   - Middle Box (Video Player): Width 420px, Height 705px (85vh). Commands the entire vertical height from navbar down to bottom baseline.
++   - Right Box (Comments & Up Next): Width 530px, Height 275px. Anchored to the bottom-right, spanning to the outer edge of the screen.
++ [Full Canvas Span] Adjusted `.shorts-stage` to `justify-content: space-between` across a 1420px container, eliminating dead horizontal voids between sidebar and right viewport.
++ [Left Panel Typography Fit] Styled title (-webkit-line-clamp: 2, 1.02rem) and description (-webkit-line-clamp: 2, 0.82rem) to sit with 14px padding inside the 130px height without scrolling.
++ [Single-Row Dynamic Shorts Shelf] Homepage `index.html` displays strictly 5 compact shorts when sidebar is uncollapsed, and 6 compact shorts when sidebar is collapsed.
++ [14-Item Curated Shorts Feed] `js/catalog-feed.js` populated with 14 curated vertical streams across Shelf 1 and Shelf 2.
 + [Zero Emojis Enforced] 100% emoji-free UI across all elements, using Lucide SVG icons and strict typography.
 ```
 
