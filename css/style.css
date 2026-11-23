@@ -2515,31 +2515,7 @@ body.sidebar-collapsed .shorts-grid > .short-card:nth-child(n+7) {
   color: var(--color-fg-light);
 }
 
-/* Responsive Scaling */
-@media screen and (max-width: 1400px) {
-  .shorts-stage {
-    gap: 16px;
-  }
-  .shorts-info-panel {
-    width: 280px;
-  }
-  .shorts-companion-panel {
-    width: 440px;
-  }
-}
-
-@media screen and (max-width: 1180px) {
-  .shorts-info-panel {
-    width: 230px;
-  }
-  .shorts-screen-box {
-    width: 360px;
-    height: 620px;
-  }
-  .shorts-companion-panel {
-    width: 380px;
-  }
-}
+/* Clean Responsive Media Queries */
 
 @media screen and (max-width: 1024px) {
   .shorts-stage {

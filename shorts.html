@@ -7,7 +7,105 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=3.0">
+  <style>
+    /* Exact Red-Marked Layout & Sizing Lock */
+    .shorts-main-content {
+      display: flex !important;
+      justify-content: center !important;
+      align-items: flex-end !important;
+      min-height: calc(100vh - var(--header-height)) !important;
+      padding: 10px 24px 22px 24px !important;
+      box-sizing: border-box !important;
+      overflow-x: hidden !important;
+    }
+    .shorts-stage {
+      display: flex !important;
+      align-items: flex-end !important;
+      justify-content: space-between !important;
+      gap: 20px !important;
+      width: 100% !important;
+      max-width: 1440px !important;
+      margin: 0 auto !important;
+      box-sizing: border-box !important;
+    }
+    /* 1. Left Box: Video Details Only (~370px x 130px, anchored bottom-left) */
+    .shorts-info-panel {
+      width: 370px !important;
+      height: 130px !important;
+      flex-shrink: 0 !important;
+      padding: 14px 18px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      gap: 6px !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
+      background: var(--bg-card) !important;
+      border: 1px solid var(--color-border) !important;
+      border-radius: 0 !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+    }
+    .shorts-info-title {
+      font-size: 1.05rem !important;
+      font-weight: 600 !important;
+      color: var(--color-fg-bold) !important;
+      line-height: 1.3 !important;
+      margin: 0 !important;
+      display: -webkit-box !important;
+      -webkit-line-clamp: 2 !important;
+      -webkit-box-orient: vertical !important;
+      overflow: hidden !important;
+    }
+    .shorts-info-desc {
+      font-size: 0.82rem !important;
+      color: var(--color-fg) !important;
+      line-height: 1.45 !important;
+      margin: 0 !important;
+      display: -webkit-box !important;
+      -webkit-line-clamp: 2 !important;
+      -webkit-box-orient: vertical !important;
+      overflow: hidden !important;
+      word-break: break-word !important;
+    }
+    /* 2. Middle Box: Tall 9:16 Video Player (420px x 705px, fills top to bottom) */
+    .shorts-center-container {
+      display: flex !important;
+      align-items: flex-end !important;
+      justify-content: center !important;
+      position: relative !important;
+      flex-shrink: 0 !important;
+    }
+    .shorts-screen-box {
+      width: 420px !important;
+      height: 705px !important;
+      max-height: calc(100vh - 75px) !important;
+      background: #000000 !important;
+      border: 1px solid var(--color-border) !important;
+      position: relative !important;
+      overflow: hidden !important;
+      border-radius: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: flex-end !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+      box-sizing: border-box !important;
+    }
+    /* 3. Right Box: Comments & Up Next Queue (530px x 275px, anchored bottom-right) */
+    .shorts-companion-panel {
+      width: 530px !important;
+      height: 275px !important;
+      flex-shrink: 0 !important;
+      background: var(--bg-card) !important;
+      border: 1px solid var(--color-border) !important;
+      border-radius: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      overflow: hidden !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+      box-sizing: border-box !important;
+    }
+  </style>
   <script src="js/components.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7/dist/hls.min.js"></script>
 </head>
@@ -23,13 +121,13 @@
     <main id="main-content" class="shorts-main-content">
       <div class="shorts-stage" id="shorts-stage">
 
-        <!-- 1. Left Box: Video Title & Description Only (Sits at Bottom-Left, Width ~350px, Height ~220px) -->
+        <!-- 1. Left Box: Video Title & Description Only (Sits at Bottom-Left, Width 370px, Height 130px) -->
         <aside class="shorts-info-panel" id="shorts-info-panel">
           <h2 class="shorts-info-title" id="shorts-info-title">
             Everyday minimalism in editorial design
           </h2>
           <div class="shorts-info-desc" id="shorts-info-desc">
-            High fidelity editorial curation • Pacing, typography, and pure brutalist aesthetic with zero compression degradation.
+            How clean spacing and typography make all the difference in under 60 seconds.
           </div>
         </aside>
 
@@ -158,14 +256,14 @@
           </div>
         </div>
 
-        <!-- 3. Right Box: Comments & Up Next Queue (Sits at Bottom-Right, Width ~560px, Height ~320px) -->
+        <!-- 3. Right Box: Comments & Up Next Queue (Sits at Bottom-Right, Width 530px, Height 275px) -->
         <aside class="shorts-companion-panel" id="shorts-companion-panel">
           <div class="shorts-tabs-header">
             <button class="shorts-tab-btn is-active" id="tab-btn-comments" data-tab="comments">
               Comments (0)
             </button>
             <button class="shorts-tab-btn" id="tab-btn-queue" data-tab="queue">
-              Up Next (5)
+              Up Next (14)
             </button>
           </div>
 

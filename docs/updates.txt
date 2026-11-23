@@ -1,17 +1,17 @@
 # The Unemployed Club — Progress Report
 
-> **Title:** Exact Red-Marked 3-Box Stage Shapes & Dimensions (Left 370x130, Middle 420x705, Right 530x275)
+> **Title:** Exact Red-Marked 3-Box Stage Shapes & Dimensions (Left 370x130, Middle 420x705, Right 530x275) with Zero-Cache Lock
 > **Repository:** `nishantkumrmishra/theunemployedclub`
 > **Live Site:** `https://nishantkumrmishra.github.io/theunemployedclub/shorts.html`
 
 ```diff
 + WORK DONE
-+ [Exact Red-Marked Box Geometry] Measured and implemented the exact pixel coordinates from user's annotated screenshot across `css/style.css`:
-+   - Left Box (Video Details): Width 370px, Height 130px. Anchored to the bottom-left immediately adjacent to the sidebar.
-+   - Middle Box (Video Player): Width 420px, Height 705px (85vh). Commands the entire vertical height from navbar down to bottom baseline.
-+   - Right Box (Comments & Up Next): Width 530px, Height 275px. Anchored to the bottom-right, spanning to the outer edge of the screen.
-+ [Full Canvas Span] Adjusted `.shorts-stage` to `justify-content: space-between` across a 1420px container, eliminating dead horizontal voids between sidebar and right viewport.
-+ [Left Panel Typography Fit] Styled title (-webkit-line-clamp: 2, 1.02rem) and description (-webkit-line-clamp: 2, 0.82rem) to sit with 14px padding inside the 130px height without scrolling.
++ [Conflicting Media Queries Purged] Removed outdated `@media screen and (max-width: 1400px)` and `(max-width: 1180px)` overrides from `css/style.css` that were shrinking the screen box back down to 360px and the info panel to 230px.
++ [Exact Red-Marked Box Geometry Locked] Embedded scoped dimension lock directly into `shorts.html` with cache-busting `?v=3.0`:
++   - Left Box (Video Details): Exact width 370px, height 130px. Anchored to the bottom-left immediately adjacent to the sidebar.
++   - Middle Box (Video Player): Exact width 420px, height 705px (85vh). Commands the entire vertical height from navbar down to bottom baseline.
++   - Right Box (Comments & Up Next): Exact width 530px, height 275px. Anchored to the bottom-right, spanning to the outer edge of the screen.
++ [Full Canvas Span] Configured `.shorts-stage` to `justify-content: space-between` across 1440px container, filling the entire horizontal canvas without empty voids.
 + [Single-Row Dynamic Shorts Shelf] Homepage `index.html` displays strictly 5 compact shorts when sidebar is uncollapsed, and 6 compact shorts when sidebar is collapsed.
 + [14-Item Curated Shorts Feed] `js/catalog-feed.js` populated with 14 curated vertical streams across Shelf 1 and Shelf 2.
 + [Zero Emojis Enforced] 100% emoji-free UI across all elements, using Lucide SVG icons and strict typography.
