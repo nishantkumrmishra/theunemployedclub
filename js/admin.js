@@ -1,331 +1,393 @@
 // The Unemployed Club - Admin Studio Controller
-// Dedicated Review Inbox View, Pro Review Cards with Inline Editing,
-// Auto-Detected Section Placement,, manages the Editorial Staging Review Queue,
-// and Instant Deletion on Approval/Dismiss.
+// Features: Sequential 1-by-1 Review Deck, Compact Catalog Table with Inline Drawer,
+// 5-Tier Shelves Manager, Dynamic Content Tags, and GitHub Pages Export.
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Primary Studio View Tabs
+  // Navigation Tabs & Panes
   const tabViewReview = document.getElementById('tab-nav-review');
   const tabViewCatalog = document.getElementById('tab-nav-catalog');
+  const tabViewShelves = document.getElementById('tab-nav-shelves');
   const tabViewUpload = document.getElementById('tab-nav-upload');
 
   const paneReview = document.getElementById('view-review-pane');
   const paneCatalog = document.getElementById('view-catalog-pane');
+  const paneShelves = document.getElementById('view-shelves-pane');
   const paneUpload = document.getElementById('view-upload-pane');
 
-  const stagedBadge = document.getElementById('tab-review-count');
-  const stagedCountHeader = document.getElementById('staged-count-header');
-  const catalogCountPill = document.getElementById('tab-catalog-count');
+  const tabReviewBadge = document.getElementById('tab-review-count');
+  const tabCatalogCount = document.getElementById('tab-catalog-count');
   const sidebarReviewBadge = document.getElementById('sidebar-review-badge');
 
-  // Staging Review Queue Elements
-  const stagedContainer = document.getElementById('staged-items-container');
+  // Deck Review Elements
+  const deckCard = document.getElementById('deck-card');
+  const deckEmptyState = document.getElementById('deck-empty-state');
+  const deckCurrentNum = document.getElementById('deck-current-num');
+  const deckTotalNum = document.getElementById('deck-total-num');
+  const btnDeckPrev = document.getElementById('btn-deck-prev');
+  const btnDeckNext = document.getElementById('btn-deck-next');
   const btnImportStageUrl = document.getElementById('btn-import-stage-url');
   const btnClearStaging = document.getElementById('btn-clear-staging');
+  const btnEmptyStage = document.getElementById('btn-empty-stage');
+  const btnEmptyCatalog = document.getElementById('btn-empty-catalog');
 
-  // Main Form Elements (Upload / Edit)
-  const form = document.getElementById('admin-video-form');
-  const formHeading = document.getElementById('form-heading');
-  const editIndicator = document.getElementById('edit-indicator');
-  const editIdInput = document.getElementById('edit-video-id');
-  const titleInput = document.getElementById('video-title');
-  const descInput = document.getElementById('video-desc');
-  const videoUrlInput = document.getElementById('video-cdn-url');
-  const artworkUrlInput = document.getElementById('video-artwork-url');
-  const artworkPreviewBox = document.getElementById('artwork-preview-box');
-  const artworkPreviewImg = document.getElementById('artwork-preview-img');
-  const artworkEmptyLabel = document.getElementById('artwork-empty-label');
-  const artworkFileInput = document.getElementById('artwork-file-input');
-  const artworkDropZone = document.getElementById('artwork-drop-zone');
-  const btnSubmit = document.getElementById('btn-submit-form');
-  const btnCancel = document.getElementById('btn-cancel-edit');
-  const btnExport = document.getElementById('btn-export-feed');
-  const btnReset = document.getElementById('btn-reset-catalog');
-  const searchInput = document.getElementById('admin-search-input') || document.getElementById('header-search-input');
-  const listContainer = document.getElementById('catalog-list-container');
+  const deckPlayerBox = document.getElementById('deck-player-box');
+  const deckVideoPlayer = document.getElementById('deck-video-player');
+  const deckStreamType = document.getElementById('deck-stream-type');
+  const deckAspectBadge = document.getElementById('deck-aspect-badge');
+  const deckThumbImg = document.getElementById('deck-thumb-img');
+  const deckThumbInput = document.getElementById('deck-thumb-input');
+  const deckTitleInput = document.getElementById('deck-title-input');
+  const deckSectionSelect = document.getElementById('deck-section-select');
+  const deckAutodetectBadge = document.getElementById('deck-autodetect-badge');
+  const deckTagsInput = document.getElementById('deck-tags-input');
+  const deckTagQuickBar = document.getElementById('deck-tag-quick-bar');
+  const deckDescInput = document.getElementById('deck-desc-input');
+  const deckStagedDate = document.getElementById('deck-staged-date');
+  const deckSourceLink = document.getElementById('deck-source-link');
+  const btnDeckDismiss = document.getElementById('btn-deck-dismiss');
+  const btnDeckApprove = document.getElementById('btn-deck-approve');
+  let deckHls = null;
 
-  // Preview Modal Elements
+  // Catalog Table Elements
+  const catalogTableBody = document.getElementById('catalog-table-body');
+  const totalCatalogCount = document.getElementById('total-catalog-count');
+  const catalogSearchInput = document.getElementById('catalog-search-input');
+  const btnPurgePlaceholders = document.getElementById('btn-purge-placeholders');
+
+  // Edit Drawer Elements
+  const editDrawerBackdrop = document.getElementById('edit-drawer-backdrop');
+  const btnCloseDrawer = document.getElementById('btn-close-drawer');
+  const btnCancelDrawer = document.getElementById('btn-cancel-drawer');
+  const btnSaveDrawer = document.getElementById('btn-save-drawer');
+  const drawerVideoId = document.getElementById('drawer-video-id');
+  const drawerTitle = document.getElementById('drawer-title');
+  const drawerVideoUrl = document.getElementById('drawer-video-url');
+  const drawerArtworkUrl = document.getElementById('drawer-artwork-url');
+  const drawerArtworkPreview = document.getElementById('drawer-artwork-preview');
+  const drawerShelfSelect = document.getElementById('drawer-shelf-select');
+  const drawerTags = document.getElementById('drawer-tags');
+  const drawerDesc = document.getElementById('drawer-desc');
+
+  // Stream Preview Modal
   const previewModal = document.getElementById('stream-preview-modal');
-  const modalVideo = document.getElementById('modal-video-player');
-  const modalTitle = document.getElementById('modal-stream-title');
+  const modalVideoPlayer = document.getElementById('modal-video-player');
+  const modalStreamTitle = document.getElementById('modal-stream-title');
   const btnCloseModal = document.getElementById('btn-close-modal');
   let modalHls = null;
 
+  // Direct Upload Form
+  const directUploadForm = document.getElementById('direct-upload-form');
+
+  // Top Banner Actions
+  const btnExportFeed = document.getElementById('btn-export-feed');
+  const btnResetCatalog = document.getElementById('btn-reset-catalog');
+  const btnAdminLogout = document.getElementById('btn-admin-logout');
+
+  // State
   let currentView = 'review';
-  let currentFilter = 'all';
+  let currentDeckIndex = 0;
+  let currentCatalogFilter = 'all';
+  let catalogTypeFilter = null; // 'video' | 'short' | null
 
   // ==============================================================
-  // 1. DEDICATED STUDIO VIEW SWITCHER
+  // 1. PRIMARY VIEW CONTROLLER
   // ==============================================================
   function switchAdminView(view) {
     currentView = view;
 
     // Toggle Tab Buttons
-    [tabViewReview, tabViewCatalog, tabViewUpload].forEach(btn => {
+    [tabViewReview, tabViewCatalog, tabViewShelves, tabViewUpload].forEach(btn => {
       if (btn) btn.classList.remove('is-active');
     });
 
     if (view === 'review' && tabViewReview) tabViewReview.classList.add('is-active');
     if (view === 'catalog' && tabViewCatalog) tabViewCatalog.classList.add('is-active');
+    if (view === 'shelves' && tabViewShelves) tabViewShelves.classList.add('is-active');
     if (view === 'upload' && tabViewUpload) tabViewUpload.classList.add('is-active');
 
     // Toggle Panes
     if (paneReview) paneReview.style.display = view === 'review' ? 'block' : 'none';
     if (paneCatalog) paneCatalog.style.display = view === 'catalog' ? 'block' : 'none';
+    if (paneShelves) paneShelves.style.display = view === 'shelves' ? 'block' : 'none';
     if (paneUpload) paneUpload.style.display = view === 'upload' ? 'block' : 'none';
 
     // Sync Sidebar
     const sideReview = document.getElementById('admin-nav-review');
-    const sideCatalog = document.getElementById('admin-nav-catalog');
-    const sideAdd = document.getElementById('admin-nav-add');
-    [sideReview, sideCatalog, sideAdd].forEach(a => a && a.classList.remove('active'));
+    const sideVideos = document.getElementById('admin-nav-videos');
+    const sideShorts = document.getElementById('admin-nav-shorts');
+    const sideTags = document.getElementById('admin-nav-tags');
+    [sideReview, sideVideos, sideShorts, sideTags].forEach(a => a && a.classList.remove('active'));
 
     if (view === 'review' && sideReview) sideReview.classList.add('active');
-    if (view === 'catalog' && sideCatalog) sideCatalog.classList.add('active');
-    if (view === 'upload' && sideAdd) sideAdd.classList.add('active');
+    if (view === 'shelves' && sideTags) sideTags.classList.add('active');
+    if (view === 'catalog') {
+      if (catalogTypeFilter === 'short' && sideShorts) sideShorts.classList.add('active');
+      else if (sideVideos) sideVideos.classList.add('active');
+    }
 
-    if (view === 'catalog') renderCatalogList();
-    if (view === 'review') renderReviewQueue();
+    if (view === 'review') renderDeck();
+    if (view === 'catalog') renderCatalogTable();
+    if (view === 'shelves') renderShelvesOverview();
   }
 
   window.switchAdminView = switchAdminView;
 
+  function filterCatalogByType(type) {
+    catalogTypeFilter = type;
+    currentCatalogFilter = 'all';
+    switchAdminView('catalog');
+  }
+  window.filterCatalogByType = filterCatalogByType;
+
   if (tabViewReview) tabViewReview.addEventListener('click', () => switchAdminView('review'));
-  if (tabViewCatalog) tabViewCatalog.addEventListener('click', () => switchAdminView('catalog'));
+  if (tabViewCatalog) tabViewCatalog.addEventListener('click', () => {
+    catalogTypeFilter = null;
+    switchAdminView('catalog');
+  });
+  if (tabViewShelves) tabViewShelves.addEventListener('click', () => switchAdminView('shelves'));
   if (tabViewUpload) tabViewUpload.addEventListener('click', () => switchAdminView('upload'));
 
   // ==============================================================
-  // 2. SMART SECTION AUTO-DETECTION HELPER
+  // 2. SEQUENTIAL 1-BY-1 REVIEW DECK ENGINE
   // ==============================================================
-  function detectDefaultSection(item) {
+  function detectDefaultShelf(item) {
     const url = (item.videoUrl || item.sourceUrl || '').toLowerCase();
     const title = (item.title || '').toLowerCase();
     const desc = (item.description || '').toLowerCase();
 
-    // Auto-detect Shorts (9:16 vertical video keywords or aspect indicators)
+    // Auto-detect Vertical Shorts
     if (
       item.isShort || item.is_short ||
-      item.section === 'shorts' ||
+      item.section === 'shorts' || item.section === 'shorts1' || item.section === 'shorts2' ||
       url.includes('/shorts/') || url.includes('/reel/') || url.includes('/tiktok/') ||
       title.includes('#short') || title.includes('shorts') ||
       desc.includes('#shorts') || desc.includes('9:16')
     ) {
-      return 'shorts';
+      return 'shorts1';
     }
 
-    // Default to Top 2 Rows for standard landscape video
-    return 'top';
+    // Standard landscape defaults to Top 20 Entries
+    return 'top20';
   }
 
-  // ==============================================================
-  // 3. EDITORIAL REVIEW QUEUE WITH INLINE EDIT & INSTANT DELETION
-  // ==============================================================
-  function updateStagingCounts() {
-    const staged = Catalog.getStaging();
-    const count = staged.length;
+  function updateDeckCounters() {
+    const staging = Catalog.getStaging();
+    const count = staging.length;
 
-    if (stagedBadge) stagedBadge.textContent = `${count} Pending`;
-    if (stagedCountHeader) stagedCountHeader.textContent = count;
+    if (deckTotalNum) deckTotalNum.textContent = count;
+    if (tabReviewBadge) {
+      tabReviewBadge.textContent = `${count} Pending`;
+      tabReviewBadge.style.display = count > 0 ? 'inline-block' : 'none';
+    }
     if (sidebarReviewBadge) {
       sidebarReviewBadge.textContent = count;
       sidebarReviewBadge.style.display = count > 0 ? 'inline-block' : 'none';
     }
   }
 
-  function checkReviewEmptyState() {
-    const staged = Catalog.getStaging();
-    if (staged.length === 0 && stagedContainer) {
-      stagedContainer.innerHTML = `
-        <div class="review-empty-state">
-          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px;">
-            <circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/>
-          </svg>
-          <h3>All Caught Up!</h3>
-          <p>There are currently zero video drafts waiting for review.</p>
-          <p style="font-size: 0.8rem; color: var(--color-fg-light); margin-top: 6px;">
-            Run <code>tools/extractor.bat</code> to extract new videos, or click below to stage a video stream link directly.
-          </p>
-          <div style="margin-top: 18px;">
-            <button class="btn-primary" id="btn-empty-stage-url" style="height: 38px; padding: 0 20px;">
-              + Stage URL Directly
-            </button>
-          </div>
-        </div>
-      `;
-      const btnEmpty = document.getElementById('btn-empty-stage-url');
-      if (btnEmpty) {
-        btnEmpty.addEventListener('click', () => {
-          if (btnImportStageUrl) btnImportStageUrl.click();
-        });
+  function renderDeck() {
+    updateDeckCounters();
+    const staging = Catalog.getStaging();
+
+    if (staging.length === 0) {
+      if (deckCard) deckCard.style.display = 'none';
+      if (deckEmptyState) deckEmptyState.style.display = 'block';
+      if (deckCurrentNum) deckCurrentNum.textContent = '0';
+      if (btnDeckPrev) btnDeckPrev.disabled = true;
+      if (btnDeckNext) btnDeckNext.disabled = true;
+
+      if (deckHls) {
+        deckHls.destroy();
+        deckHls = null;
       }
-    }
-  }
-
-  function renderReviewQueue() {
-    if (!stagedContainer) return;
-    updateStagingCounts();
-
-    const staged = Catalog.getStaging();
-    stagedContainer.innerHTML = '';
-
-    if (staged.length === 0) {
-      checkReviewEmptyState();
+      if (deckVideoPlayer) {
+        deckVideoPlayer.pause();
+        deckVideoPlayer.src = '';
+      }
       return;
     }
 
-    staged.forEach((item) => {
-      const detectedSection = detectDefaultSection(item);
-      const isShortDetected = detectedSection === 'shorts';
+    if (deckCard) deckCard.style.display = 'grid';
+    if (deckEmptyState) deckEmptyState.style.display = 'none';
 
-      const card = document.createElement('div');
-      card.className = 'review-card-pro';
-      card.setAttribute('data-draft-id', item.id);
+    // Clamp currentDeckIndex
+    if (currentDeckIndex >= staging.length) currentDeckIndex = staging.length - 1;
+    if (currentDeckIndex < 0) currentDeckIndex = 0;
 
-      card.innerHTML = `
-        <!-- Left Column: Video Thumbnail & Stream Preview -->
-        <div class="review-thumb-col">
-          <div class="review-thumb-box ${isShortDetected ? 'is-short' : ''}" title="Click to test live video stream">
-            <img src="${item.artworkUrl || 'images/pic01.jpg'}" alt="${escapeHtml(item.title)}" />
-            <div class="review-thumb-overlay">
-              <div class="review-play-badge">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 3 20 12 6 21 6 3"/></svg>
-                <span>Preview Stream</span>
-              </div>
-            </div>
-          </div>
-          <div style="font-size: 0.72rem; color: var(--color-fg-light); text-align: center; word-break: break-all;">
-            <code>${item.videoUrl.includes('.m3u8') ? 'Adaptive HLS (.m3u8)' : 'Direct MP4 Stream'}</code>
-          </div>
-        </div>
+    const currentDraft = staging[currentDeckIndex];
+    if (deckCurrentNum) deckCurrentNum.textContent = currentDeckIndex + 1;
 
-        <!-- Center Column: Inline Editing (Title & Description) -->
-        <div class="review-edit-col">
-          <div class="review-input-group">
-            <label>Video Title (Click to edit):</label>
-            <input type="text" class="review-title-input" value="${escapeHtml(item.title)}" placeholder="Enter video title..." />
-          </div>
+    // Navigation buttons state
+    if (btnDeckPrev) btnDeckPrev.disabled = currentDeckIndex <= 0;
+    if (btnDeckNext) btnDeckNext.disabled = currentDeckIndex >= staging.length - 1;
 
-          <div class="review-input-group">
-            <label>Description:</label>
-            <textarea class="review-desc-input" rows="2" placeholder="Video description...">${escapeHtml(item.description || 'Direct CDN video stream.')}</textarea>
-          </div>
+    // Populate Fields
+    if (deckTitleInput) deckTitleInput.value = currentDraft.title || '';
+    if (deckDescInput) deckDescInput.value = currentDraft.description || '';
+    if (deckTagsInput) {
+      const tagsArr = Array.isArray(currentDraft.tags) ? currentDraft.tags : [];
+      deckTagsInput.value = tagsArr.join(', ');
+    }
+    if (deckThumbInput) deckThumbInput.value = currentDraft.artworkUrl || 'images/pic01.jpg';
+    if (deckThumbImg) deckThumbImg.src = currentDraft.artworkUrl || 'images/pic01.jpg';
+    if (deckStagedDate) deckStagedDate.textContent = currentDraft.extractedAt || 'Recent';
+    if (deckSourceLink) {
+      deckSourceLink.href = currentDraft.sourceUrl || '#';
+      deckSourceLink.style.display = currentDraft.sourceUrl ? 'inline' : 'none';
+    }
 
-          <div class="review-meta-row">
-            <span>Staged: ${escapeHtml(item.extractedAt || 'Recent')}</span>
-            <span>&bull;</span>
-            <span style="max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-              CDN: <a href="${item.videoUrl}" target="_blank" style="color: var(--color-accent); text-decoration: none;">${escapeHtml(item.videoUrl)}</a>
-            </span>
-            ${item.sourceUrl ? `<span>&bull;</span><a href="${item.sourceUrl}" target="_blank" style="color: var(--color-fg-light); text-decoration: none;">Original Source</a>` : ''}
-          </div>
-        </div>
+    // Auto-detect Shelf
+    const autoShelf = detectDefaultShelf(currentDraft);
+    if (deckSectionSelect) deckSectionSelect.value = autoShelf;
+    if (deckAutodetectBadge) {
+      if (autoShelf === 'shorts1') {
+        deckAutodetectBadge.textContent = 'Auto: Shorts Shelf 1';
+        deckAutodetectBadge.style.color = '#e0245e';
+        deckAutodetectBadge.style.background = 'rgba(224, 36, 94, 0.12)';
+      } else {
+        deckAutodetectBadge.textContent = 'Auto: Top 20 Grid';
+        deckAutodetectBadge.style.color = '#2563eb';
+        deckAutodetectBadge.style.background = 'rgba(37, 99, 235, 0.12)';
+      }
+    }
 
-        <!-- Right Column: Section Placement Dropdown & Action Buttons -->
-        <div class="review-actions-col">
-          <div class="review-placement-label">
-            <span>Where should this go?</span>
-            ${isShortDetected ? '<span class="auto-detected-tag">Auto: Shorts</span>' : '<span class="auto-detected-tag">Auto: Top Grid</span>'}
-          </div>
+    // Video Player & Aspect Ratio
+    const isVertical = autoShelf === 'shorts1' || autoShelf === 'shorts2';
+    if (deckPlayerBox) {
+      if (isVertical) deckPlayerBox.classList.add('is-vertical');
+      else deckPlayerBox.classList.remove('is-vertical');
+    }
+    if (deckAspectBadge) {
+      deckAspectBadge.textContent = isVertical ? '9:16 Vertical Reel' : '16:9 Landscape';
+    }
 
-          <select class="select-review-placement" title="Select website section">
-            <option value="shorts" ${detectedSection === 'shorts' ? 'selected' : ''}>📱 Shorts Shelf (9:14 Vertical)</option>
-            <option value="top" ${detectedSection === 'top' ? 'selected' : ''}>⭐ Top 2 Rows (Featured Grid)</option>
-            <option value="mid">🎬 Middle Row (Curated Break)</option>
-            <option value="bottom">📜 Bottom Feed (Endless Scroll)</option>
-          </select>
+    const streamUrl = currentDraft.videoUrl || '';
+    const isHls = streamUrl.includes('.m3u8');
+    if (deckStreamType) {
+      deckStreamType.textContent = isHls ? 'Adaptive HLS (.m3u8)' : 'Direct MP4 Stream';
+    }
 
-          <!-- 40px High-Contrast Approve & Publish Button -->
-          <button class="btn-approve-pro" title="Publish live and immediately remove from review queue">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>Approve &amp; Publish</span>
-          </button>
+    // Load Stream into Deck Player
+    if (deckVideoPlayer) {
+      if (deckHls) {
+        deckHls.destroy();
+        deckHls = null;
+      }
 
-          <!-- Sub-Actions: Preview & Dismiss -->
-          <div class="review-sub-actions">
-            <button class="review-sub-btn btn-preview-stream" title="Watch stream in modal">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 3 20 12 6 21 6 3"/></svg>
-              <span>Preview</span>
-            </button>
-            <button class="review-sub-btn btn-dismiss-pro" title="Delete draft immediately">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              <span>Dismiss</span>
-            </button>
-          </div>
-        </div>
-      `;
+      if (isHls && window.Hls && Hls.isSupported()) {
+        deckHls = new Hls({ autoStartLoad: true });
+        deckHls.loadSource(streamUrl);
+        deckHls.attachMedia(deckVideoPlayer);
+      } else {
+        deckVideoPlayer.src = streamUrl;
+      }
+    }
 
-      // Elements inside card
-      const thumbBox = card.querySelector('.review-thumb-box');
-      const btnPreview = card.querySelector('.btn-preview-stream');
-      const btnApprove = card.querySelector('.btn-approve-pro');
-      const btnDismiss = card.querySelector('.btn-dismiss-pro');
-      const titleInputCard = card.querySelector('.review-title-input');
-      const descInputCard = card.querySelector('.review-desc-input');
-      const selectPlacement = card.querySelector('.select-review-placement');
-
-      // 1. Preview Stream Handlers
-      const triggerPreview = () => openStreamPreview(titleInputCard.value.trim() || item.title, item.videoUrl);
-      thumbBox.addEventListener('click', triggerPreview);
-      btnPreview.addEventListener('click', triggerPreview);
-
-      // 2. Placement Dropdown Change: adjust thumbnail aspect ratio if user selects Shorts
-      selectPlacement.addEventListener('change', () => {
-        if (selectPlacement.value === 'shorts') {
-          thumbBox.classList.add('is-short');
-        } else {
-          thumbBox.classList.remove('is-short');
-        }
-      });
-
-      // 3. Approve & Publish: Saves to Catalog & AUTOMATICALLY DELETES FROM REVIEW QUEUE
-      btnApprove.addEventListener('click', () => {
-        const chosenSec = selectPlacement.value;
-        const finalTitle = titleInputCard.value.trim() || item.title;
-        const finalDesc = descInputCard.value.trim() || item.description;
-
-        // Publish into active catalog and purge from staging
-        const published = Catalog.approveStaged(item.id, chosenSec, {
-          title: finalTitle,
-          description: finalDesc
+    // Render Quick Tag Suggestion Chips
+    if (deckTagQuickBar) {
+      const activeTags = Catalog.getAllTags().slice(0, 8);
+      deckTagQuickBar.innerHTML = '';
+      activeTags.forEach(t => {
+        const chip = document.createElement('span');
+        chip.className = 'deck-tag-chip';
+        chip.textContent = `+ ${t}`;
+        chip.addEventListener('click', () => {
+          const current = (deckTagsInput.value || '').split(',').map(x => x.trim()).filter(Boolean);
+          if (!current.includes(t)) {
+            current.push(t);
+            deckTagsInput.value = current.join(', ');
+          }
         });
-
-        if (published) {
-          // Animate card removal smoothly
-          card.style.opacity = '0';
-          card.style.transform = 'translateX(24px)';
-          setTimeout(() => {
-            card.remove();
-            updateStagingCounts();
-            checkReviewEmptyState();
-          }, 220);
-
-          showToast(`Approved "${finalTitle}" to ${getPlacementLabel(chosenSec)}! Draft deleted from review.`);
-          renderCatalogList();
-        }
+        deckTagQuickBar.appendChild(chip);
       });
+    }
+  }
 
-      // 4. Dismiss / Delete Draft: Permanently deletes from review queue on the spot
-      btnDismiss.addEventListener('click', () => {
-        if (confirm(`Delete draft "${item.title}" from review queue?`)) {
-          Catalog.rejectStaged(item.id);
+  window.renderDeck = renderDeck;
+  window.renderReviewQueue = renderDeck; // Alias for backward compatibility
 
-          card.style.opacity = '0';
-          card.style.transform = 'translateX(24px)';
-          setTimeout(() => {
-            card.remove();
-            updateStagingCounts();
-            checkReviewEmptyState();
-          }, 220);
-
-          showToast(`Deleted draft "${item.title}"`);
-        }
-      });
-
-      stagedContainer.appendChild(card);
+  // Thumbnail URL live preview
+  if (deckThumbInput && deckThumbImg) {
+    deckThumbInput.addEventListener('input', (e) => {
+      deckThumbImg.src = e.target.value.trim() || 'images/pic01.jpg';
     });
   }
 
-  // Quick Stage URL Direct prompt
+  // Prev / Next Navigation
+  if (btnDeckPrev) {
+    btnDeckPrev.addEventListener('click', () => {
+      if (currentDeckIndex > 0) {
+        currentDeckIndex--;
+        renderDeck();
+      }
+    });
+  }
+  if (btnDeckNext) {
+    btnDeckNext.addEventListener('click', () => {
+      const staging = Catalog.getStaging();
+      if (currentDeckIndex < staging.length - 1) {
+        currentDeckIndex++;
+        renderDeck();
+      }
+    });
+  }
+
+  // Approve & Advance to Next
+  if (btnDeckApprove) {
+    btnDeckApprove.addEventListener('click', () => {
+      const staging = Catalog.getStaging();
+      if (staging.length === 0) return;
+
+      const currentDraft = staging[currentDeckIndex];
+      const title = deckTitleInput.value.trim() || currentDraft.title;
+      const shelf = deckSectionSelect.value;
+      const tags = (deckTagsInput.value || '').split(',').map(t => t.trim()).filter(Boolean);
+      const desc = deckDescInput.value.trim();
+      const artwork = deckThumbInput.value.trim() || currentDraft.artworkUrl;
+
+      // Save to public catalog & remove from staging
+      Catalog.approveStaged(currentDraft.id, shelf, {
+        title,
+        artworkUrl: artwork,
+        tags,
+        description: desc
+      });
+
+      showToast(`Approved "${title}" to ${getShelfLabel(shelf)}! Advanced to next.`);
+
+      // Smooth card transition
+      if (deckCard) {
+        deckCard.style.opacity = '0.4';
+        deckCard.style.transform = 'translateX(-12px)';
+        setTimeout(() => {
+          renderDeck();
+          deckCard.style.opacity = '1';
+          deckCard.style.transform = 'translateX(0)';
+        }, 160);
+      } else {
+        renderDeck();
+      }
+
+      renderCatalogTable();
+    });
+  }
+
+  // Dismiss / Discard Draft
+  if (btnDeckDismiss) {
+    btnDeckDismiss.addEventListener('click', () => {
+      const staging = Catalog.getStaging();
+      if (staging.length === 0) return;
+
+      const currentDraft = staging[currentDeckIndex];
+      if (confirm(`Dismiss draft "${currentDraft.title}" from review?`)) {
+        Catalog.rejectStaged(currentDraft.id);
+        showToast(`Discarded draft "${currentDraft.title}"`);
+        renderDeck();
+      }
+    });
+  }
+
+  // Quick Stage URL Prompt
   if (btnImportStageUrl) {
     btnImportStageUrl.addEventListener('click', () => {
       const url = prompt('Enter video stream CDN URL (.mp4 or .m3u8):');
@@ -337,33 +399,361 @@ document.addEventListener('DOMContentLoaded', () => {
         title: title.trim(),
         videoUrl: url.trim(),
         artworkUrl: artwork.trim(),
-        description: 'Directly staged stream waiting for section review.',
-        author: 'The Unemployed Club'
+        description: 'Directly staged stream waiting for review.'
       });
 
-      showToast(`Staged "${title}" in Review Queue!`);
-      renderReviewQueue();
+      showToast(`Staged "${title}" in Review Deck!`);
+      currentDeckIndex = 0;
+      renderDeck();
       switchAdminView('review');
     });
   }
 
-  // Clear all staged
+  // Clear Staging
   if (btnClearStaging) {
     btnClearStaging.addEventListener('click', () => {
-      if (confirm('Clear all pending drafts from the review queue?')) {
+      if (confirm('Clear all pending drafts from review queue?')) {
         Catalog.clearStaging();
         showToast('Cleared review queue');
-        renderReviewQueue();
+        renderDeck();
+      }
+    });
+  }
+
+  if (btnEmptyStage) btnEmptyStage.addEventListener('click', () => btnImportStageUrl && btnImportStageUrl.click());
+  if (btnEmptyCatalog) btnEmptyCatalog.addEventListener('click', () => switchAdminView('catalog'));
+
+  // ==============================================================
+  // 3. COMPACT CATALOG TABLE & INLINE EDIT DRAWER
+  // ==============================================================
+  function getShelfLabel(sec) {
+    switch (sec) {
+      case 'top20': return 'Top 20 Entries';
+      case 'shorts1': return 'Shorts Shelf 1';
+      case 'mid': return 'Curated Mid Stream';
+      case 'shorts2': return 'Trending Shorts 2';
+      case 'default': return 'Endless Default Feed';
+      default: return 'Endless Default Feed';
+    }
+  }
+
+  function getShelfBadgeClass(sec) {
+    switch (sec) {
+      case 'top20': return 'shelf-top20';
+      case 'shorts1': return 'shelf-shorts1';
+      case 'mid': return 'shelf-mid';
+      case 'shorts2': return 'shelf-shorts2';
+      default: return 'shelf-default';
+    }
+  }
+
+  function updateCatalogCounts() {
+    const all = Catalog.getAll();
+    if (totalCatalogCount) totalCatalogCount.textContent = all.length;
+    if (tabCatalogCount) tabCatalogCount.textContent = all.length;
+
+    const countAll = document.getElementById('count-all');
+    const countTop20 = document.getElementById('count-top20');
+    const countShorts1 = document.getElementById('count-shorts1');
+    const countMid = document.getElementById('count-mid');
+    const countShorts2 = document.getElementById('count-shorts2');
+    const countDefault = document.getElementById('count-default');
+
+    if (countAll) countAll.textContent = all.length;
+    if (countTop20) countTop20.textContent = Catalog.getTop20().length;
+    if (countShorts1) countShorts1.textContent = Catalog.getShorts1().length;
+    if (countMid) countMid.textContent = Catalog.getMid().length;
+    if (countShorts2) countShorts2.textContent = Catalog.getShorts2().length;
+    if (countDefault) countDefault.textContent = Catalog.getDefaultFeed().length;
+  }
+
+  function renderCatalogTable() {
+    updateCatalogCounts();
+    if (!catalogTableBody) return;
+
+    let items = Catalog.getAll();
+
+    // Shelf filter
+    if (currentCatalogFilter && currentCatalogFilter !== 'all') {
+      if (currentCatalogFilter === 'top20') items = Catalog.getTop20();
+      else if (currentCatalogFilter === 'shorts1') items = Catalog.getShorts1();
+      else if (currentCatalogFilter === 'mid') items = Catalog.getMid();
+      else if (currentCatalogFilter === 'shorts2') items = Catalog.getShorts2();
+      else if (currentCatalogFilter === 'default') items = Catalog.getDefaultFeed();
+    }
+
+    // Type filter from sidebar (Videos vs Shorts)
+    if (catalogTypeFilter) {
+      items = items.filter(v => v.type === catalogTypeFilter);
+    }
+
+    // Search query
+    const q = (catalogSearchInput ? catalogSearchInput.value : '').toLowerCase().trim();
+    if (q) {
+      items = items.filter(v => {
+        const titleMatch = (v.title || '').toLowerCase().includes(q);
+        const tagsMatch = (v.tags || []).some(t => String(t).toLowerCase().includes(q));
+        return titleMatch || tagsMatch;
+      });
+    }
+
+    catalogTableBody.innerHTML = '';
+
+    if (items.length === 0) {
+      catalogTableBody.innerHTML = `
+        <tr>
+          <td colspan="6" style="padding: 36px; text-align: center; color: var(--color-fg-light);">
+            No videos found matching the selected filter.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    items.forEach(v => {
+      const tr = document.createElement('tr');
+      const isShort = v.type === 'short' || v.section === 'shorts1' || v.section === 'shorts2';
+      const tagsList = (v.tags || []).map(t => `<span class="tag-chip-sm">#${escapeHtml(t)}</span>`).join('');
+
+      tr.innerHTML = `
+        <td class="catalog-thumb-cell" title="Click to test live video stream">
+          <img src="${v.artworkUrl || 'images/pic01.jpg'}" alt="${escapeHtml(v.title)}" />
+          <div class="catalog-thumb-overlay">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+          </div>
+        </td>
+        <td>
+          <a class="catalog-title-link" title="Click to edit">${escapeHtml(v.title)}</a>
+          <div style="font-size: 0.72rem; color: var(--color-fg-light); margin-top: 2px;">
+            <span>${escapeHtml(v.date || 'Recent')}</span>
+            <span>&bull;</span>
+            <span style="max-width: 200px; display: inline-block; overflow: hidden; text-overflow: ellipsis; vertical-align: bottom;">
+              ${escapeHtml(v.videoUrl)}
+            </span>
+          </div>
+        </td>
+        <td>
+          <span class="shelf-badge-pill ${getShelfBadgeClass(v.section)}">
+            ${getShelfLabel(v.section)}
+          </span>
+        </td>
+        <td>
+          <span style="font-size: 0.75rem; color: ${isShort ? '#e0245e' : 'var(--color-fg-bold)'};">
+            ${isShort ? '📱 9:16 Short' : '🎬 16:9 Video'}
+          </span>
+        </td>
+        <td>
+          <div style="max-width: 220px; overflow: hidden;">
+            ${tagsList || '<span style="color: var(--color-fg-light); font-size: 0.72rem;">No tags</span>'}
+          </div>
+        </td>
+        <td style="text-align: right; white-space: nowrap;">
+          <button class="table-action-btn btn-edit" title="Edit inside content">Edit</button>
+          <button class="table-action-btn btn-prev" title="Preview stream">Preview</button>
+          <button class="table-action-btn btn-del" title="Delete from catalog">Delete</button>
+        </td>
+      `;
+
+      // Events
+      const thumbCell = tr.querySelector('.catalog-thumb-cell');
+      const titleLink = tr.querySelector('.catalog-title-link');
+      const btnEdit = tr.querySelector('.btn-edit');
+      const btnPrev = tr.querySelector('.btn-prev');
+      const btnDel = tr.querySelector('.btn-del');
+
+      const openPrev = () => openStreamPreview(v.title, v.videoUrl);
+      const openEdit = () => openEditDrawer(v);
+
+      if (thumbCell) thumbCell.addEventListener('click', openPrev);
+      if (btnPrev) btnPrev.addEventListener('click', openPrev);
+      if (titleLink) titleLink.addEventListener('click', openEdit);
+      if (btnEdit) btnEdit.addEventListener('click', openEdit);
+
+      if (btnDel) {
+        btnDel.addEventListener('click', () => {
+          if (confirm(`Delete "${v.title}" from catalog?`)) {
+            Catalog.deleteVideo(v.id);
+            showToast(`Deleted "${v.title}"`);
+            renderCatalogTable();
+          }
+        });
+      }
+
+      catalogTableBody.appendChild(tr);
+    });
+  }
+
+  window.renderCatalogList = renderCatalogTable;
+
+  // Filter Tabs
+  const filterBtns = document.querySelectorAll('.catalog-tab-btn');
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      currentCatalogFilter = btn.dataset.filter;
+      renderCatalogTable();
+    });
+  });
+
+  if (catalogSearchInput) {
+    catalogSearchInput.addEventListener('input', () => renderCatalogTable());
+  }
+
+  // Purge Demo Placeholders
+  if (btnPurgePlaceholders) {
+    btnPurgePlaceholders.addEventListener('click', () => {
+      if (confirm('Purge all initial demo placeholder videos (pic01-pic12) from your catalog?')) {
+        Catalog.clearDemoPlaceholders();
+        showToast('Purged demo placeholders from catalog');
+        renderCatalogTable();
       }
     });
   }
 
   // ==============================================================
-  // 4. STREAM PREVIEW MODAL
+  // 4. INLINE EDIT DRAWER CONTROLLER
+  // ==============================================================
+  function openEditDrawer(video) {
+    if (!editDrawerBackdrop) return;
+    drawerVideoId.value = video.id;
+    drawerTitle.value = video.title || '';
+    drawerVideoUrl.value = video.videoUrl || '';
+    drawerArtworkUrl.value = video.artworkUrl || '';
+    if (drawerArtworkPreview) drawerArtworkPreview.src = video.artworkUrl || 'images/pic01.jpg';
+    drawerShelfSelect.value = video.section || 'default';
+    drawerTags.value = (video.tags || []).join(', ');
+    drawerDesc.value = video.description || '';
+
+    editDrawerBackdrop.classList.add('is-open');
+  }
+
+  function closeEditDrawer() {
+    if (!editDrawerBackdrop) return;
+    editDrawerBackdrop.classList.remove('is-open');
+  }
+
+  if (btnCloseDrawer) btnCloseDrawer.addEventListener('click', closeEditDrawer);
+  if (btnCancelDrawer) btnCancelDrawer.addEventListener('click', closeEditDrawer);
+  if (editDrawerBackdrop) {
+    editDrawerBackdrop.addEventListener('click', (e) => {
+      if (e.target === editDrawerBackdrop) closeEditDrawer();
+    });
+  }
+
+  if (drawerArtworkUrl && drawerArtworkPreview) {
+    drawerArtworkUrl.addEventListener('input', (e) => {
+      drawerArtworkPreview.src = e.target.value.trim() || 'images/pic01.jpg';
+    });
+  }
+
+  if (btnSaveDrawer) {
+    btnSaveDrawer.addEventListener('click', () => {
+      const id = drawerVideoId.value;
+      if (!id) return;
+
+      const title = drawerTitle.value.trim();
+      const videoUrl = drawerVideoUrl.value.trim();
+      const artworkUrl = drawerArtworkUrl.value.trim() || 'images/pic01.jpg';
+      const section = drawerShelfSelect.value;
+      const tags = drawerTags.value.split(',').map(t => t.trim()).filter(Boolean);
+      const description = drawerDesc.value.trim();
+
+      if (!title || !videoUrl) {
+        alert('Please provide both Title and Video URL');
+        return;
+      }
+
+      Catalog.updateVideo(id, {
+        title,
+        videoUrl,
+        artworkUrl,
+        section,
+        tags,
+        description
+      });
+
+      showToast(`Updated "${title}" successfully!`);
+      closeEditDrawer();
+      renderCatalogTable();
+    });
+  }
+
+  // ==============================================================
+  // 5. SHELVES & DYNAMIC TAGS OVERVIEW CONTROLLER
+  // ==============================================================
+  function renderShelvesOverview() {
+    const statTop = document.getElementById('stat-count-top20');
+    const statShorts1 = document.getElementById('stat-count-shorts1');
+    const statMid = document.getElementById('stat-count-mid');
+    const statShorts2 = document.getElementById('stat-count-shorts2');
+    const statDefault = document.getElementById('stat-count-default');
+    const tagCloud = document.getElementById('overview-tag-cloud');
+
+    if (statTop) statTop.textContent = `${Catalog.getTop20().length} / 20`;
+    if (statShorts1) statShorts1.textContent = Catalog.getShorts1().length;
+    if (statMid) statMid.textContent = Catalog.getMid().length;
+    if (statShorts2) statShorts2.textContent = Catalog.getShorts2().length;
+    if (statDefault) statDefault.textContent = Catalog.getDefaultFeed().length;
+
+    if (tagCloud) {
+      const allTags = Catalog.getAllTags();
+      tagCloud.innerHTML = '';
+      if (allTags.length === 0) {
+        tagCloud.innerHTML = '<span style="color: var(--color-fg-light); font-size: 0.82rem;">No tags defined yet. Add tags while reviewing or editing videos.</span>';
+        return;
+      }
+
+      allTags.forEach(t => {
+        const count = Catalog.getByTag(t).length;
+        const pill = document.createElement('button');
+        pill.className = 'btn-secondary';
+        pill.style.height = '32px';
+        pill.style.fontSize = '0.78rem';
+        pill.textContent = `#${t} (${count})`;
+        pill.addEventListener('click', () => {
+          if (catalogSearchInput) catalogSearchInput.value = t;
+          switchAdminView('catalog');
+        });
+        tagCloud.appendChild(pill);
+      });
+    }
+  }
+
+  // ==============================================================
+  // 6. DIRECT UPLOAD FORM
+  // ==============================================================
+  if (directUploadForm) {
+    directUploadForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = document.getElementById('upload-title').value.trim();
+      const videoUrl = document.getElementById('upload-cdn-url').value.trim();
+      const artworkUrl = document.getElementById('upload-artwork-url').value.trim() || 'images/pic01.jpg';
+      const section = document.getElementById('upload-shelf-select').value;
+      const tags = (document.getElementById('upload-tags').value || '').split(',').map(t => t.trim()).filter(Boolean);
+      const description = document.getElementById('upload-desc').value.trim();
+
+      Catalog.addVideo({
+        title,
+        videoUrl,
+        artworkUrl,
+        section,
+        tags,
+        description
+      });
+
+      showToast(`Published "${title}" to ${getShelfLabel(section)}!`);
+      directUploadForm.reset();
+      switchAdminView('catalog');
+    });
+  }
+
+  // ==============================================================
+  // 7. STREAM PREVIEW MODAL
   // ==============================================================
   function openStreamPreview(title, streamUrl) {
-    if (!previewModal || !modalVideo) return;
-    modalTitle.textContent = `Preview: ${title}`;
+    if (!previewModal || !modalVideoPlayer) return;
+    if (modalStreamTitle) modalStreamTitle.textContent = `Preview: ${title}`;
     previewModal.classList.add('is-open');
 
     if (modalHls) {
@@ -375,22 +765,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isHls && window.Hls && Hls.isSupported()) {
       modalHls = new Hls({ autoStartLoad: true });
       modalHls.loadSource(streamUrl);
-      modalHls.attachMedia(modalVideo);
+      modalHls.attachMedia(modalVideoPlayer);
       modalHls.on(Hls.Events.MANIFEST_PARSED, () => {
-        modalVideo.play().catch(() => {});
+        modalVideoPlayer.play().catch(() => {});
       });
     } else {
-      modalVideo.src = streamUrl;
-      modalVideo.load();
-      modalVideo.play().catch(() => {});
+      modalVideoPlayer.src = streamUrl;
+      modalVideoPlayer.load();
+      modalVideoPlayer.play().catch(() => {});
     }
   }
 
   function closeStreamPreview() {
-    if (!previewModal || !modalVideo) return;
+    if (!previewModal || !modalVideoPlayer) return;
     previewModal.classList.remove('is-open');
-    modalVideo.pause();
-    modalVideo.src = '';
+    modalVideoPlayer.pause();
+    modalVideoPlayer.src = '';
     if (modalHls) {
       modalHls.destroy();
       modalHls = null;
@@ -405,378 +795,35 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==============================================================
-  // 5. DIRECT UPLOAD / EDIT FORM SUBMIT
+  // 8. EXPORT FOR GITHUB & RESET
   // ==============================================================
-  // Placement Pills in Upload View
-  const placementPills = document.querySelectorAll('.placement-pill-btn');
-  placementPills.forEach(pill => {
-    pill.addEventListener('click', () => {
-      placementPills.forEach(p => p.classList.remove('is-active'));
-      pill.classList.add('is-active');
-      const radio = pill.querySelector('input[type="radio"]');
-      if (radio) radio.checked = true;
-
-      const selectedVal = getSelectedPlacement();
-      if (selectedVal === 'shorts') {
-        artworkPreviewBox.classList.add('is-short');
-      } else {
-        artworkPreviewBox.classList.remove('is-short');
-      }
-    });
-  });
-
-  function getSelectedPlacement() {
-    const checked = document.querySelector('input[name="video-placement"]:checked');
-    return checked ? checked.value : 'top';
-  }
-
-  function setSelectedPlacement(val) {
-    placementPills.forEach(p => {
-      const radio = p.querySelector('input[type="radio"]');
-      if (radio && radio.value === val) {
-        radio.checked = true;
-        p.classList.add('is-active');
-      } else {
-        p.classList.remove('is-active');
-      }
-    });
-    if (val === 'shorts') {
-      artworkPreviewBox.classList.add('is-short');
-    } else {
-      artworkPreviewBox.classList.remove('is-short');
-    }
-  }
-
-  if (artworkUrlInput) {
-    ['input', 'change'].forEach(evt => {
-      artworkUrlInput.addEventListener(evt, () => {
-        updateArtworkPreview(artworkUrlInput.value.trim());
-      });
-    });
-  }
-
-  function updateArtworkPreview(src) {
-    if (src) {
-      artworkPreviewImg.src = src;
-      artworkPreviewImg.style.display = 'block';
-      artworkEmptyLabel.style.display = 'none';
-    } else {
-      artworkPreviewImg.src = '';
-      artworkPreviewImg.style.display = 'none';
-      artworkEmptyLabel.style.display = 'block';
-    }
-  }
-
-  if (artworkDropZone && artworkFileInput) {
-    artworkDropZone.addEventListener('click', () => artworkFileInput.click());
-    artworkFileInput.addEventListener('change', (e) => {
-      if (e.target.files.length > 0) {
-        handleImageFile(e.target.files[0]);
-      }
-    });
-
-    ['dragenter', 'dragover'].forEach(name => {
-      artworkDropZone.addEventListener(name, (e) => {
-        e.preventDefault();
-        artworkDropZone.style.borderColor = 'var(--color-accent)';
-      });
-    });
-
-    ['dragleave', 'drop'].forEach(name => {
-      artworkDropZone.addEventListener(name, (e) => {
-        e.preventDefault();
-        artworkDropZone.style.borderColor = '';
-      });
-    });
-
-    artworkDropZone.addEventListener('drop', (e) => {
-      if (e.dataTransfer.files.length > 0) {
-        handleImageFile(e.dataTransfer.files[0]);
-      }
-    });
-
-    function handleImageFile(file) {
-      if (!file.type.startsWith('image/')) {
-        showToast('Please select an image file (.jpg, .png, .webp)');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        const dataUrl = evt.target.result;
-        artworkUrlInput.value = dataUrl;
-        updateArtworkPreview(dataUrl);
-        showToast(`Loaded ${file.name} into artwork preview`);
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
-  // ==============================================================
-  // 5. MAIN FORM SUBMIT (ADD OR UPDATE)
-  // ==============================================================
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const title = titleInput.value.trim();
-    const desc = descInput.value.trim();
-    const videoUrl = videoUrlInput.value.trim();
-    const artworkUrl = artworkUrlInput.value.trim() || 'images/pic01.jpg';
-    const placement = getSelectedPlacement();
-    const editId = editIdInput.value.trim();
-
-    if (!title || !videoUrl) {
-      showToast('Please enter both Title and Video Stream URL');
-      return;
-    }
-
-    if (editId) {
-      Catalog.updateVideo(editId, {
-        title,
-        description: desc,
-        videoUrl,
-        artworkUrl,
-        section: placement
-      });
-      showToast(`Updated "${title}" successfully`);
-      resetForm();
-    } else {
-      Catalog.addVideo({
-        title,
-        description: desc,
-        videoUrl,
-        artworkUrl,
-        section: placement,
-        type: placement === 'shorts' ? 'short' : 'video'
-      });
-
-      // If this was loaded from a staged draft, remove it from staging
-      if (form._stagedIdToDismiss) {
-        Catalog.rejectStaged(form._stagedIdToDismiss);
-        form._stagedIdToDismiss = null;
-        renderReviewQueue();
-      }
-
-      showToast(`Added "${title}" to ${getPlacementLabel(placement)}`);
-      resetForm();
-    }
-
-    renderCatalogList();
-    switchAdminView('catalog');
-  });
-
-  if (btnCancel) {
-    btnCancel.addEventListener('click', resetForm);
-  }
-
-  function resetForm() {
-    form.reset();
-    form._stagedIdToDismiss = null;
-    editIdInput.value = '';
-    formHeading.textContent = 'Add Video to Stream';
-    editIndicator.textContent = 'New Entry';
-    btnSubmit.innerHTML = '<span>+ Add Video to Stream</span>';
-    setSelectedPlacement('top');
-    updateArtworkPreview('');
-  }
-
-  // ==============================================================
-  // 6==============================================================
-  // 6. RENDERRENDER CATALOGCATALOG MANAGEMENTMANAGEMENT LIST
-  // ==============================================================LIST
-  // ==============================================================
-  function renderCatalogList() {
-    if (!listContainer) return;
-
-    let items = Catalog.getAll();
-    updateCounts(items);
-
-    if (currentFilter !== 'all') {
-      if (currentFilter === 'shorts') {
-        items = items.filter(v => v.section === 'shorts' || v.type === 'short');
-      } else {
-        items = items.filter(v => v.section === currentFilter);
-      }
-    }
-
-    const searchVal = searchInput ? searchInput.value.trim().toLowerCase() : '';
-    if (searchVal) {
-      items = items.filter(v => 
-        (v.title && v.title.toLowerCase().includes(searchVal)) ||
-        (v.description && v.description.toLowerCase().includes(searchVal)) ||
-        (v.id && v.id.toLowerCase().includes(searchVal))
-      );
-    }
-
-    listContainer.innerHTML = '';
-
-    if (items.length === 0) {
-      listContainer.innerHTML = `
-        <div style="padding: 40px; text-align: center; color: var(--color-fg-light); background: var(--bg-card); border: 1px solid var(--color-border);">
-          No published videos found for this filter.
-        </div>
-      `;
-      return;
-    }
-
-    items.forEach(v => {
-      const row = document.createElement('div');
-      row.className = 'catalog-item-row';
-      const isShort = v.section === 'shorts' || v.type === 'short';
-      const thumbClass = isShort ? 'catalog-item-thumb is-short-thumb' : 'catalog-item-thumb';
-      const badgeClass = isShort ? 'catalog-badge-sec shorts-badge' : 'catalog-badge-sec';
-      const secLabel = getPlacementLabel(v.section);
-
-      row.innerHTML = `
-        <div class="${thumbClass}" style="cursor: pointer;" title="Preview video">
-          <img src="${v.artworkUrl || v.image || 'images/pic01.jpg'}" alt="${escapeHtml(v.title)}" />
-        </div>
-        <div class="catalog-item-details">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <h4 class="catalog-item-title">${escapeHtml(v.title)}</h4>
-            <span class="${badgeClass}">${secLabel}</span>
-          </div>
-          <div class="catalog-item-desc">${escapeHtml(v.description || 'No description provided')}</div>
-          <div class="catalog-item-meta">
-            <span>ID: <code>${v.id}</code></span>
-            <span>&bull;</span>
-            <span>${escapeHtml(v.date || 'Recent')}</span>
-            <span>&bull;</span>
-            <span style="max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-              CDN: <a href="${v.videoUrl}" target="_blank" style="color: var(--color-accent); text-decoration: none;">${escapeHtml(v.videoUrl)}</a>
-            </span>
-          </div>
-        </div>
-        <div class="catalog-item-actions">
-          <select class="select-section-move" data-id="${v.id}" title="Move section">
-            <option value="top" ${v.section === 'top' ? 'selected' : ''}>Top 2 Rows</option>
-            <option value="mid" ${v.section === 'mid' ? 'selected' : ''}>Middle Row</option>
-            <option value="shorts" ${v.section === 'shorts' ? 'selected' : ''}>Shorts</option>
-            <option value="bottom" ${v.section === 'bottom' ? 'selected' : ''}>Bottom Feed</option>
-          </select>
-          <button class="btn-item-action btn-preview-cat" data-id="${v.id}" title="Preview stream">Preview</button>
-          <button class="btn-item-action btn-edit" data-id="${v.id}" title="Edit metadata">Edit</button>
-          <button class="btn-item-action btn-del" data-id="${v.id}" title="Delete video">Delete</button>
-        </div>
-      `;
-
-      // Event: Preview
-      const thumb = row.querySelector('.catalog-item-thumb');
-      const btnPrev = row.querySelector('.btn-preview-cat');
-      const prevHandler = () => openStreamPreview(v.title, v.videoUrl);
-      if (thumb) thumb.addEventListener('click', prevHandler);
-      if (btnPrev) btnPrev.addEventListener('click', prevHandler);
-
-      const selectMove = row.querySelector('.select-section-move');
-      selectMove.addEventListener('change', (e) => {
-        const newSec = e.target.value;
-        Catalog.moveSection(v.id, newSec);
-        showToast(`Moved "${v.title}" to ${getPlacementLabel(newSec)}`);
-        renderCatalogList();
-      });
-
-      const btnEdit = row.querySelector('.btn-edit');
-      btnEdit.addEventListener('click', () => {
-        loadVideoIntoForm(v);
-        switchAdminView('upload');
-      });
-
-      const btnDel = row.querySelector('.btn-del');
-      btnDel.addEventListener('click', () => {
-        if (confirm(`Delete "${v.title}" from catalog?`)) {
-          Catalog.deleteVideo(v.id);
-          showToast(`Deleted "${v.title}"`);
-          renderCatalogList();
-        }
-      });
-
-      listContainer.appendChild(row);
-    });
-  }
-
-  function loadVideoIntoForm(v) {
-    editIdInput.value = v.id;
-    titleInput.value = v.title || '';
-    descInput.value = v.description || '';
-    videoUrlInput.value = v.videoUrl || '';
-    artworkUrlInput.value = v.artworkUrl || v.image || '';
-    setSelectedPlacement(v.section || 'top');
-    updateArtworkPreview(v.artworkUrl || v.image || '');
-
-    formHeading.textContent = `Edit Video: ${v.title}`;
-    editIndicator.textContent = `Editing ID: ${v.id}`;
-    btnSubmit.innerHTML = '<span>Save Changes</span>';
-
-    titleInput.focus();
-  }
-
-  function updateCounts(allVideos) {
-    const totalEl = document.getElementById('total-video-count');
-    const countAll = document.getElementById('count-all');
-    const countTop = document.getElementById('count-top');
-    const countMid = document.getElementById('count-mid');
-    const countShorts = document.getElementById('count-shorts');
-    const countBottom = document.getElementById('count-bottom');
-
-    const topCount = allVideos.filter(v => v.section === 'top').length;
-    const midCount = allVideos.filter(v => v.section === 'mid').length;
-    const shortsCount = allVideos.filter(v => v.section === 'shorts' || v.type === 'short').length;
-    const bottomCount = allVideos.filter(v => v.section === 'bottom').length;
-
-    if (totalEl) totalEl.textContent = allVideos.length;
-    if (countAll) countAll.textContent = allVideos.length;
-    if (countTop) countTop.textContent = topCount;
-    if (countMid) countMid.textContent = midCount;
-    if (countShorts) countShorts.textContent = shortsCount;
-    if (countBottom) countBottom.textContent = bottomCount;
-    if (catalogCountPill) catalogCountPill.textContent = allVideos.length;
-  }
-
-  // Filter tabstabs
-  document.querySelectorAll('.catalog-tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.catalog-tab-btn').forEach(b => b.classList.remove('is-active'));
-      btn.classList.add('is-active');
-      currentFilter = btn.getAttribute('data-filter');
-      renderCatalogList();
-    });
-  });
-
-  if (searchInput) {
-    searchInput.addEventListener('input', renderCatalogList);
-  }
-
-  // Export& Reset
-  if (btnExport) {
-    btnExport.addEventListener('click', () => {
-      const jsContent = Catalog.exportFeedJS();
-      const blob = new Blob([jsContent], { type: 'application/javascript;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
+  if (btnExportFeed) {
+    btnExportFeed.addEventListener('click', () => {
+      const code = Catalog.exportFeedJS();
+      const blob = new Blob([code], { type: 'application/javascript;charset=utf-8' });
       const a = document.createElement('a');
-      a.href = url;
+      a.href = URL.createObjectURL(blob);
       a.download = 'catalog-feed.js';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      showToast('Downloaded catalog-feed.js! Drag it into your GitHub repo\'s js/ folder.');
+      showToast('Downloaded updated catalog-feed.js! Drag into your repo js/ folder.');
     });
   }
 
-  if (btnReset) {
-    btnReset.addEventListener('click', () => {
-      if (confirm('Reset catalog back to initial defaults?')) {
+  if (btnResetCatalog) {
+    btnResetCatalog.addEventListener('click', () => {
+      if (confirm('Reset your catalog to the default master feed?')) {
         Catalog.resetToDefaults();
-        showToast('Catalog reset to initial feed defaults');
-        renderCatalogList();
+        showToast('Reset catalog to master feed');
+        renderCatalogTable();
+        renderDeck();
       }
     });
   }
 
-  // Logout
-  const btnLogout = document.getElementById('btn-admin-logout');
-  if (btnLogout) {
-    btnLogout.addEventListener('click', () => {
+  if (btnAdminLogout) {
+    btnAdminLogout.addEventListener('click', () => {
       try {
         sessionStorage.removeItem('tuc_admin_auth');
         localStorage.removeItem('tuc_admin_auth');
@@ -786,15 +833,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function getPlacementLabel(sec) {
-    switch (sec) {
-      case 'top': return 'Top 2 Rows';
-      case 'mid': return 'Middle Row';
-      case 'shorts': return 'Shorts Shelf';
-      case 'bottom': return 'Bottom Feed';
-      default: return 'Top 2 Rows';
+  // Keyboard navigation for Deck: ArrowLeft / ArrowRight
+  window.addEventListener('keydown', (e) => {
+    if (currentView !== 'review') return;
+    if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+    if (e.key === 'ArrowLeft' && btnDeckPrev && !btnDeckPrev.disabled) {
+      btnDeckPrev.click();
+    } else if (e.key === 'ArrowRight' && btnDeckNext && !btnDeckNext.disabled) {
+      btnDeckNext.click();
     }
-  }
+  });
 
   function showToast(msg) {
     const toast = document.getElementById('admin-toast');
@@ -818,8 +866,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Initial renders
-  renderReviewQueue();
+  renderDeck();
+  renderCatalogTable();
   switchAdminView('review');
-  window.renderReviewQueue = renderReviewQueue;
-  window.updateStagingCounts = updateStagingCounts;
 });

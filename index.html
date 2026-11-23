@@ -21,17 +21,22 @@
 
     <!-- Main Content Area: Fluid Full Width Auto Adjust Grid -->
     <main id="main-content">
-      <div class="content-header">
-        <h2>Featured Videos</h2>
-        <p>Curated stream matching the classic editorial aesthetic</p>
+      <!-- Dynamic Content Header with Active Tag Filter Bar -->
+      <div class="content-header-row">
+        <div class="content-header-title">
+          <h2>Featured Videos</h2>
+        </div>
+        <div class="content-tags-bar" id="content-tags-bar">
+          <!-- Populated dynamically from approved video stream tags -->
+        </div>
       </div>
 
-      <!-- 11: Top 2 Rows of Videos -->
+      <!-- Tier 1: Top 20 Entries Video Grid -->
       <section class="video-grid" id="video-grid-top">
-        <!-- 2 rows rendered by JS -->
+        <!-- Rendered dynamically by js/app.js -->
       </section>
 
-      <!-- 0: First Shorts Shelf -->
+      <!-- Tier 2: First Shorts Shelf -->
       <section class="shorts-section" id="shorts-section-1">
         <div class="shorts-header">
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e0245e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
@@ -40,16 +45,16 @@
           <h2>Shorts</h2>
         </div>
         <div class="shorts-grid" id="shorts-grid-1">
-          <!-- First Shorts shelf rendered by JS -->
+          <!-- Rendered dynamically by js/app.js -->
         </div>
       </section>
 
-      <!-- 1: 1 Row of Videos -->
+      <!-- Tier 3: Curated Video Stream (Mid-Tier) -->
       <section class="video-grid" id="video-grid-mid">
-        <!-- 1 row rendered by JS -->
+        <!-- Rendered dynamically by js/app.js -->
       </section>
 
-      <!-- 0: Second Shorts Shelf -->
+      <!-- Tier 4: Trending Shorts Shelf 2 -->
       <section class="shorts-section" id="shorts-section-2">
         <div class="shorts-header">
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e0245e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
@@ -58,13 +63,13 @@
           <h2>Trending Shorts</h2>
         </div>
         <div class="shorts-grid" id="shorts-grid-2">
-          <!-- Second Shorts shelf rendered by JS -->
+          <!-- Rendered dynamically by js/app.js -->
         </div>
       </section>
 
-      <!-- 111...: Endless Videos Feed -->
+      <!-- Tier 5: Endless Default Video Feed (Fallback Pool) -->
       <section class="video-grid" id="video-grid-bottom">
-        <!-- Endless video cards rendered by JS -->
+        <!-- Endless video cards rendered dynamically by js/app.js -->
       </section>
       <div id="infinite-sentinel" class="infinite-sentinel"></div>
       <div id="infinite-loader" class="infinite-loader" style="display: none;">

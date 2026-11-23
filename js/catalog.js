@@ -1,7 +1,7 @@
 /**
  * The Unemployed Club - Unified Editorial Catalog Data Store
- * Manages video metadata, stream links, artwork CDN URLs, section placement,
- * staging / review queue pipeline, and zero-technical-knowledge export for GitHub Pages.
+ * Manages video metadata, stream links, artwork CDN URLs, 5-tier section placement,
+ * dynamic content tags, sequential review deck pipeline, and GitHub Pages sync.
  */
 
 (function (window) {
@@ -10,6 +10,33 @@
   const STORAGE_KEY = 'webvideo_catalog_v1';
   const STAGING_KEY = 'webvideo_staging_v1';
   const PROCESSED_KEY = 'webvideo_staging_processed_v1';
+
+  // Helper: Normalize tags into a clean string array
+  function normalizeTags(rawTags) {
+    if (!rawTags) return [];
+    if (Array.isArray(rawTags)) {
+      return rawTags.map(t => String(t).trim()).filter(Boolean);
+    }
+    if (typeof rawTags === 'string') {
+      return rawTags
+        .split(',')
+        .map(t => t.replace(/^[#\s]+/, '').trim())
+        .filter(Boolean);
+    }
+    return [];
+  }
+
+  // Helper: Normalize 5-tier section identifiers
+  function normalizeSection(sec, type) {
+    const s = String(sec || '').toLowerCase().trim();
+    if (s === 'top' || s === 'top20' || s === 'featured') return 'top20';
+    if (s === 'shorts' || s === 'shorts1' || s === 'short') return 'shorts1';
+    if (s === 'mid' || s === 'middle' || s === 'curated') return 'mid';
+    if (s === 'shorts2' || s === 'trending_shorts') return 'shorts2';
+    if (s === 'bottom' || s === 'default' || s === 'feed') return 'default';
+    if (type === 'short') return 'shorts1';
+    return 'default'; // Unassigned videos default to the endless bottom feed
+  }
 
   function initCatalog() {
     let items = [];
@@ -32,6 +59,12 @@
       items = JSON.parse(JSON.stringify(window.WEBVIDEO_FEED));
       saveToStorage(items);
     }
+
+    // Normalize items
+    items.forEach(v => {
+      v.section = normalizeSection(v.section, v.type);
+      v.tags = normalizeTags(v.tags);
+    });
 
     return items;
   }
@@ -123,27 +156,68 @@
       return [...catalogItems];
     },
 
-    getSection(section) {
-      return catalogItems.filter(v => (v.section || 'top').toLowerCase() === section.toLowerCase());
+    // --- Dynamic Content Tags System ---
+    getAllTags() {
+      const counts = {};
+      catalogItems.forEach(item => {
+        const tags = Array.isArray(item.tags) ? item.tags : [];
+        tags.forEach(t => {
+          const clean = String(t).trim();
+          if (clean) counts[clean] = (counts[clean] || 0) + 1;
+        });
+      });
+      return Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
     },
 
+    getByTag(tag) {
+      if (!tag) return this.getAll();
+      const lower = String(tag).toLowerCase().replace(/^[#\s]+/, '').trim();
+      return catalogItems.filter(item => {
+        const tags = Array.isArray(item.tags) ? item.tags : [];
+        return tags.some(t => String(t).toLowerCase().replace(/^[#\s]+/, '').trim() === lower);
+      });
+    },
+
+    // --- 5-Tier Section Query Methods ---
+    getTop20() {
+      return catalogItems.filter(v => v.section === 'top20').slice(0, 20);
+    },
+
+    getShorts1() {
+      return catalogItems.filter(v => v.section === 'shorts1');
+    },
+
+    getMid() {
+      return catalogItems.filter(v => v.section === 'mid');
+    },
+
+    getShorts2() {
+      return catalogItems.filter(v => v.section === 'shorts2');
+    },
+
+    getDefaultFeed() {
+      const tiers = new Set(['top20', 'shorts1', 'mid', 'shorts2']);
+      return catalogItems.filter(v => !v.section || v.section === 'default' || !tiers.has(v.section));
+    },
+
+    // Legacy method aliases for backward compatibility
     getTopVideos() {
-      const vids = this.getSection('top');
-      return vids.length > 0 ? vids : catalogItems.filter(v => v.type !== 'short').slice(0, 12);
+      const top = this.getTop20();
+      return top.length > 0 ? top : catalogItems.filter(v => v.type !== 'short').slice(0, 12);
     },
 
     getMidVideos() {
-      const vids = this.getSection('mid');
-      return vids.length > 0 ? vids : catalogItems.filter(v => v.type !== 'short').slice(12, 18);
+      const mid = this.getMid();
+      return mid.length > 0 ? mid : catalogItems.filter(v => v.type !== 'short').slice(12, 18);
     },
 
     getShorts(offset = 0, limit = 100) {
-      const shorts = catalogItems.filter(v => v.section === 'shorts' || v.type === 'short');
-      return shorts.slice(offset, offset + limit);
+      const allShorts = catalogItems.filter(v => v.section === 'shorts1' || v.section === 'shorts2' || v.type === 'short');
+      return allShorts.slice(offset, offset + limit);
     },
 
     getEndlessPool() {
-      const pool = this.getSection('bottom');
+      const pool = this.getDefaultFeed();
       if (pool.length > 0) return pool;
       return catalogItems.filter(v => v.type !== 'short');
     },
@@ -161,22 +235,25 @@
 
     addVideo(videoData) {
       const id = 'vid_' + Date.now();
+      const section = normalizeSection(videoData.section, videoData.type);
+      const isShort = section === 'shorts1' || section === 'shorts2';
+
       const newVideo = {
         id,
-        section: videoData.section || 'top',
-        type: videoData.section === 'shorts' ? 'short' : (videoData.type || 'video'),
+        section,
+        type: isShort ? 'short' : (videoData.type || 'video'),
         title: videoData.title || 'Untitled Video',
         description: videoData.description || '',
+        tags: normalizeTags(videoData.tags),
         date: videoData.date || new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
         author: videoData.author || 'The Unemployed Club',
         avatar: videoData.avatar || 'images/avatar.jpg',
         artworkUrl: videoData.artworkUrl || 'images/pic01.jpg',
         videoUrl: videoData.videoUrl || '',
         views: videoData.views || '1.2K views',
-        duration: videoData.duration || '12:00'
+        duration: videoData.duration || (isShort ? '0:45' : '12:00')
       };
 
-      // Add to beginning of catalog
       catalogItems.unshift(newVideo);
       saveToStorage(catalogItems);
       return newVideo;
@@ -185,10 +262,16 @@
     updateVideo(id, updatedData) {
       const idx = catalogItems.findIndex(v => String(v.id) === String(id));
       if (idx !== -1) {
+        const cur = catalogItems[idx];
+        const section = updatedData.section !== undefined ? normalizeSection(updatedData.section, updatedData.type) : cur.section;
+        const isShort = section === 'shorts1' || section === 'shorts2';
+
         catalogItems[idx] = {
-          ...catalogItems[idx],
+          ...cur,
           ...updatedData,
-          type: updatedData.section === 'shorts' ? 'short' : 'video'
+          section,
+          type: isShort ? 'short' : 'video',
+          tags: updatedData.tags !== undefined ? normalizeTags(updatedData.tags) : cur.tags
         };
         saveToStorage(catalogItems);
         return catalogItems[idx];
@@ -204,9 +287,8 @@
     moveSection(id, newSection) {
       const vid = this.getVideoById(id);
       if (vid) {
-        vid.section = newSection;
-        if (newSection === 'shorts') vid.type = 'short';
-        else vid.type = 'video';
+        vid.section = normalizeSection(newSection, vid.type);
+        vid.type = (vid.section === 'shorts1' || vid.section === 'shorts2') ? 'short' : 'video';
         saveToStorage(catalogItems);
         return true;
       }
@@ -226,6 +308,7 @@
         videoUrl: item.videoUrl || item.video_url || '',
         artworkUrl: item.artworkUrl || item.artwork_url || 'images/pic01.jpg',
         description: item.description || '',
+        tags: normalizeTags(item.tags),
         author: item.author || 'The Unemployed Club',
         sourceUrl: item.sourceUrl || item.source_url || '',
         status: 'pending_review',
@@ -237,23 +320,27 @@
       return stagedItem;
     },
 
-    approveStaged(id, targetSection = 'top', overrides = {}) {
+    approveStaged(id, targetSection = 'default', overrides = {}) {
       const idx = stagingItems.findIndex(s => String(s.id) === String(id));
       if (idx === -1) return null;
 
       const staged = stagingItems[idx];
       markDraftProcessed(staged.id, staged.videoUrl, staged.sourceUrl);
 
+      const resolvedSection = normalizeSection(targetSection);
+      const isShort = resolvedSection === 'shorts1' || resolvedSection === 'shorts2';
+
       const videoData = {
         title: overrides.title !== undefined ? overrides.title : staged.title,
         description: overrides.description !== undefined ? overrides.description : staged.description,
+        tags: overrides.tags !== undefined ? normalizeTags(overrides.tags) : (staged.tags || []),
         videoUrl: overrides.videoUrl !== undefined ? overrides.videoUrl : staged.videoUrl,
         artworkUrl: overrides.artworkUrl !== undefined ? overrides.artworkUrl : staged.artworkUrl,
         author: overrides.author !== undefined ? overrides.author : staged.author,
-        section: targetSection,
-        type: targetSection === 'shorts' ? 'short' : 'video',
+        section: resolvedSection,
+        type: isShort ? 'short' : 'video',
         views: '1.4K views',
-        duration: targetSection === 'shorts' ? '0:45' : '12:00'
+        duration: isShort ? '0:45' : '12:00'
       };
 
       const published = this.addVideo(videoData);
@@ -286,15 +373,35 @@
     resetToDefaults() {
       if (Array.isArray(window.WEBVIDEO_FEED)) {
         catalogItems = JSON.parse(JSON.stringify(window.WEBVIDEO_FEED));
+        catalogItems.forEach(v => {
+          v.section = normalizeSection(v.section, v.type);
+          v.tags = normalizeTags(v.tags);
+        });
         saveToStorage(catalogItems);
       }
+      return catalogItems;
+    },
+
+    // Clean out demo placeholder videos
+    clearDemoPlaceholders() {
+      catalogItems = catalogItems.filter(v => {
+        const art = String(v.artworkUrl || '');
+        const title = String(v.title || '').toLowerCase();
+        if (art.includes('pic01.jpg') || art.includes('pic02.jpg') || art.includes('pic03.jpg')) {
+          if (title.includes('vitae sed') || title.includes('magna sed') || title.includes('lorem ipsum')) {
+            return false;
+          }
+        }
+        return true;
+      });
+      saveToStorage(catalogItems);
       return catalogItems;
     },
 
     // Zero-Knowledge 1-File Export for GitHub Pages
     exportFeedJS() {
       const json = JSON.stringify(catalogItems, null, 2);
-      return `// The Unemployed Club - Master Editorial Catalog Feed\n// Auto-generated by Admin Panel\nwindow.WEBVIDEO_FEED = ${json};\n`;
+      return `// The Unemployed Club - Master Editorial Catalog Feed\n// Auto-generated by Admin Studio\nwindow.WEBVIDEO_FEED = ${json};\n`;
     },
 
     exportJSON() {

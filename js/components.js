@@ -226,54 +226,31 @@
     renderAdminSidebar(active) {
       this.innerHTML = `
         <aside id="sidebar-nav">
-          <div class="sidebar-section-header">Studio Views</div>
+          <div class="sidebar-section-header">Content Studio</div>
           <ul class="side-links">
             <li>
-              <a href="#view-review" id="admin-nav-review" class="${active === 'review' || !active ? 'active' : ''}" title="Review Queue">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                <span>Review Inbox</span>
+              <a href="#view-review" id="admin-nav-review" class="${active === 'review' || !active ? 'active' : ''}" title="Sequential 1-by-1 Review Deck">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <span>Review Deck</span>
                 <span class="sidebar-pending-badge" id="sidebar-review-badge">0</span>
               </a>
             </li>
             <li>
-              <a href="#view-catalog" id="admin-nav-catalog" class="${active === 'catalog' ? 'active' : ''}" title="Video Catalog Manager">
+              <a href="#view-videos" id="admin-nav-videos" class="${active === 'videos' ? 'active' : ''}" title="Landscape Video Catalog">
                 ${ICONS.catalogGrid}
-                <span>Video Catalog</span>
+                <span>Videos</span>
               </a>
             </li>
             <li>
-              <a href="#view-upload" id="admin-nav-add" class="${active === 'add' ? 'active' : ''}" title="Upload / Add Video">
-                ${ICONS.videoPlus}
-                <span>Upload Video</span>
-              </a>
-            </li>
-          </ul>
-
-          <div class="sidebar-section-divider"></div>
-          <div class="sidebar-section-header">Categories & Shelves</div>
-          <ul class="side-links">
-            <li>
-              <a href="#view-catalog" id="admin-nav-top" title="Top 2 Rows (Featured)">
-                ${ICONS.star}
-                <span>Top 2 Rows</span>
-              </a>
-            </li>
-            <li>
-              <a href="#view-catalog" id="admin-nav-mid" title="Middle Row (Curated)">
-                ${ICONS.layers}
-                <span>Middle Row</span>
-              </a>
-            </li>
-            <li>
-              <a href="#view-catalog" id="admin-nav-shorts" title="Shorts Shelf (9:16)">
+              <a href="#view-shorts" id="admin-nav-shorts" class="${active === 'shorts' ? 'active' : ''}" title="Vertical Shorts Catalog">
                 ${ICONS.shorts}
-                <span>Shorts Shelf</span>
+                <span>Shorts</span>
               </a>
             </li>
             <li>
-              <a href="#view-catalog" id="admin-nav-bottom" title="Bottom Feed">
-                ${ICONS.trending}
-                <span>Bottom Feed</span>
+              <a href="#view-shelves" id="admin-nav-tags" class="${active === 'shelves' ? 'active' : ''}" title="Content Tags and Shelves">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                <span>Tags &amp; Shelves</span>
               </a>
             </li>
           </ul>
@@ -308,8 +285,9 @@
 
     initAdminEvents() {
       const navReview = this.querySelector('#admin-nav-review');
-      const navCatalog = this.querySelector('#admin-nav-catalog');
-      const navAdd = this.querySelector('#admin-nav-add');
+      const navVideos = this.querySelector('#admin-nav-videos');
+      const navShorts = this.querySelector('#admin-nav-shorts');
+      const navTags = this.querySelector('#admin-nav-tags');
 
       if (navReview) {
         navReview.addEventListener('click', (e) => {
@@ -319,41 +297,29 @@
         });
       }
 
-      if (navCatalog) {
-        navCatalog.addEventListener('click', (e) => {
+      if (navVideos) {
+        navVideos.addEventListener('click', (e) => {
           e.preventDefault();
-          this.setActiveLink(navCatalog);
-          if (window.switchAdminView) window.switchAdminView('catalog');
+          this.setActiveLink(navVideos);
+          if (window.filterCatalogByType) window.filterCatalogByType('video');
         });
       }
 
-      if (navAdd) {
-        navAdd.addEventListener('click', (e) => {
+      if (navShorts) {
+        navShorts.addEventListener('click', (e) => {
           e.preventDefault();
-          this.setActiveLink(navAdd);
-          if (window.switchAdminView) window.switchAdminView('upload');
+          this.setActiveLink(navShorts);
+          if (window.filterCatalogByType) window.filterCatalogByType('short');
         });
       }
 
-      // Shelf filter shortcuts
-      const shelves = [
-        { id: '#admin-nav-top', filter: 'top' },
-        { id: '#admin-nav-mid', filter: 'mid' },
-        { id: '#admin-nav-shorts', filter: 'shorts' },
-        { id: '#admin-nav-bottom', filter: 'bottom' }
-      ];
-      shelves.forEach(sh => {
-        const a = this.querySelector(sh.id);
-        if (a) {
-          a.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.setActiveLink(a);
-            if (window.switchAdminView) window.switchAdminView('catalog');
-            const catBtn = document.querySelector(`.catalog-tab-btn[data-filter="${sh.filter}"]`);
-            if (catBtn) catBtn.click();
-          });
-        }
-      });
+      if (navTags) {
+        navTags.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.setActiveLink(navTags);
+          if (window.switchAdminView) window.switchAdminView('shelves');
+        });
+      }
 
       // Export for GitHub
       const navExport = this.querySelector('#admin-nav-export');

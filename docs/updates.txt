@@ -1,22 +1,25 @@
 # The Unemployed Club — Progress Report
 
-> **Title:** Dedicated Review Inbox & Smart Auto-Placement Pipeline
+> **Title:** Sequential 1-by-1 Review Deck, Dynamic Content Tags & 5-Tier Editorial Feed
 > **Repository:** `nishantkumrmishra/theunemployedclub`
 > **Live Site:** `https://nishantkumrmishra.github.io/theunemployedclub/`
 
 ```diff
 + WORK DONE
-+ [Review Inbox] Created dedicated primary view tab in Admin Studio (`admin.html`) separating Review, Catalog, and Upload.
-+ [Sidebar Navigation] Added Review Inbox link with dynamic pending count badge (`#sidebar-review-badge`) in `<site-sidebar>`.
-+ [Review Cards] Designed modern Pro Review Cards with 210px thumbnail column, hover play overlay, and direct stream type indicators.
-+ [Inline Editing] Enabled instant in-place title and description editing directly on the review card without opening secondary forms.
-+ [Auto-Detection] Built smart detection to auto-identify vertical shorts (`/shorts/`, `/reel/`, `#shorts`) and pre-select Shorts Shelf.
-+ [Section Dropdown] Provided clean override dropdown for manual routing to Top 2 Rows (Featured), Middle Row, or Bottom Feed.
-+ [Instant Deletion] Configured `Approve & Publish` and `Dismiss` to automatically delete reviewed drafts from queue with exit animation.
-+ [Permanent Purge] Implemented processed draft registry (`webvideo_staging_processed_v1`) to prevent reviewed items from lingering on refresh.
-+ [Empty State] Added dedicated "All Caught Up!" empty state with direct URL staging button when review queue reaches 0.
-+ [Shorts Playback] Integrated Hls.js in `shorts.html` for native `.m3u8` desktop stream decoding with muted autoplay fix.
-+ [Shorts UX] Added spinning CD vinyl icon, flyout volume slider, mouse wheel / touch swipe navigation, and 0-comment notice.
++ [Review Deck] Replaced bulky queue cards with a Sequential 1-by-1 Focus Deck in `admin.html`.
++ [Deck Auto-Advance] Clicking "Approve & Advance" or "Dismiss" saves to catalog, purges draft, and immediately advances to the next draft in line.
++ [Real-Time Preview] Embedded live video player (HLS / MP4) right inside the Review Deck card with aspect ratio and stream codec badges.
++ [Deck Inline Editing] Editable Title, Thumbnail URL, Shelf Dropdown, Tags, and Description fields right on the deck card.
++ [Dynamic Tags System] Replaced static subtitle with horizontal scrollable content tag chips next to "Featured Videos" on `index.html`.
++ [Dynamic Tags Engine] Engine aggregates all unique tags from active videos (`Catalog.getAllTags()`) and filters grid on 1-click.
++ [5-Tier Hierarchy] Structured feed into 5 explicit tiers: Top 20 Entries, Shorts Shelf 1, Curated Mid Stream, Trending Shorts 2, Endless Default Feed.
++ [Default Fallback Feed] Any unassigned video automatically flows into the Endless Default Feed, supporting unlimited video additions.
++ [Compact Catalog Table] Built high-density table view in Admin Studio showing Thumbnail, Title, Shelf Badge, Type, Tags, and Actions.
++ [Slide-out Edit Drawer] Clicking any catalog title or row opens a slide-out edit drawer to update video metadata and artwork with live preview.
++ [Sidebar Overhaul] Stripped out cluttered redundant links; sidebar now cleanly displays Review Deck, Videos, Shorts, Tags & Shelves, Export.
++ [Tags & Shelves View] Built dedicated overview dashboard displaying video counts across all 5 tiers and interactive tag cloud.
++ [Demo Placeholders Purge] Added 1-click button in Admin Studio to purge initial mock placeholder videos (pic01-pic12).
++ [Shorts Player Polish] Integrated spinning CD vinyl icon, flyout volume slider, mouse wheel / touch swipe navigation, and 0-comment notice.
 + [Security] Maintained `js/staging-feed.js` and `tools/extracted/` in `.gitignore` to prevent repository suspensions.
 ```
 

@@ -32,7 +32,7 @@
       background: var(--bg-card);
       border: solid 1px var(--color-border);
       border-left: 4px solid var(--color-accent);
-      padding: 18px 24px;
+      padding: 16px 22px;
       margin-bottom: 24px;
       display: flex;
       align-items: center;
@@ -47,7 +47,7 @@
       font-weight: 400 !important;
     }
     .admin-banner-info p {
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       color: var(--color-fg);
       max-width: 680px;
       line-height: 1.5;
@@ -62,7 +62,7 @@
     .admin-view-tabs {
       display: flex;
       gap: 8px;
-      margin-bottom: 26px;
+      margin-bottom: 22px;
       border-bottom: solid 1px var(--color-border);
       padding-bottom: 12px;
       flex-wrap: wrap;
@@ -71,11 +71,11 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 18px;
+      padding: 9px 18px;
       background: var(--bg-card);
       border: solid 1px var(--color-border);
       color: var(--color-fg-bold);
-      font-size: 0.86rem;
+      font-size: 0.85rem;
       cursor: pointer;
       border-radius: 0 !important;
       transition: all 0.15s ease;
@@ -92,7 +92,7 @@
     .staged-badge-count {
       background: #f59e0b;
       color: #ffffff;
-      padding: 2px 8px;
+      padding: 2px 7px;
       font-size: 0.72rem;
       font-weight: 500;
       letter-spacing: 0.4px;
@@ -114,457 +114,474 @@
       color: #ffffff;
     }
 
-    /* Pro Review Card - Comfortable size, balanced proportions */
-    .review-card-pro {
-      background: #ffffff;
-      border: solid 1px var(--color-border);
-      border-left: 4px solid #f59e0b;
-      padding: 22px;
-      margin-bottom: 20px;
-      display: grid;
-      grid-template-columns: 210px 1fr 260px;
-      gap: 24px;
-      align-items: start;
-      transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.15s ease;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-    }
-    .review-card-pro:hover {
-      border-color: var(--color-accent);
-    }
-    .review-thumb-col {
+    /* Sequential 1-by-1 Review Deck Styles */
+    .deck-status-bar {
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 18px;
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .deck-counter-label {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--color-fg-bold);
+      display: flex;
+      align-items: center;
       gap: 8px;
     }
-    .review-thumb-box {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      background: #111111;
-      overflow: hidden;
-      position: relative;
+    .deck-nav-btn {
+      height: 32px;
+      padding: 0 12px;
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      color: var(--color-fg-bold);
+      font-size: 0.8rem;
       cursor: pointer;
-      border: solid 1px var(--color-border);
-    }
-    .review-thumb-box.is-short {
-      aspect-ratio: 9 / 14;
-      max-width: 150px;
-      margin: 0 auto;
-    }
-    .review-thumb-box img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .review-thumb-overlay {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.38);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-    .review-thumb-box:hover .review-thumb-overlay {
-      opacity: 1;
-    }
-    .review-play-badge {
-      background: var(--color-accent);
-      color: #ffffff;
-      padding: 6px 10px;
-      font-size: 0.74rem;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 6px;
+      border-radius: 0 !important;
+      transition: all 0.15s ease;
     }
-    .review-edit-col {
+    .deck-nav-btn:hover:not(:disabled) {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+    .deck-nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .deck-card-container {
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      border-left: 4px solid var(--color-accent);
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 28px;
+      padding: 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+      margin-bottom: 24px;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .deck-media-col {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      min-width: 0;
+      gap: 14px;
     }
-    .review-input-group label {
-      font-size: 0.72rem;
-      color: var(--color-fg-light);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 4px;
+    .deck-player-box {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000000;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+    }
+    .deck-player-box.is-vertical {
+      aspect-ratio: 9 / 14;
+      max-width: 280px;
+      margin: 0 auto;
+    }
+    .deck-player-box video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
       display: block;
     }
-    .review-title-input {
-      width: 100%;
-      font-size: 0.96rem;
-      font-weight: 500;
-      color: var(--color-fg-bold);
-      padding: 9px 12px;
-      border: solid 1px var(--color-border);
-      background: #fafafa;
-      outline: none;
-      font-family: inherit;
-      border-radius: 0 !important;
-      transition: border-color 0.2s ease, background 0.2s ease;
-    }
-    .review-title-input:focus {
-      border-color: var(--color-accent);
-      background: #ffffff;
-    }
-    .review-desc-input {
-      width: 100%;
-      font-size: 0.82rem;
-      color: var(--color-fg);
-      padding: 8px 12px;
-      border: solid 1px var(--color-border);
-      background: #fafafa;
-      outline: none;
-      font-family: inherit;
-      resize: vertical;
-      line-height: 1.45;
-      border-radius: 0 !important;
-      transition: border-color 0.2s ease, background 0.2s ease;
-    }
-    .review-desc-input:focus {
-      border-color: var(--color-accent);
-      background: #ffffff;
-    }
-    .review-meta-row {
-      font-size: 0.74rem;
-      color: var(--color-fg-light);
+    .deck-badges-row {
       display: flex;
-      gap: 10px;
-      align-items: center;
+      gap: 8px;
       flex-wrap: wrap;
     }
-    .review-actions-col {
+    .deck-badge-pill {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      background: rgba(160, 160, 160, 0.12);
+      border: 1px solid var(--color-border);
+      color: var(--color-fg-bold);
+    }
+    .deck-badge-pill.is-live {
+      background: rgba(46, 186, 174, 0.12);
+      border-color: rgba(46, 186, 174, 0.35);
+      color: var(--color-accent);
+    }
+    .deck-thumb-preview-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      background: rgba(160, 160, 160, 0.05);
+      border: 1px solid var(--color-border);
+    }
+    .deck-thumb-preview-box img {
+      width: 72px;
+      height: 48px;
+      object-fit: cover;
+      display: block;
+      border: 1px solid var(--color-border);
+    }
+
+    .deck-form-col {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      background: rgba(160, 160, 160, 0.05);
-      border: solid 1px var(--color-border);
-      padding: 16px;
+      gap: 14px;
     }
-    .review-placement-label {
-      font-size: 0.75rem;
-      color: var(--color-fg-bold);
+    .deck-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .deck-field-group label {
+      font-size: 0.78rem;
       font-weight: 500;
+      color: var(--color-fg-bold);
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
     .auto-detected-tag {
-      font-size: 0.68rem;
+      font-size: 0.7rem;
       color: #b45309;
       background: rgba(245, 158, 11, 0.15);
-      padding: 1px 6px;
+      padding: 2px 7px;
       border: 1px solid rgba(245, 158, 11, 0.3);
     }
-    .select-review-placement {
+    .deck-input-text {
       height: 38px;
-      padding: 0 10px;
+      padding: 0 12px;
       background: #ffffff;
-      border: solid 1px var(--color-border);
-      font-size: 0.82rem;
+      border: 1px solid var(--color-border);
+      font-size: 0.86rem;
+      color: var(--color-fg-bold);
+      outline: none;
+      width: 100%;
+      border-radius: 0 !important;
+    }
+    .deck-input-text:focus {
+      border-color: var(--color-accent);
+    }
+    .deck-select {
+      height: 40px;
+      padding: 0 12px;
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      font-size: 0.86rem;
       color: var(--color-fg-bold);
       outline: none;
       width: 100%;
       cursor: pointer;
       border-radius: 0 !important;
     }
-    .btn-approve-pro {
-      height: 40px;
-      padding: 0 16px;
-      background: var(--color-accent);
-      color: #ffffff;
-      border: solid 1px var(--color-accent);
+    .deck-textarea {
+      padding: 10px 12px;
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      font-size: 0.82rem;
+      color: var(--color-fg-bold);
+      outline: none;
+      width: 100%;
+      resize: vertical;
+      min-height: 64px;
+      border-radius: 0 !important;
+    }
+    .deck-textarea:focus {
+      border-color: var(--color-accent);
+    }
+    .deck-tag-quick-bar {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    .deck-tag-chip {
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      background: rgba(160, 160, 160, 0.1);
+      border: 1px solid var(--color-border);
+      color: var(--color-fg);
+      cursor: pointer;
+    }
+    .deck-tag-chip:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+
+    .deck-action-bar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 10px;
+      padding-top: 16px;
+      border-top: 1px solid var(--color-border);
+    }
+    .btn-deck-dismiss {
+      height: 42px;
+      padding: 0 18px;
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      color: #b91c1c;
       font-size: 0.84rem;
+      cursor: pointer;
+      border-radius: 0 !important;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-deck-dismiss:hover {
+      background: #fee2e2;
+      border-color: #ef4444;
+    }
+    .btn-deck-approve {
+      height: 42px;
+      padding: 0 24px;
+      background: var(--color-accent);
+      border: 1px solid var(--color-accent);
+      color: #ffffff;
+      font-size: 0.88rem;
       font-weight: 500;
       cursor: pointer;
       border-radius: 0 !important;
       display: flex;
       align-items: center;
-      justify-content: center;
       gap: 8px;
       transition: opacity 0.15s ease;
     }
-    .btn-approve-pro:hover {
+    .btn-deck-approve:hover {
       opacity: 0.9;
     }
-    .review-sub-actions {
-      display: flex;
-      gap: 6px;
-    }
-    .review-sub-btn {
-      flex: 1;
-      height: 34px;
-      background: #ffffff;
-      border: solid 1px var(--color-border);
-      color: var(--color-fg-bold);
-      font-size: 0.78rem;
-      cursor: pointer;
-      border-radius: 0 !important;
-      transition: all 0.15s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-    }
-    .review-sub-btn:hover {
-      border-color: var(--color-accent);
-      color: var(--color-accent);
-    }
-    .review-sub-btn.btn-dismiss:hover {
-      border-color: #e0245e;
-      color: #e0245e;
-    }
 
-    /* Empty state */
-    .review-empty-state {
-      padding: 48px 24px;
+    /* Deck Empty State */
+    .deck-empty-state {
+      padding: 60px 24px;
       text-align: center;
       background: #ffffff;
       border: 1px dashed var(--color-border);
+      margin-bottom: 24px;
     }
-    .review-empty-state h3 {
-      font-size: 1.15rem;
+    .deck-empty-state h3 {
+      font-size: 1.25rem;
       color: var(--color-fg-bold);
       margin-bottom: 6px;
-      font-weight: 400 !important;
+      font-weight: 400;
     }
-    .review-empty-state p {
-      font-size: 0.84rem;
+    .deck-empty-state p {
+      font-size: 0.85rem;
       color: var(--color-fg-light);
-      margin: 0 auto;
-      max-width: 520px;
-      line-height: 1.5;
+      margin: 0;
     }
 
-    /* Video Add / Edit Card */
-    .admin-form-card {
-      background: var(--bg-card);
-      border: solid 1px var(--color-border);
-      padding: 32px 36px;
-      margin-bottom: 36px;
-    }
-    .admin-form-header {
+    /* Compact Catalog Table Layout */
+    .catalog-table-wrap {
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      overflow-x: auto;
       margin-bottom: 24px;
-      padding-bottom: 14px;
-      border-bottom: solid 1px var(--color-border);
+    }
+    .catalog-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      text-align: left;
+    }
+    .catalog-table th {
+      background: rgba(160, 160, 160, 0.08);
+      padding: 12px 14px;
+      font-weight: 500;
+      color: var(--color-fg-bold);
+      border-bottom: 1px solid var(--color-border);
+      white-space: nowrap;
+    }
+    .catalog-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--color-border);
+      vertical-align: middle;
+      color: var(--color-fg);
+    }
+    .catalog-table tr:hover td {
+      background: rgba(46, 186, 174, 0.03);
+    }
+    .catalog-thumb-cell {
+      width: 76px;
+      position: relative;
+      cursor: pointer;
+    }
+    .catalog-thumb-cell img {
+      width: 72px;
+      height: 44px;
+      object-fit: cover;
+      display: block;
+      border: 1px solid var(--color-border);
+    }
+    .catalog-thumb-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 72px; height: 44px;
+      background: rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      color: #fff;
+    }
+    .catalog-thumb-cell:hover .catalog-thumb-overlay {
+      opacity: 1;
+    }
+    .catalog-title-link {
+      font-weight: 500;
+      color: var(--color-fg-bold);
+      text-decoration: none;
+      cursor: pointer;
+      display: block;
+      max-width: 320px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .catalog-title-link:hover {
+      color: var(--color-accent);
+    }
+    .shelf-badge-pill {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border: 1px solid var(--color-border);
+      background: rgba(160,160,160,0.08);
+      white-space: nowrap;
+      color: var(--color-fg-bold);
+    }
+    .shelf-badge-pill.shelf-top20 {
+      border-color: rgba(46, 186, 174, 0.4);
+      background: rgba(46, 186, 174, 0.08);
+      color: var(--color-accent);
+    }
+    .shelf-badge-pill.shelf-shorts1, .shelf-badge-pill.shelf-shorts2 {
+      border-color: rgba(224, 36, 94, 0.4);
+      background: rgba(224, 36, 94, 0.08);
+      color: #e0245e;
+    }
+    .shelf-badge-pill.shelf-mid {
+      border-color: rgba(59, 130, 246, 0.4);
+      background: rgba(59, 130, 246, 0.08);
+      color: #2563eb;
+    }
+    .tag-chip-sm {
+      display: inline-block;
+      font-size: 0.68rem;
+      padding: 1px 6px;
+      background: rgba(160, 160, 160, 0.1);
+      border: 1px solid var(--color-border);
+      margin-right: 4px;
+      margin-bottom: 2px;
+      white-space: nowrap;
+    }
+    .table-action-btn {
+      height: 30px;
+      padding: 0 10px;
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      font-size: 0.76rem;
+      color: var(--color-fg-bold);
+      cursor: pointer;
+      border-radius: 0 !important;
+      margin-right: 4px;
+      transition: all 0.15s ease;
+    }
+    .table-action-btn:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+    .table-action-btn.btn-del:hover {
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+
+    /* Slide-out Edit Drawer */
+    .edit-drawer-backdrop {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.5);
+      z-index: 9998;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .edit-drawer-backdrop.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .edit-drawer-panel {
+      position: fixed;
+      top: 0; right: 0; width: 540px; max-width: 95vw; height: 100vh;
+      background: #ffffff;
+      z-index: 9999;
+      box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .edit-drawer-backdrop.is-open .edit-drawer-panel {
+      transform: translateX(0);
+    }
+    .edit-drawer-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--color-border);
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .admin-form-header h2 {
-      font-size: 1.35rem;
-      color: var(--color-fg-bold);
-    }
-    .admin-grid-layout {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 32px;
-    }
-    .placement-pills {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 6px;
-    }
-    .placement-pill-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
-      background: rgba(160, 160, 160, 0.08);
-      border: solid 1px var(--color-border);
-      color: var(--color-fg-bold);
-      font-size: 0.82rem;
-      cursor: pointer;
-      border-radius: 0 !important;
-      transition: all 0.15s ease;
-    }
-    .placement-pill-btn:hover {
-      border-color: var(--color-accent);
-      color: var(--color-accent);
-    }
-    .placement-pill-btn.is-active {
-      background: var(--color-accent);
-      border-color: var(--color-accent);
-      color: #ffffff;
-    }
-    .placement-pill-btn input[type="radio"] {
-      display: none;
-    }
-    .artwork-preview-box {
-      border: solid 1px var(--color-border);
-      background: #eaeaea;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-    .artwork-preview-box img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .artwork-preview-box.is-short {
-      aspect-ratio: 9 / 14 !important;
-      max-width: 220px;
-      margin: 0 auto;
-    }
-    .artwork-empty-label {
-      color: var(--color-fg-light);
-      font-size: 0.78rem;
-      text-align: center;
-      padding: 20px;
-    }
-
-    /* Catalog Management List */
-    .catalog-filter-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-      border-bottom: solid 1px var(--color-border);
-      padding-bottom: 8px;
-      overflow-x: auto;
-    }
-    .catalog-tab-btn {
-      padding: 6px 14px;
-      font-size: 0.84rem;
-      color: var(--color-fg);
-      background: transparent;
-      border: solid 1px transparent;
-      cursor: pointer;
-      border-radius: 0 !important;
-      transition: all 0.15s ease;
-    }
-    .catalog-tab-btn:hover {
-      color: var(--color-accent);
-    }
-    .catalog-tab-btn.is-active {
-      border-color: var(--color-accent);
-      color: var(--color-accent);
-      background: rgba(46, 186, 174, 0.08);
-    }
-    .catalog-item-row {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      padding: 16px;
-      background: var(--bg-card);
-      border: solid 1px var(--color-border);
-      margin-bottom: 12px;
-      transition: border-color 0.15s ease;
-    }
-    .catalog-item-row:hover {
-      border-color: var(--color-accent);
-    }
-    .catalog-item-thumb {
-      width: 110px;
-      aspect-ratio: 16 / 9;
-      background: #eaeaea;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    .catalog-item-thumb.is-short-thumb {
-      width: 60px;
-      aspect-ratio: 9 / 14;
-    }
-    .catalog-item-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .catalog-item-details {
+    .edit-drawer-body {
+      padding: 24px;
+      overflow-y: auto;
       flex: 1;
-      min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 16px;
     }
-    .catalog-item-title {
-      font-size: 0.95rem;
-      color: var(--color-fg-bold);
-      font-weight: 400 !important;
-      line-height: 1.3;
+    .edit-drawer-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      background: #fafafa;
     }
-    .catalog-item-desc {
-      font-size: 0.82rem;
-      color: var(--color-fg);
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      line-height: 1.4;
+
+    /* Shelves & Tags Metric Grid */
+    .shelves-metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
     }
-    .catalog-item-meta {
-      font-size: 0.74rem;
+    .shelf-stat-card {
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      padding: 18px 20px;
+    }
+    .shelf-stat-card h4 {
+      font-size: 0.85rem;
       color: var(--color-fg-light);
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      margin-top: 2px;
+      font-weight: 400;
+      margin-bottom: 8px;
     }
-    .catalog-badge-sec {
-      background: rgba(46, 186, 174, 0.12);
-      color: var(--color-accent);
-      padding: 2px 7px;
-      font-size: 0.72rem;
-      border: 1px solid rgba(46, 186, 174, 0.25);
-    }
-    .catalog-badge-sec.shorts-badge {
-      background: rgba(224, 36, 94, 0.1);
-      color: #e0245e;
-      border-color: rgba(224, 36, 94, 0.25);
-    }
-    .catalog-item-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .select-section-move {
-      height: 32px;
-      padding: 0 8px;
-      background: #fbfbfb;
-      border: solid 1px var(--color-border);
-      font-size: 0.78rem;
+    .shelf-stat-card .stat-number {
+      font-size: 1.6rem;
+      font-weight: 300;
       color: var(--color-fg-bold);
-      border-radius: 0 !important;
-      outline: none;
-    }
-    .btn-item-action {
-      height: 32px;
-      padding: 0 10px;
-      border: solid 1px var(--color-border);
-      background: transparent;
-      color: var(--color-fg-bold);
-      font-size: 0.78rem;
-      cursor: pointer;
-      border-radius: 0 !important;
-      transition: all 0.15s ease;
-    }
-    .btn-item-action:hover {
-      border-color: var(--color-accent);
-      color: var(--color-accent);
-    }
-    .btn-item-action.btn-del:hover {
-      border-color: #e0245e;
-      color: #e0245e;
     }
 
     /* Stream Preview Modal */
     .stream-preview-backdrop {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
+      top: 0; left: 0; width: 100vw; height: 100vh;
       background: rgba(0, 0, 0, 0.75);
-      z-index: 9999;
+      z-index: 10000;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -581,12 +598,11 @@
       width: 90%;
       max-width: 820px;
       border: 1px solid var(--color-border);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
       display: flex;
       flex-direction: column;
     }
     .stream-preview-modal-header {
-      padding: 16px 20px;
+      padding: 14px 20px;
       border-bottom: 1px solid var(--color-border);
       display: flex;
       justify-content: space-between;
@@ -605,15 +621,8 @@
     }
 
     @media screen and (max-width: 960px) {
-      .review-card-pro {
+      .deck-card-container {
         grid-template-columns: 1fr;
-      }
-      .admin-grid-layout {
-        grid-template-columns: 1fr;
-      }
-      .catalog-item-row {
-        flex-direction: column;
-        align-items: flex-start;
       }
     }
   </style>
@@ -624,7 +633,7 @@
   <site-header></site-header>
 
   <div id="wrapper">
-    <!-- Modular Zero-Build Sidebar -->
+    <!-- Simplified Modular Sidebar -->
     <site-sidebar mode="admin" active="review"></site-sidebar>
 
     <!-- Main Content Area -->
@@ -659,178 +668,306 @@
       <!-- Studio Primary View Navigation Tabs -->
       <div class="admin-view-tabs">
         <button class="admin-view-tab-btn is-active" data-view="review" id="tab-nav-review">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          <span>Review Inbox</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span>Review Deck</span>
           <span class="staged-badge-count" id="tab-review-count">0</span>
         </button>
 
         <button class="admin-view-tab-btn" data-view="catalog" id="tab-nav-catalog">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          <span>Catalog Stream Manager</span>
+          <span>Videos Catalog</span>
           <span class="count-pill" id="tab-catalog-count">0</span>
+        </button>
+
+        <button class="admin-view-tab-btn" data-view="shelves" id="tab-nav-shelves">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          <span>Tags &amp; Shelves</span>
         </button>
 
         <button class="admin-view-tab-btn" data-view="upload" id="tab-nav-upload">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          <span>Direct Video Upload</span>
+          <span>+ Upload Video</span>
         </button>
       </div>
 
       <!-- ============================================================== -->
-      <!-- VIEW 1: DEDICATED EDITORIAL REVIEW INBOX -->
+      <!-- VIEW 1: SEQUENTIAL 1-BY-1 REVIEW DECK -->
       <!-- ============================================================== -->
       <section class="admin-view-pane is-active" id="view-review-pane">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+        
+        <!-- Deck Status & Navigation Bar -->
+        <div class="deck-status-bar">
+          <div class="deck-counter-label">
+            <span>Draft</span>
+            <span id="deck-current-num" style="color: var(--color-accent); font-weight: 600;">1</span>
+            <span>of</span>
+            <span id="deck-total-num">0</span>
+            <span>Pending Review</span>
+          </div>
+
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="deck-nav-btn" id="btn-deck-prev" title="Previous draft">
+              &larr; Prev
+            </button>
+            <button class="deck-nav-btn" id="btn-deck-next" title="Next draft">
+              Next &rarr;
+            </button>
+            <span style="color: var(--color-border); margin: 0 4px;">|</span>
+            <button class="deck-nav-btn" id="btn-import-stage-url" style="color: var(--color-accent);">
+              + Stage URL
+            </button>
+            <button class="deck-nav-btn" id="btn-clear-staging" style="color: #b91c1c;">
+              Clear All
+            </button>
+          </div>
+        </div>
+
+        <!-- The 1-Item Sequential Review Deck Card -->
+        <div class="deck-card-container" id="deck-card">
+          <!-- Left: Media Player Box -->
+          <div class="deck-media-col">
+            <div class="deck-player-box" id="deck-player-box">
+              <video id="deck-video-player" playsinline controls></video>
+            </div>
+
+            <div class="deck-badges-row">
+              <span class="deck-badge-pill is-live" id="deck-stream-type">Direct Stream</span>
+              <span class="deck-badge-pill" id="deck-aspect-badge">16:9 Landscape</span>
+            </div>
+
+            <div class="deck-thumb-preview-box">
+              <img id="deck-thumb-img" src="images/pic01.jpg" alt="Thumbnail" />
+              <div style="flex: 1;">
+                <label style="font-size: 0.72rem; color: var(--color-fg-light); display: block; margin-bottom: 2px;">Artwork Thumbnail URL:</label>
+                <input type="text" id="deck-thumb-input" class="deck-input-text" style="height: 32px; font-size: 0.78rem;" placeholder="https://..." />
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Inline Edit Form -->
+          <div class="deck-form-col">
+            <div class="deck-field-group">
+              <label for="deck-title-input">Video Title (Click to edit):</label>
+              <input type="text" id="deck-title-input" class="deck-input-text" style="font-size: 0.95rem; font-weight: 500;" placeholder="Enter video title..." />
+            </div>
+
+            <div class="deck-field-group">
+              <label for="deck-section-select">
+                <span>Destination Shelf:</span>
+                <span class="auto-detected-tag" id="deck-autodetect-badge">Auto-Detected: Shorts Shelf 1</span>
+              </label>
+              <select id="deck-section-select" class="deck-select">
+                <option value="top20">⭐ Top 20 Entries (Featured Grid)</option>
+                <option value="shorts1">📱 Shorts Shelf 1 (9:14 Vertical)</option>
+                <option value="mid">🎬 Curated Video Stream (Mid-Tier)</option>
+                <option value="shorts2">🔥 Trending Shorts Shelf 2 (9:14 Vertical)</option>
+                <option value="default">📜 Endless Default Video Feed (Fallback Pool)</option>
+              </select>
+            </div>
+
+            <div class="deck-field-group">
+              <label for="deck-tags-input">Content Tags (Comma-separated):</label>
+              <input type="text" id="deck-tags-input" class="deck-input-text" placeholder="e.g. Tokyo, Drift, Nightlife, 4K" />
+              <div class="deck-tag-quick-bar" id="deck-tag-quick-bar">
+                <!-- Dynamically populated chips of existing tags for 1-click addition -->
+              </div>
+            </div>
+
+            <div class="deck-field-group">
+              <label for="deck-desc-input">Description:</label>
+              <textarea id="deck-desc-input" class="deck-textarea" placeholder="Editorial description..."></textarea>
+            </div>
+
+            <div style="font-size: 0.75rem; color: var(--color-fg-light); margin-top: 4px; display: flex; gap: 10px; flex-wrap: wrap;">
+              <span>Staged: <span id="deck-staged-date">Recent</span></span>
+              <span>&bull;</span>
+              <a id="deck-source-link" href="#" target="_blank" style="color: var(--color-accent); text-decoration: none;">Original Source</a>
+            </div>
+
+            <!-- Bottom Action Rail -->
+            <div class="deck-action-bar">
+              <button class="btn-deck-dismiss" id="btn-deck-dismiss" title="Permanently delete this draft and show next">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <span>Dismiss &amp; Discard</span>
+              </button>
+
+              <button class="btn-deck-approve" id="btn-deck-approve" title="Save to public catalog and immediately show next draft">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Approve &amp; Advance to Next &rarr;</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clean Empty State when 0 Drafts Pending -->
+        <div class="deck-empty-state" id="deck-empty-state" style="display: none;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 14px;">
+            <circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/>
+          </svg>
+          <h3>All Caught Up!</h3>
+          <p>There are currently zero video drafts waiting in the review queue.</p>
+          <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+            <button class="btn-primary" id="btn-empty-stage">
+              + Stage URL Directly
+            </button>
+            <button class="btn-secondary" id="btn-empty-catalog">
+              Browse Videos Catalog
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- VIEW 2: COMPACT CATALOG TABLE & INLINE EDIT DRAWER -->
+      <!-- ============================================================== -->
+      <section class="admin-view-pane" id="view-catalog-pane" style="display: none;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
           <div>
             <h3 style="font-size: 1.15rem; color: var(--color-fg-bold); margin-bottom: 4px; font-weight: 400;">
-              Drafts Waiting for Review (<span id="staged-count-header">0</span>)
+              Published Catalog Stream (<span id="total-catalog-count">0</span> Videos)
             </h3>
-            <p style="font-size: 0.82rem; color: var(--color-fg-light); margin: 0;">
-              Review stream preview, edit title/description, select target section, and click Approve to publish live. Reviewed drafts are automatically deleted from this queue.
+            <p style="font-size: 0.8rem; color: var(--color-fg-light); margin: 0;">
+              Click any title to edit inside content, click thumbnail to preview stream, or re-route between shelves.
             </p>
           </div>
           <div style="display: flex; gap: 8px;">
-            <button class="btn-secondary" id="btn-import-stage-url" style="height: 36px; font-size: 0.8rem;">
-              + Stage URL Directly
-            </button>
-            <button class="btn-secondary" id="btn-clear-staging" style="height: 36px; font-size: 0.8rem; border-color: #fecaca; color: #b91c1c;">
-              Clear All Drafts
+            <button class="btn-secondary" id="btn-purge-placeholders" style="font-size: 0.78rem; height: 34px;">
+              Purge Demo Placeholders
             </button>
           </div>
         </div>
 
-        <!-- Staged Items Review Container -->
-        <div id="staged-items-container">
-          <!-- Rendered dynamically by js/admin.js -->
-        </div>
-      </section>
-
-      <!-- ============================================================== -->
-      <!-- VIEW 2: ACTIVE CATALOG STREAM MANAGER -->
-      <!-- ============================================================== -->
-      <section class="admin-view-pane" id="view-catalog-pane" style="display: none;">
-        <div class="content-header" style="margin-bottom: 20px;">
-          <h3>Published Catalog Stream (<span id="total-video-count">0</span> Videos)</h3>
-          <p>Re-order, move between sections, or edit currently published videos</p>
-        </div>
-
-        <!-- Section Filter Tabs & In-Page Search -->
+        <!-- Filter Tabs & Quick Search -->
         <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; justify-content: space-between; align-items: center;">
-          <div class="catalog-filter-tabs" style="margin-bottom: 0;">
-            <button class="catalog-tab-btn is-active" data-filter="all">All Videos (<span id="count-all">0</span>)</button>
-            <button class="catalog-tab-btn" data-filter="top">Top 2 Rows (<span id="count-top">0</span>)</button>
-            <button class="catalog-tab-btn" data-filter="mid">Middle Row (<span id="count-mid">0</span>)</button>
-            <button class="catalog-tab-btn" data-filter="shorts">Shorts (<span id="count-shorts">0</span>)</button>
-            <button class="catalog-tab-btn" data-filter="bottom">Bottom Feed (<span id="count-bottom">0</span>)</button>
+          <div class="catalog-filter-tabs" style="display: flex; gap: 6px; overflow-x: auto; margin-bottom: 0;">
+            <button class="catalog-tab-btn is-active" data-filter="all">All (<span id="count-all">0</span>)</button>
+            <button class="catalog-tab-btn" data-filter="top20">Top 20 Entries (<span id="count-top20">0</span>)</button>
+            <button class="catalog-tab-btn" data-filter="shorts1">Shorts Shelf 1 (<span id="count-shorts1">0</span>)</button>
+            <button class="catalog-tab-btn" data-filter="mid">Curated Mid (<span id="count-mid">0</span>)</button>
+            <button class="catalog-tab-btn" data-filter="shorts2">Trending Shorts 2 (<span id="count-shorts2">0</span>)</button>
+            <button class="catalog-tab-btn" data-filter="default">Endless Default (<span id="count-default">0</span>)</button>
           </div>
           <div style="min-width: 240px;">
-            <input type="text" id="admin-search-input" placeholder="Search catalog videos..." style="height: 34px; padding: 0 10px; font-size: 0.8rem; border: 1px solid var(--color-border); background: #ffffff; width: 100%; outline: none;" />
+            <input type="text" id="catalog-search-input" placeholder="Search title or tag..." style="height: 34px; padding: 0 10px; font-size: 0.8rem; border: 1px solid var(--color-border); background: #ffffff; width: 100%; outline: none;" />
           </div>
         </div>
 
-        <!-- Catalog List Container -->
-        <div id="catalog-list-container">
-          <!-- Rendered by js/admin.js -->
+        <!-- High-Density Table Layout -->
+        <div class="catalog-table-wrap">
+          <table class="catalog-table" id="catalog-table">
+            <thead>
+              <tr>
+                <th style="width: 80px;">Thumbnail</th>
+                <th>Title</th>
+                <th style="width: 140px;">Destination Shelf</th>
+                <th style="width: 90px;">Type</th>
+                <th>Tags</th>
+                <th style="width: 160px; text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="catalog-table-body">
+              <!-- Dynamically populated by js/admin.js -->
+            </tbody>
+          </table>
         </div>
       </section>
 
       <!-- ============================================================== -->
-      <!-- VIEW 3: DIRECT VIDEO UPLOAD FORM -->
+      <!-- VIEW 3: TAGS & SHELVES OVERVIEW -->
+      <!-- ============================================================== -->
+      <section class="admin-view-pane" id="view-shelves-pane" style="display: none;">
+        <div class="content-header" style="margin-bottom: 20px;">
+          <h3>Shelves &amp; Dynamic Content Tags</h3>
+          <p>Overview of the 5-tier editorial architecture and active content tag cloud</p>
+        </div>
+
+        <div class="shelves-metric-grid" id="shelves-metric-grid">
+          <div class="shelf-stat-card">
+            <h4>Tier 1: Top 20 Entries</h4>
+            <div class="stat-number" id="stat-count-top20">0 / 20</div>
+          </div>
+          <div class="shelf-stat-card">
+            <h4>Tier 2: Shorts Shelf 1</h4>
+            <div class="stat-number" id="stat-count-shorts1">0</div>
+          </div>
+          <div class="shelf-stat-card">
+            <h4>Tier 3: Curated Video Stream</h4>
+            <div class="stat-number" id="stat-count-mid">0</div>
+          </div>
+          <div class="shelf-stat-card">
+            <h4>Tier 4: Trending Shorts Shelf 2</h4>
+            <div class="stat-number" id="stat-count-shorts2">0</div>
+          </div>
+          <div class="shelf-stat-card">
+            <h4>Tier 5: Endless Default Feed</h4>
+            <div class="stat-number" id="stat-count-default">0</div>
+          </div>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid var(--color-border); padding: 22px;">
+          <h4 style="font-size: 0.95rem; font-weight: 500; color: var(--color-fg-bold); margin-bottom: 12px;">
+            Active Content Tags (Extracted from Approved Streams)
+          </h4>
+          <p style="font-size: 0.8rem; color: var(--color-fg-light); margin-bottom: 16px;">
+            These tags automatically render as clickable filter chips on the homepage header next to "Featured Videos".
+          </p>
+          <div id="overview-tag-cloud" style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- VIEW 4: DIRECT MANUAL UPLOAD / ADD VIDEO -->
       <!-- ============================================================== -->
       <section class="admin-view-pane" id="view-upload-pane" style="display: none;">
-        <div class="admin-form-card">
-          <div class="admin-form-header">
-            <h2 id="form-heading">Add Video to Stream</h2>
-            <span style="font-size: 0.82rem; color: var(--color-fg-light);" id="edit-indicator">New Entry</span>
-          </div>
+        <div class="content-header" style="margin-bottom: 20px;">
+          <h3>Direct Video Entry</h3>
+          <p>Manually publish any video directly into any of the 5 shelf tiers</p>
+        </div>
 
-          <form id="admin-video-form">
-            <input type="hidden" id="edit-video-id" value="" />
-
-            <div class="admin-grid-layout">
-              <!-- Left Inputs Column -->
-              <div style="display: flex; flex-direction: column; gap: 18px;">
-                <div class="form-group">
-                  <label for="video-title">Video Title *</label>
-                  <input type="text" id="video-title" placeholder="e.g. Architectural Shadows in Brutalist Concrete" required />
-                </div>
-
-                <div class="form-group">
-                  <label for="video-cdn-url">Video Stream CDN URL *</label>
-                  <input type="url" id="video-cdn-url" placeholder="https://cdn.example.com/videos/stream.mp4 or HLS .m3u8" required />
-                  <span class="form-hint">Direct CDN stream link, MP4 video file, or HLS .m3u8 streaming URL.</span>
-                </div>
-
-                <div class="form-group">
-                  <label for="video-artwork-url">Photo / Artwork CDN URL</label>
-                  <input type="url" id="video-artwork-url" placeholder="https://cdn.example.com/images/cover.jpg" />
-                  <span class="form-hint">Direct link to cover photo, poster, or thumbnail.</span>
-                </div>
-
-                <!-- Drag & Drop Artwork Selector -->
-                <div class="drop-zone" id="artwork-drop-zone" style="padding: 16px; margin-top: -6px; cursor: pointer;">
-                  <input type="file" id="artwork-file-input" accept="image/*" style="display: none;" />
-                  <div style="font-size: 0.82rem; color: var(--color-fg);">
-                    <strong style="color: var(--color-accent);">Choose local image</strong> or drop photo here to preview & embed
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="video-desc">Description</label>
-                  <textarea id="video-desc" rows="3" placeholder="Curated stream matching the classic editorial aesthetic..."></textarea>
-                </div>
-
-                <!-- Placement Selector -->
-                <div class="form-group">
-                  <label>Website Section Placement *</label>
-                  <div class="placement-pills">
-                    <label class="placement-pill-btn is-active">
-                      <input type="radio" name="video-placement" value="top" checked />
-                      <span>Top 2 Rows (Featured Grid)</span>
-                    </label>
-                    <label class="placement-pill-btn">
-                      <input type="radio" name="video-placement" value="mid" />
-                      <span>Middle Row (Curated Break)</span>
-                    </label>
-                    <label class="placement-pill-btn">
-                      <input type="radio" name="video-placement" value="shorts" />
-                      <span>Shorts Shelf (9:14 Vertical)</span>
-                    </label>
-                    <label class="placement-pill-btn">
-                      <input type="radio" name="video-placement" value="bottom" />
-                      <span>Bottom Feed (Endless Scroll)</span>
-                    </label>
-                  </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div style="display: flex; gap: 12px; margin-top: 10px;">
-                  <button type="submit" class="btn-primary" id="btn-submit-form" style="height: 42px; padding: 0 24px;">
-                    <span>+ Add Video to Stream</span>
-                  </button>
-                  <button type="button" class="btn-secondary" id="btn-cancel-edit" style="height: 42px;">Clear</button>
-                </div>
-              </div>
-
-              <!-- Right Artwork Preview Column -->
-              <div style="display: flex; flex-direction: column; gap: 14px;">
-                <div style="font-size: 0.84rem; color: var(--color-fg-bold);">Artwork Live Preview:</div>
-                <div class="artwork-preview-box" id="artwork-preview-box">
-                  <img id="artwork-preview-img" src="" alt="Artwork Preview" style="display: none;" />
-                  <div class="artwork-empty-label" id="artwork-empty-label">
-                    Paste a Photo CDN link or choose a photo file to preview cover art here
-                  </div>
-                </div>
-
-                <div style="background: rgba(160, 160, 160, 0.05); border: 1px solid var(--color-border); padding: 14px; font-size: 0.78rem; color: var(--color-fg); line-height: 1.5;">
-                  <div style="font-weight: 400; color: var(--color-fg-bold); margin-bottom: 4px;">Editorial Placement Guide:</div>
-                  &bull; <strong>Top 2 Rows</strong>: Highest priority curated cards on index.html.<br/>
-                  &bull; <strong>Middle Row</strong>: Appears directly between the two Shorts shelves.<br/>
-                  &bull; <strong>Shorts Shelf</strong>: Formatted as 9:14 vertical cards.<br/>
-                  &bull; <strong>Bottom Feed</strong>: Endless stream that loads automatically on scroll.
-                </div>
-              </div>
+        <div style="max-width: 680px; background: #ffffff; border: 1px solid var(--color-border); padding: 24px;">
+          <form id="direct-upload-form">
+            <div class="deck-field-group" style="margin-bottom: 16px;">
+              <label for="upload-title">Video Title:</label>
+              <input type="text" id="upload-title" class="deck-input-text" required placeholder="Enter video title..." />
             </div>
+
+            <div class="deck-field-group" style="margin-bottom: 16px;">
+              <label for="upload-cdn-url">Video Stream CDN URL (.mp4 or .m3u8):</label>
+              <input type="url" id="upload-cdn-url" class="deck-input-text" required placeholder="https://cdn.example.com/video.mp4" />
+            </div>
+
+            <div class="deck-field-group" style="margin-bottom: 16px;">
+              <label for="upload-artwork-url">Artwork Thumbnail URL:</label>
+              <input type="text" id="upload-artwork-url" class="deck-input-text" placeholder="images/pic01.jpg" />
+            </div>
+
+            <div class="deck-field-group" style="margin-bottom: 16px;">
+              <label for="upload-shelf-select">Destination Shelf:</label>
+              <select id="upload-shelf-select" class="deck-select">
+                <option value="top20">⭐ Top 20 Entries (Featured Grid)</option>
+                <option value="shorts1">📱 Shorts Shelf 1 (9:14 Vertical)</option>
+                <option value="mid">🎬 Curated Video Stream (Mid-Tier)</option>
+                <option value="shorts2">🔥 Trending Shorts Shelf 2 (9:14 Vertical)</option>
+                <option value="default" selected>📜 Endless Default Video Feed (Fallback Pool)</option>
+              </select>
+            </div>
+
+            <div class="deck-field-group" style="margin-bottom: 16px;">
+              <label for="upload-tags">Content Tags (Comma-separated):</label>
+              <input type="text" id="upload-tags" class="deck-input-text" placeholder="e.g. Tokyo, Drift, Nightlife, 4K" />
+            </div>
+
+            <div class="deck-field-group" style="margin-bottom: 20px;">
+              <label for="upload-desc">Description:</label>
+              <textarea id="upload-desc" class="deck-textarea" placeholder="Editorial summary..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary" style="height: 40px; padding: 0 24px;">
+              Publish to Stream
+            </button>
           </form>
         </div>
       </section>
@@ -838,12 +975,68 @@
     </main>
   </div>
 
-  <!-- Quick Video Stream Preview Modal -->
+  <!-- Slide-out Inline Edit Drawer -->
+  <div class="edit-drawer-backdrop" id="edit-drawer-backdrop">
+    <div class="edit-drawer-panel" id="edit-drawer-panel">
+      <div class="edit-drawer-header">
+        <h3 style="font-size: 1.05rem; font-weight: 500; color: var(--color-fg-bold); margin: 0;">Edit Video Content</h3>
+        <button id="btn-close-drawer" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--color-fg-light);">&times;</button>
+      </div>
+      <div class="edit-drawer-body">
+        <input type="hidden" id="drawer-video-id" />
+
+        <div class="deck-field-group">
+          <label for="drawer-title">Video Title:</label>
+          <input type="text" id="drawer-title" class="deck-input-text" />
+        </div>
+
+        <div class="deck-field-group">
+          <label for="drawer-video-url">Video Stream CDN URL:</label>
+          <input type="text" id="drawer-video-url" class="deck-input-text" />
+        </div>
+
+        <div class="deck-field-group">
+          <label for="drawer-artwork-url">Artwork Thumbnail URL:</label>
+          <input type="text" id="drawer-artwork-url" class="deck-input-text" />
+          <div style="width: 100%; aspect-ratio: 16/9; background: #000; overflow: hidden; margin-top: 6px; border: 1px solid var(--color-border);">
+            <img id="drawer-artwork-preview" src="images/pic01.jpg" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;" />
+          </div>
+        </div>
+
+        <div class="deck-field-group">
+          <label for="drawer-shelf-select">Destination Shelf:</label>
+          <select id="drawer-shelf-select" class="deck-select">
+            <option value="top20">⭐ Top 20 Entries (Featured Grid)</option>
+            <option value="shorts1">📱 Shorts Shelf 1 (9:14 Vertical)</option>
+            <option value="mid">🎬 Curated Video Stream (Mid-Tier)</option>
+            <option value="shorts2">🔥 Trending Shorts Shelf 2 (9:14 Vertical)</option>
+            <option value="default">📜 Endless Default Video Feed (Fallback Pool)</option>
+          </select>
+        </div>
+
+        <div class="deck-field-group">
+          <label for="drawer-tags">Tags (Comma-separated):</label>
+          <input type="text" id="drawer-tags" class="deck-input-text" />
+        </div>
+
+        <div class="deck-field-group">
+          <label for="drawer-desc">Description:</label>
+          <textarea id="drawer-desc" class="deck-textarea" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="edit-drawer-footer">
+        <button class="btn-secondary" id="btn-cancel-drawer">Cancel</button>
+        <button class="btn-primary" id="btn-save-drawer">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stream Preview Modal -->
   <div class="stream-preview-backdrop" id="stream-preview-modal">
     <div class="stream-preview-modal">
       <div class="stream-preview-modal-header">
-        <h3 id="modal-stream-title" style="font-size: 1rem; color: var(--color-fg-bold); font-weight: 400; margin: 0;">Preview Stream</h3>
-        <button id="btn-close-modal" style="background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--color-fg);">&times;</button>
+        <h4 id="modal-stream-title" style="margin: 0; font-size: 0.95rem; font-weight: 500; max-width: 700px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Stream Preview</h4>
+        <button id="btn-close-modal" style="background: transparent; border: none; font-size: 1.25rem; cursor: pointer; color: var(--color-fg-light);">&times;</button>
       </div>
       <div class="stream-preview-modal-body">
         <video id="modal-video-player" controls playsinline></video>
@@ -851,11 +1044,10 @@
     </div>
   </div>
 
-  <!-- Notification Toast -->
-  <div id="admin-toast" style="position: fixed; bottom: 24px; right: 24px; background: #1e1e24; color: #fff; padding: 10px 18px; font-size: 0.82rem; border-left: 3px solid var(--color-accent); box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 3000; opacity: 0; transform: translateY(12px); pointer-events: none; transition: all 0.2s ease;"></div>
+  <!-- Global Toast Notification -->
+  <div id="admin-toast" class="admin-toast" style="position: fixed; bottom: 24px; right: 24px; background: #1e1e24; color: #fff; padding: 12px 20px; font-size: 0.84rem; opacity: 0; pointer-events: none; transition: all 0.25s ease; transform: translateY(12px); z-index: 10001; border-left: 3px solid var(--color-accent);"></div>
 
-  <!-- Scripts -->
-  <script src="js/staging-feed.js" onerror="window.WEBVIDEO_STAGING=window.WEBVIDEO_STAGING||[]"></script>
+  <script src="js/staging-feed.js"></script>
   <script src="js/catalog-feed.js"></script>
   <script src="js/catalog.js"></script>
   <script src="js/admin.js"></script>
