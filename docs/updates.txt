@@ -1,21 +1,20 @@
 # The Unemployed Club — Progress Report
 
-> **Title:** Shorts Viewer 3-Box Architectural Redesign, Hover Timeline Scrubber & Translucent Action Controls
+> **Title:** Exact 3-Box Shorts Stage Layout, Bottom-Aligned Companion Panels & Hover Scrubber
 > **Repository:** `nishantkumrmishra/theunemployedclub`
 > **Live Site:** `https://nishantkumrmishra.github.io/theunemployedclub/shorts.html`
 
 ```diff
 + WORK DONE
-+ [Shorts 3-Box Stage Layout] Architected balanced 3-box editorial layout across `shorts.html` and `css/style.css`: Left Info Panel (320px), Middle 9:16 Video Stage (380px), Right Companion Panel (340px).
-+ [Dedicated Left Info Panel] Extracted author avatar, channel title, view counter, subscribe button, video title, full description, tag pills, and spinning CD original sound badge into a clean left-hand card, removing all visual clutter from the video frame.
-+ [Translucent Dynamic Action Stack] Converted vertical action buttons (Like, Dislike, Comment, Share, Volume Flyout, Next/Prev Arrows) into frosted glass controls (`rgba(0, 0, 0, 0.5)` with `backdrop-filter: blur(12px)` and light border), adapting cleanly over both dark and bright video frames.
-+ [Interactive Hover Timeline Scrubber] Engineered bottom timeline scrubber bar inside `.shorts-hover-controls` that remains hidden by default and smoothly reveals only when the user hovers over the video player (`opacity: 0` to `1`).
-+ [Instant Scrub & Seek Drag] Enabled click and drag seeking across the scrubber track with immediate visual feedback (`updateScrubber`), buffered bar fill, 12px scrub thumb handle, and timestamp indicator (`0:18 / 0:46`).
-+ [Mini Play/Pause Toggle] Added compact play/pause toggle button directly in the hover scrubber bar with state sync and click event isolation to prevent accidental video pause toggles during seeking.
-+ [Right Companion Panel] Dedicated right-hand box housing Under-Construction Comments (0) tab and Up Next queue list.
-+ [Zero Emojis Enforced] 100% emoji-free interface throughout all components, using Lucide SVG icons and strict typography.
++ [Exact 3-Box Proportions & Sizing] Refactored `shorts.html` and `css/style.css` to match user's annotated layout with precision: Left Video Info Box (clamp(260px, 22vw, 340px) x 210px), Middle Tall 9:16 Video Player (380px x 660px), and Right Comments & Up Next Box (clamp(340px, 35vw, 540px) x 320px).
++ [Bottom Baseline Alignment] Unified all 3 boxes along the exact same bottom baseline using flex-end alignment, allowing the tall center player to command the vertical stage while companion boxes anchor gracefully at bottom-left and bottom-right.
++ [Minimalist Left Box] Stripped away channel avatars, badges, subscribe buttons, tags, and icons to deliver strictly the video title and editorial description with 0px brutalist spacing.
++ [Dynamic Translucent Action Stack] Integrated vertical frosted glass action buttons directly floating on the right edge of the video player (44px controls with 12px backdrop blur and white SVG icons) adapting seamlessly over dynamic video frames.
++ [Bottom Hover Timeline Scrubber] Positioned bottom timeline scrubber inside the video container that remains invisible until hovered, supporting drag-seeking, buffer fill, thumb handle, mini play toggle, and live duration counter.
++ [Wide Right Companion Box] Expanded companion box width to provide breathing room for the Under-Construction Comments (0) notice and Up Next queue list.
++ [Modular Header & Sidebar Integration] Connected `<site-header>` and `<site-sidebar>` web components with zero layout shift and responsive sidebar offset.
++ [Zero Emojis Enforced] 100% emoji-free UI across all elements, using Lucide SVG icons and strict typography.
 + [Duplicate Detection Engine] `tools/modules/duplicate_detector.py` and sequential review deck in `admin.html` with duplicate alerts and 1-click delete duplicate draft actions.
-+ [5-Tier Editorial Shelf System] Top 20 Entries, Shorts Shelf 1, Curated Mid Stream, Trending Shorts 2, and Endless Default Feed with dynamic tag pills.
 ```
 
 ```diff
