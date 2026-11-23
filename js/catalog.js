@@ -1,71 +1,83 @@
 /**
- * The Unemployed Club - Unified Editorial Catalog Data Store
- * Manages video metadata, stream links, artwork CDN URLs, 5-tier section placement,
- * dynamic content tags, sequential review deck pipeline, and GitHub Pages sync.
+ * The Unemployed Club - Master Video Catalog & Staging Data Store
+ * =========================================================================
+ * Manages:
+ *   1. Published Catalog Feed (5-Tier Editorial Shelves)
+ *      - top20:    "Top 20 Entries" (Top 2 Featured Rows, max 20)
+ *      - shorts1:  "Shorts Shelf 1" (9:14 Vertical Reels, Row 1)
+ *      - mid:      "Curated Video Stream" (Middle Featured Shelf)
+ *      - shorts2:  "Trending Shorts Shelf 2" (9:14 Vertical Reels, Row 2)
+ *      - default:  "Endless Default Video Feed" (Fallback pool, bottom infinite grid)
+ *   2. Editorial Staging & Review Queue (window.WEBVIDEO_STAGING)
+ *      - Auto-populated by python tools/main.py & extractor.bat
+ *      - Interactive Review Deck in admin.html with Duplicate Detection
+ *      - 1-Click Approve -> Publishes directly to designated shelf
+ *      - 1-Click Dismiss/Delete -> Removes draft permanently
+ *   3. Dynamic Content Tags
+ *      - Tags stored per item, collected dynamically, filterable on homepage
+ *   4. Zero-Knowledge 1-File GitHub Export
+ *      - Downloads updated catalog-feed.js for 1-click GitHub drag-and-drop
  */
 
 (function (window) {
   'use strict';
 
-  const STORAGE_KEY = 'webvideo_catalog_v1';
-  const STAGING_KEY = 'webvideo_staging_v1';
-  const PROCESSED_KEY = 'webvideo_staging_processed_v1';
+  const STORAGE_KEY = 'webvideo_catalog_v5';
+  const STAGING_KEY = 'webvideo_staging_v5';
+  const PROCESSED_KEY = 'webvideo_staging_processed_v5';
 
-  // Helper: Normalize tags into a clean string array
-  function normalizeTags(rawTags) {
-    if (!rawTags) return [];
-    if (Array.isArray(rawTags)) {
-      return rawTags.map(t => String(t).trim()).filter(Boolean);
+  // Allowed editorial section slugs
+  const VALID_SECTIONS = ['top20', 'shorts1', 'mid', 'shorts2', 'default'];
+
+  function normalizeSection(sec, type) {
+    if (sec && VALID_SECTIONS.includes(sec)) return sec;
+    if (type === 'short') return 'shorts1';
+    return 'default';
+  }
+
+  function normalizeTags(raw) {
+    if (Array.isArray(raw)) {
+      return raw.map(t => String(t).trim()).filter(Boolean);
     }
-    if (typeof rawTags === 'string') {
-      return rawTags
-        .split(',')
-        .map(t => t.replace(/^[#\s]+/, '').trim())
-        .filter(Boolean);
+    if (typeof raw === 'string') {
+      return raw.split(',').map(t => t.trim()).filter(Boolean);
     }
     return [];
   }
 
-  // Helper: Normalize 5-tier section identifiers
-  function normalizeSection(sec, type) {
-    const s = String(sec || '').toLowerCase().trim();
-    if (s === 'top' || s === 'top20' || s === 'featured') return 'top20';
-    if (s === 'shorts' || s === 'shorts1' || s === 'short') return 'shorts1';
-    if (s === 'mid' || s === 'middle' || s === 'curated') return 'mid';
-    if (s === 'shorts2' || s === 'trending_shorts') return 'shorts2';
-    if (s === 'bottom' || s === 'default' || s === 'feed') return 'default';
-    if (type === 'short') return 'shorts1';
-    return 'default'; // Unassigned videos default to the endless bottom feed
-  }
-
+  // --- Published Catalog Storage & Synchronization ---
   function initCatalog() {
     let items = [];
-
-    // 1. Try reading from browser LocalStorage
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
+      if (stored !== null) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed) && parsed.length > 0) {
           items = parsed;
         }
       }
     } catch (e) {
-      console.warn('[Catalog] LocalStorage parse error:', e);
+      console.warn('[Catalog] LocalStorage parse error, falling back to feed:', e);
     }
 
-    // 2. Fall back to static master feed window.WEBVIDEO_FEED
     if (items.length === 0 && Array.isArray(window.WEBVIDEO_FEED)) {
       items = JSON.parse(JSON.stringify(window.WEBVIDEO_FEED));
-      saveToStorage(items);
     }
 
-    // Normalize items
-    items.forEach(v => {
-      v.section = normalizeSection(v.section, v.type);
-      v.tags = normalizeTags(v.tags);
+    // Ensure all items conform to the 5-tier schema
+    items.forEach((item, idx) => {
+      if (!item.section) {
+        item.section = normalizeSection(item.section, item.type);
+      }
+      if (!Array.isArray(item.tags)) {
+        item.tags = normalizeTags(item.tags);
+      }
+      if (!item.id) {
+        item.id = 'vid_' + (idx + 1);
+      }
     });
 
+    saveToStorage(items);
     return items;
   }
 
@@ -73,11 +85,11 @@
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
     } catch (e) {
-      console.error('[Catalog] Failed to save to LocalStorage:', e);
+      console.error('[Catalog] Failed to save catalog:', e);
     }
   }
 
-  // --- Processed / Dismissed Draft Tracking ---
+  // --- Processed Registry: prevents cleared drafts from reappearing ---
   function getProcessedSet() {
     try {
       const stored = localStorage.getItem(PROCESSED_KEY);
@@ -113,23 +125,25 @@
     }
 
     const processed = getProcessedSet();
-    const publishedUrls = new Set((catalogItems || []).map(v => v.videoUrl).filter(Boolean));
+
+    // If staged queue is completely empty in localStorage, seed with sample drafts from window.WEBVIDEO_STAGING
+    if (staged.length === 0 && Array.isArray(window.WEBVIDEO_STAGING) && window.WEBVIDEO_STAGING.length > 0) {
+      window.WEBVIDEO_STAGING.forEach(item => {
+        staged.push(item);
+      });
+      saveStagingToStorage(staged);
+      return staged;
+    }
 
     // Merge static feed window.WEBVIDEO_STAGING only for genuinely new unreviewed drafts
     if (Array.isArray(window.WEBVIDEO_STAGING)) {
       window.WEBVIDEO_STAGING.forEach(item => {
         const id = String(item.id || '');
-        const vUrl = String(item.videoUrl || '');
-        const sUrl = String(item.sourceUrl || '');
-
-        if (processed.has(id) || (vUrl && processed.has(vUrl)) || (sUrl && processed.has(sUrl))) {
+        if (processed.has(id)) {
           return; // Already approved, reviewed, or dismissed
         }
-        if (vUrl && publishedUrls.has(vUrl)) {
-          return; // Already in live public catalog
-        }
 
-        const exists = staged.some(s => s.id === item.id || (s.videoUrl && s.videoUrl === item.videoUrl));
+        const exists = staged.some(s => s.id === item.id);
         if (!exists) {
           staged.push(item);
         }
@@ -288,14 +302,87 @@
       const vid = this.getVideoById(id);
       if (vid) {
         vid.section = normalizeSection(newSection, vid.type);
-        vid.type = (vid.section === 'shorts1' || vid.section === 'shorts2') ? 'short' : 'video';
         saveToStorage(catalogItems);
-        return true;
       }
-      return false;
     },
 
-    // --- Staging & Review Pipeline Methods ---
+    // --- Duplicate Content Detection ---
+    checkDuplicate(item) {
+      if (!item) return null;
+      const vUrl = String(item.videoUrl || item.video_url || '').trim();
+      const sUrl = String(item.sourceUrl || item.source_url || '').trim();
+      const normTitle = String(item.title || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+      const norm = (url) => {
+        if (!url) return '';
+        try {
+          const u = new URL(url);
+          return (u.hostname.replace(/^www\./, '') + u.pathname.replace(/\/$/, '')).toLowerCase();
+        } catch(e) {
+          return url.toLowerCase().replace(/\/$/, '');
+        }
+      };
+
+      const nVUrl = norm(vUrl);
+      const nSUrl = norm(sUrl);
+
+      // 1. Check against Live Published Catalog
+      for (const cat of catalogItems) {
+        if (item.id && String(cat.id) === String(item.id)) continue;
+        const catV = norm(cat.videoUrl);
+        const catS = norm(cat.sourceUrl);
+        const catTitle = String(cat.title || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+        let matchedBy = null;
+        if (nVUrl && catV && nVUrl === catV) {
+          matchedBy = 'Stream CDN URL';
+        } else if (nSUrl && catS && nSUrl === catS) {
+          matchedBy = 'Original Source Webpage';
+        } else if (normTitle && catTitle && normTitle.length > 8 && normTitle === catTitle) {
+          matchedBy = 'Exact Video Title';
+        }
+
+        if (matchedBy) {
+          return {
+            isDuplicate: true,
+            location: 'Live Published Catalog',
+            shelf: cat.section || 'default',
+            matchedBy,
+            existing: cat,
+            reason: `Stream matches existing entry in Live Catalog (${matchedBy})`
+          };
+        }
+      }
+
+      // 2. Check against other items in Staging Queue
+      for (const st of stagingItems) {
+        if (item.id && String(st.id) === String(item.id)) continue;
+        const stV = norm(st.videoUrl);
+        const stS = norm(st.sourceUrl);
+
+        let matchedBy = null;
+        if (nVUrl && stV && nVUrl === stV) {
+          matchedBy = 'Stream CDN URL';
+        } else if (nSUrl && stS && nSUrl === stS) {
+          matchedBy = 'Original Source Webpage';
+        }
+
+        if (matchedBy) {
+          return {
+            isDuplicate: true,
+            location: 'Pending Review Queue',
+            shelf: 'Draft',
+            matchedBy,
+            existing: st,
+            reason: `Stream matches another draft in Review Queue (${matchedBy})`
+          };
+        }
+      }
+
+      return null;
+    },
+
+    // --- Staging Review Queue Interface ---
     getStaging() {
       return [...stagingItems];
     },
@@ -360,6 +447,10 @@
       stagingItems = stagingItems.filter(s => String(s.id) !== String(id));
       saveStagingToStorage(stagingItems);
       return true;
+    },
+
+    dismissStaged(id) {
+      return this.rejectStaged(id);
     },
 
     clearStaging() {

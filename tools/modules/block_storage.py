@@ -41,7 +41,8 @@ def update_staging_feed(record: dict):
         'author': record.get('author', 'The Unemployed Club'),
         'sourceUrl': record.get('source_url', ''),
         'status': 'pending_review',
-        'extractedAt': record.get('extracted_at', time.strftime('%Y-%m-%d %H:%M:%S'))
+        'extractedAt': record.get('extracted_at', time.strftime('%Y-%m-%d %H:%M:%S')),
+        'duplicateInfo': record.get('duplicate_info')
     }
 
     current_items = []
@@ -49,7 +50,7 @@ def update_staging_feed(record: dict):
         try:
             with open(STAGING_FEED_FILE, 'r', encoding='utf-8') as f:
                 content = f.read()
-                match = re.search(r'window\.WEBVIDEO_STAGING\s*=\s*(\[.*?\]);', content, re.DOTALL)
+                match = re.search(r'window\.WEBVIDEO_STAGING\s*=\\s*(\\[.*?\\]);', content, re.DOTALL)
                 if match:
                     current_items = json.loads(match.group(1))
                     if not isinstance(current_items, list):
@@ -111,8 +112,11 @@ def save_extracted_block(record: dict) -> str:
         f"Author:      {record.get('author', 'The Unemployed Club')}\n"
         f"Block File:  blocks/{block_filename}\n"
         f"Original:    {record.get('source_url', 'N/A')}\n"
-        f"======================================================================\n\n"
     )
+    if record.get('duplicate_info'):
+        dup = record['duplicate_info']
+        text_block += f"DUPLICATE:   YES - Matched in {dup.get('location')} ({dup.get('shelf')})\n"
+    text_block += f"======================================================================\n\n"
 
     with open(TXT_FILE, 'a', encoding='utf-8') as f:
         f.write(text_block)

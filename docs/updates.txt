@@ -1,25 +1,23 @@
 # The Unemployed Club — Progress Report
 
-> **Title:** Sequential 1-by-1 Review Deck, Dynamic Content Tags & 5-Tier Editorial Feed
+> **Title:** Duplicate Content Detection, Review Deck Seed Data & Complete Emoji Eradication
 > **Repository:** `nishantkumrmishra/theunemployedclub`
 > **Live Site:** `https://nishantkumrmishra.github.io/theunemployedclub/`
 
 ```diff
 + WORK DONE
-+ [Review Deck] Replaced bulky queue cards with a Sequential 1-by-1 Focus Deck in `admin.html`.
-+ [Deck Auto-Advance] Clicking "Approve & Advance" or "Dismiss" saves to catalog, purges draft, and immediately advances to the next draft in line.
-+ [Real-Time Preview] Embedded live video player (HLS / MP4) right inside the Review Deck card with aspect ratio and stream codec badges.
-+ [Deck Inline Editing] Editable Title, Thumbnail URL, Shelf Dropdown, Tags, and Description fields right on the deck card.
-+ [Dynamic Tags System] Replaced static subtitle with horizontal scrollable content tag chips next to "Featured Videos" on `index.html`.
-+ [Dynamic Tags Engine] Engine aggregates all unique tags from active videos (`Catalog.getAllTags()`) and filters grid on 1-click.
-+ [5-Tier Hierarchy] Structured feed into 5 explicit tiers: Top 20 Entries, Shorts Shelf 1, Curated Mid Stream, Trending Shorts 2, Endless Default Feed.
-+ [Default Fallback Feed] Any unassigned video automatically flows into the Endless Default Feed, supporting unlimited video additions.
-+ [Compact Catalog Table] Built high-density table view in Admin Studio showing Thumbnail, Title, Shelf Badge, Type, Tags, and Actions.
-+ [Slide-out Edit Drawer] Clicking any catalog title or row opens a slide-out edit drawer to update video metadata and artwork with live preview.
-+ [Sidebar Overhaul] Stripped out cluttered redundant links; sidebar now cleanly displays Review Deck, Videos, Shorts, Tags & Shelves, Export.
-+ [Tags & Shelves View] Built dedicated overview dashboard displaying video counts across all 5 tiers and interactive tag cloud.
-+ [Demo Placeholders Purge] Added 1-click button in Admin Studio to purge initial mock placeholder videos (pic01-pic12).
-+ [Shorts Player Polish] Integrated spinning CD vinyl icon, flyout volume slider, mouse wheel / touch swipe navigation, and 0-comment notice.
++ [Duplicate Detection Engine] Built `tools/modules/duplicate_detector.py` to detect duplicate video streams by CDN URL, original source webpage, and normalized title against catalog and staging.
++ [Extractor CLI Duplicate Alert] Updated `tools/main.py` to run duplicate check on single URL, batch files, and interactive loop, printing terminal warnings and staging duplicate tags.
++ [Admin Deck Duplicate Banner] Built prominent alert banner in `admin.html` and `js/admin.js` notifying admin when a draft stream matches an existing video in catalog or staging.
++ [1-Click Delete Duplicate] Added dedicated red `[Delete Duplicate Draft]` button to instantly remove duplicate drafts from the review deck and advance to the next item.
++ [Duplicate Approval Guard] Implemented confirmation safeguard in `btnDeckApprove` preventing accidental duplicate publishing unless explicitly confirmed.
++ [Sample Pending Drafts] Seeded 4 high-fidelity editorial drafts into `js/staging-feed.js` and `Catalog.initStaging()` (3 unique streams, 1 intentional duplicate test against vid_top_1).
++ [Zero Emojis Enforced] Stripped 100% of emojis across entire codebase (select dropdown options, aspect badges, shelf pills); using standard Lucide SVG icons and clean typography.
++ [Sequential Review Deck] Sequential 1-by-1 Focus Deck in `admin.html` with smooth card transitions and auto-advance.
++ [Compact Catalog Table] High-density catalog table view with slide-out inline edit drawer and live thumbnail preview.
++ [Dynamic Tags System] Horizontal scrollable tag filter bar next to "Featured Videos" on `index.html`.
++ [5-Tier Editorial Hierarchy] Structured into Top 20 Entries, Shorts Shelf 1, Curated Mid Stream, Trending Shorts 2, and Endless Default Feed.
++ [Shorts Player Polish] Spinning CD vinyl icon, flyout volume slider, mouse wheel / touch swipe navigation, and 0-comment notice.
 + [Security] Maintained `js/staging-feed.js` and `tools/extracted/` in `.gitignore` to prevent repository suspensions.
 ```
 

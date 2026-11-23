@@ -356,6 +356,45 @@
       opacity: 0.9;
     }
 
+    /* Review Deck Duplicate Detection Banner */
+    .deck-duplicate-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-left: 4px solid #ef4444;
+      padding: 12px 18px;
+      margin-bottom: 16px;
+      border-radius: 0;
+      box-sizing: border-box;
+    }
+    .deck-duplicate-banner.hidden {
+      display: none !important;
+    }
+    .duplicate-banner-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .duplicate-banner-icon {
+      color: #ef4444;
+      flex-shrink: 0;
+    }
+    .duplicate-banner-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #991b1b;
+      letter-spacing: 0.04em;
+      margin-bottom: 2px;
+    }
+    .duplicate-banner-desc {
+      font-size: 0.8rem;
+      color: #7f1d1d;
+      line-height: 1.4;
+    }
+
     /* Deck Empty State */
     .deck-empty-state {
       padding: 60px 24px;
@@ -722,6 +761,27 @@
           </div>
         </div>
 
+        <!-- Duplicate Detection Warning Banner -->
+        <div id="deck-duplicate-banner" class="deck-duplicate-banner hidden">
+          <div class="duplicate-banner-content">
+            <svg class="duplicate-banner-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <div class="duplicate-banner-text">
+              <div class="duplicate-banner-title">Duplicate Content Detected</div>
+              <div id="deck-duplicate-desc" class="duplicate-banner-desc">This video stream is already present in the catalog.</div>
+            </div>
+          </div>
+          <div class="duplicate-banner-actions">
+            <button type="button" id="btn-deck-delete-duplicate" class="btn btn-sm" style="background: #ef4444; color: #fff; border: 1px solid #dc2626; border-radius: 0; padding: 6px 14px; font-size: 0.78rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+              <span>Delete Duplicate Draft</span>
+            </button>
+          </div>
+        </div>
+
         <!-- The 1-Item Sequential Review Deck Card -->
         <div class="deck-card-container" id="deck-card">
           <!-- Left: Media Player Box -->
@@ -757,11 +817,11 @@
                 <span class="auto-detected-tag" id="deck-autodetect-badge">Auto-Detected: Shorts Shelf 1</span>
               </label>
               <select id="deck-section-select" class="deck-select">
-                <option value="top20">⭐ Top 20 Entries (Featured Grid)</option>
-                <option value="shorts1">📱 Shorts Shelf 1 (9:14 Vertical)</option>
-                <option value="mid">🎬 Curated Video Stream (Mid-Tier)</option>
-                <option value="shorts2">🔥 Trending Shorts Shelf 2 (9:14 Vertical)</option>
-                <option value="default">📜 Endless Default Video Feed (Fallback Pool)</option>
+                <option value="top20">Top 20 Entries (Featured Grid)</option>
+                <option value="shorts1">Shorts Shelf 1 (9:14 Vertical)</option>
+                <option value="mid">Curated Video Stream (Mid-Tier)</option>
+                <option value="shorts2">Trending Shorts Shelf 2 (9:14 Vertical)</option>
+                <option value="default">Endless Default Video Feed (Fallback Pool)</option>
               </select>
             </div>
 
@@ -947,11 +1007,11 @@
             <div class="deck-field-group" style="margin-bottom: 16px;">
               <label for="upload-shelf-select">Destination Shelf:</label>
               <select id="upload-shelf-select" class="deck-select">
-                <option value="top20">⭐ Top 20 Entries (Featured Grid)</option>
-                <option value="shorts1">📱 Shorts Shelf 1 (9:14 Vertical)</option>
-                <option value="mid">🎬 Curated Video Stream (Mid-Tier)</option>
-                <option value="shorts2">🔥 Trending Shorts Shelf 2 (9:14 Vertical)</option>
-                <option value="default" selected>📜 Endless Default Video Feed (Fallback Pool)</option>
+                <option value="top20">Top 20 Entries (Featured Grid)</option>
+                <option value="shorts1">Shorts Shelf 1 (9:14 Vertical)</option>
+                <option value="mid">Curated Video Stream (Mid-Tier)</option>
+                <option value="shorts2">Trending Shorts Shelf 2 (9:14 Vertical)</option>
+                <option value="default" selected>Endless Default Video Feed (Fallback Pool)</option>
               </select>
             </div>
 
@@ -1006,11 +1066,11 @@
         <div class="deck-field-group">
           <label for="drawer-shelf-select">Destination Shelf:</label>
           <select id="drawer-shelf-select" class="deck-select">
-            <option value="top20">⭐ Top 20 Entries (Featured Grid)</option>
-            <option value="shorts1">📱 Shorts Shelf 1 (9:14 Vertical)</option>
-            <option value="mid">🎬 Curated Video Stream (Mid-Tier)</option>
-            <option value="shorts2">🔥 Trending Shorts Shelf 2 (9:14 Vertical)</option>
-            <option value="default">📜 Endless Default Video Feed (Fallback Pool)</option>
+            <option value="top20">Top 20 Entries (Featured Grid)</option>
+            <option value="shorts1">Shorts Shelf 1 (9:14 Vertical)</option>
+            <option value="mid">Curated Video Stream (Mid-Tier)</option>
+            <option value="shorts2">Trending Shorts Shelf 2 (9:14 Vertical)</option>
+            <option value="default">Endless Default Video Feed (Fallback Pool)</option>
           </select>
         </div>
 

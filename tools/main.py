@@ -15,6 +15,7 @@ Modular chunk architecture:
   - modules/metadata_parser.py  -> Title & description extraction
   - modules/stream_extractor.py -> Video stream extraction
   - modules/artwork_extractor.py-> Photo / artwork extraction
+  - modules/duplicate_detector.py -> Pre-staging duplicate content detector
   - modules/block_storage.py    -> Persists modular data blocks to extracted/blocks/ & staging feed
 
 Usage:
@@ -42,6 +43,7 @@ from modules.aamchor_handler import extract_aamchor_single_video, discover_aamch
 from modules.metadata_parser import parse_metadata
 from modules.stream_extractor import extract_stream, extract_with_ytdlp
 from modules.artwork_extractor import extract_artwork
+from modules.duplicate_detector import check_for_duplicates
 from modules.block_storage import save_extracted_block, load_all_blocks, TXT_FILE, BLOCKS_DIR
 
 def extract_video_link(url: str, verbose: bool = True) -> dict:
@@ -68,6 +70,12 @@ def extract_video_link(url: str, verbose: bool = True) -> dict:
             'author': 'The Unemployed Club',
             'source_url': url
         }
+        dup = check_for_duplicates(video_url=url, source_url=url, title=title)
+        if dup:
+            record['duplicate_info'] = dup
+            if verbose:
+                print(f"[-] Duplicate detected: Matched in {dup.get('location')} ({dup.get('shelf')})")
+
         block_path = save_extracted_block(record)
         if verbose:
             print(f"[+] Saved modular block: {os.path.basename(block_path)}")
@@ -85,11 +93,20 @@ def extract_video_link(url: str, verbose: bool = True) -> dict:
                 if verbose:
                     print(f"[+] Discovered {len(gallery_items)} videos on Aamchor gallery. Saving modular blocks...")
                 for item in gallery_items:
+                    d = check_for_duplicates(video_url=item.get('video_url', ''), source_url=item.get('source_url', ''), title=item.get('title', ''))
+                    if d:
+                        item['duplicate_info'] = d
                     save_extracted_block(item)
                 return gallery_items[0]
 
         rec = extract_aamchor_single_video(url)
         if rec and rec.get('video_url'):
+            dup = check_for_duplicates(video_url=rec.get('video_url', ''), source_url=url, title=rec.get('title', ''))
+            if dup:
+                rec['duplicate_info'] = dup
+                if verbose:
+                    print(f"[-] Duplicate detected: Matched in {dup.get('location')} ({dup.get('shelf')})")
+
             block_path = save_extracted_block(rec)
             if verbose:
                 print(f"[+] Saved modular block: {os.path.basename(block_path)}")
@@ -127,6 +144,12 @@ def extract_video_link(url: str, verbose: bool = True) -> dict:
         'source_url': url
     }
 
+    dup = check_for_duplicates(video_url=stream, source_url=url, title=meta['title'])
+    if dup:
+        record['duplicate_info'] = dup
+        if verbose:
+            print(f"[-] Duplicate detected: Matched in {dup.get('location')} ({dup.get('shelf')})")
+
     block_path = save_extracted_block(record)
     if verbose:
         print(f"[+] Saved modular block: {os.path.basename(block_path)}")
@@ -145,15 +168,26 @@ def print_record_banner(record: dict):
     print(f"Photo / Artwork CDN: {record.get('artwork_url')}")
     print(f"Description:         {record.get('description')}")
     print(f"Author / Channel:    {record.get('author')}")
+
+    if record.get('duplicate_info'):
+        dup = record['duplicate_info']
+        print("-" * 70)
+        print("[-] WARNING: DUPLICATE CONTENT DETECTED!")
+        print(f"[-] Matched By:      {dup.get('matched_by')}")
+        print(f"[-] Found In:        {dup.get('location')} ({dup.get('shelf')})")
+        print(f"[-] Existing Title:  \"{dup.get('existing_title')}\"")
+        print("[-] Website Action:  Flagged in Admin Review Deck with 1-click Delete button.")
+
     print("-" * 70)
     print("HOW TO REVIEW & PUBLISH:")
     print("  1. Log into Admin Studio: admin.html")
     print("  2. Check the 'Review Queue' (Pending Drafts)")
     print("  3. Preview video stream & select section:")
-    print("     • Top 2 Rows (Featured Grid)")
-    print("     • Middle Row (Curated Break)")
-    print("     • Shorts Shelf (9:14 Vertical)")
-    print("     • Bottom Feed (Endless Scroll)")
+    print("     + Top 20 Entries (Featured Grid)")
+    print("     + Shorts Shelf 1 (9:14 Vertical)")
+    print("     + Curated Mid Stream (Mid-Tier)")
+    print("     + Trending Shorts 2 (9:14 Vertical)")
+    print("     + Endless Default Feed (Fallback Pool)")
     print("  4. Click 'Approve & Publish' to add to live stream catalog!")
     print("=" * 70 + "\n")
 
@@ -198,10 +232,10 @@ def main():
     if args.list:
         blocks = load_all_blocks()
         print(f"\n--- Saved Video Blocks ({len(blocks)}) ---")
-        for i, b in enumerate(blocks, 1):
-            print(f"{i}. {b.get('title')} [{b.get('id', 'N/A')}]")
-            print(f"   Video: {b.get('video_url')}")
-            print(f"   Photo: {b.get('artwork_url')}\n")
+        for b in blocks:
+            dup_tag = " [DUPLICATE]" if b.get('duplicate_info') else ""
+            print(f"  + [{b.get('id')}]{dup_tag} {b.get('title')} ({b.get('video_url', '')[:45]}...)")
+        print("------------------------------------------\n")
         return
 
     if args.file:
@@ -209,25 +243,28 @@ def main():
             print(f"[!] File not found: {args.file}")
             sys.exit(1)
         with open(args.file, 'r', encoding='utf-8') as f:
-            urls = [line.strip() for line in f if line.strip() and not line.startswith('#')]
-        print(f"[*] Processing {len(urls)} URLs from {args.file}...")
-        for u in urls:
-            rec = extract_video_link(u, verbose=True)
-            if rec and not args.json:
-                print_record_banner(rec)
-        print(f"\n[+] Batch extraction complete. Check Admin Studio (admin.html) to review!")
+            links = [line.strip() for line in f if line.strip() and not line.startswith('#')]
+        print(f"\n[*] Found {len(links)} links to process.")
+        for idx, link in enumerate(links, start=1):
+            print(f"\n[{idx}/{len(links)}] Processing: {link}")
+            rec = extract_video_link(link, verbose=False)
+            if rec:
+                dup_str = " (DUPLICATE DETECTED)" if rec.get('duplicate_info') else ""
+                print(f"[+] Successfully staged: {rec.get('title')}{dup_str}")
+        print("\n[+] Batch extraction complete. Open admin.html to review and publish!\n")
         return
 
     if args.url:
-        rec = extract_video_link(args.url, verbose=not args.json)
-        if args.json:
-            print(json.dumps(rec, indent=2, ensure_ascii=False))
+        record = extract_video_link(args.url, verbose=not args.json)
+        if record:
+            if args.json:
+                print(json.dumps(record, indent=2, ensure_ascii=False))
+            else:
+                print_record_banner(record)
         else:
-            print_record_banner(rec)
-        return
-
-    # If no CLI arguments provided, launch interactive paste loop
-    interactive_loop()
+            sys.exit(1)
+    else:
+        interactive_loop()
 
 if __name__ == "__main__":
     main()

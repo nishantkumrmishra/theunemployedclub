@@ -85,7 +85,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // State
   let currentView = 'review';
-  let currentDeckIndex = 0;
+  const urlDraftParam = parseInt(new URLSearchParams(window.location.search).get('draft'), 10);
+  let currentDeckIndex = (!isNaN(urlDraftParam) && urlDraftParam >= 1) ? urlDraftParam - 1 : 0;
   let currentCatalogFilter = 'all';
   let catalogTypeFilter = null; // 'video' | 'short' | null
 
@@ -236,6 +237,21 @@ document.addEventListener('DOMContentLoaded', () => {
       deckSourceLink.style.display = currentDraft.sourceUrl ? 'inline' : 'none';
     }
 
+    // Duplicate Detection Check
+    const deckDuplicateBanner = document.getElementById('deck-duplicate-banner');
+    const deckDuplicateDesc = document.getElementById('deck-duplicate-desc');
+    const dup = Catalog.checkDuplicate(currentDraft);
+    if (dup && dup.isDuplicate) {
+      if (deckDuplicateBanner) deckDuplicateBanner.classList.remove('hidden');
+      if (deckDuplicateDesc) {
+        const existingTitle = dup.existing ? dup.existing.title : 'an existing video';
+        const shelfLabel = dup.location.includes('Catalog') ? getShelfLabel(dup.shelf) : 'Review Queue';
+        deckDuplicateDesc.textContent = `Warning: ${dup.matchedBy} matches "${existingTitle}" in ${dup.location} (${shelfLabel}).`;
+      }
+    } else {
+      if (deckDuplicateBanner) deckDuplicateBanner.classList.add('hidden');
+    }
+
     // Auto-detect Shelf
     const autoShelf = detectDefaultShelf(currentDraft);
     if (deckSectionSelect) deckSectionSelect.value = autoShelf;
@@ -339,6 +355,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (staging.length === 0) return;
 
       const currentDraft = staging[currentDeckIndex];
+      const dup = Catalog.checkDuplicate(currentDraft);
+      if (dup && dup.isDuplicate) {
+        if (!confirm(`Warning: This video is detected as duplicate of "${dup.existing?.title || 'an existing video'}" in ${dup.location}. Are you sure you want to approve and publish anyway?`)) {
+          return;
+        }
+      }
       const title = deckTitleInput.value.trim() || currentDraft.title;
       const shelf = deckSectionSelect.value;
       const tags = (deckTagsInput.value || '').split(',').map(t => t.trim()).filter(Boolean);
@@ -369,6 +391,21 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       renderCatalogTable();
+    });
+  }
+
+  // Delete Duplicate 1-Click Action
+  const btnDeckDeleteDup = document.getElementById('btn-deck-delete-duplicate');
+  if (btnDeckDeleteDup) {
+    btnDeckDeleteDup.addEventListener('click', () => {
+      const staging = Catalog.getStaging();
+      if (staging.length === 0) return;
+      const currentDraft = staging[currentDeckIndex];
+      if (confirm(`Permanently delete duplicate draft "${currentDraft.title}" from review queue?`)) {
+        Catalog.rejectStaged(currentDraft.id);
+        showToast('Duplicate draft deleted from review queue.');
+        renderDeck();
+      }
     });
   }
 
@@ -539,7 +576,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </td>
         <td>
           <span style="font-size: 0.75rem; color: ${isShort ? '#e0245e' : 'var(--color-fg-bold)'};">
-            ${isShort ? '📱 9:16 Short' : '🎬 16:9 Video'}
+            ${isShort ? '9:16 Short' : '16:9 Video'}
           </span>
         </td>
         <td>
