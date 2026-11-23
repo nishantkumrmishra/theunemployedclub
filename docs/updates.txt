@@ -1,0 +1,30 @@
+# The Unemployed Club — Progress Report
+
+> **Title:** Shorts Video Engine Fix & Editorial Staging Pipeline
+> **Repository:** `nishantkumrmishra/theunemployedclub`
+> **Live Site:** `https://nishantkumrmishra.github.io/theunemployedclub/`
+
+```diff
++ WORK DONE
++ [Shorts Playback] Integrated Hls.js in `shorts.html` for native `.m3u8` desktop stream decoding.
++ [Shorts Playback] Solved browser autoplay blockage by initializing playback with `muted = true`.
++ [Shorts Playback] Added full-screen click handler on `#shorts-box` to toggle play and pause.
++ [Shorts Playback] Synchronized play overlay visibility with native HTML5 `play` and `pause` events.
++ [Shorts Playback] Replaced fake interval timeline with real-time video `timeupdate` tracking.
++ [Extractor] Updated `tools/extractor.bat` and `tools/main.py` to save items as Drafts (`pending_review`).
++ [Extractor] Configured extractor to avoid direct publishing to public feeds without authentication.
++ [Admin Studio] Added Amber `Editorial Review Queue` card in `admin.html` with pending count badges.
++ [Admin Studio] Added Stream Preview modal to test video playback directly inside Admin Studio.
++ [Admin Studio] Built 1-click placement selector for `Top 2 Rows`, `Middle Row`, `Shorts`, and `Bottom Feed`.
++ [Admin Studio] Added `Approve & Publish`, `Edit in Form`, and `Dismiss` draft controls.
++ [Security] Added `js/staging-feed.js` and `tools/extracted/` to `.gitignore` to prevent repository suspensions.
++ [Deployment] Pushed commit `1971fb1` to `origin main` and updated GitHub Pages live build.
+```
+
+```diff
+- NOT DONE / NEXT STEPS
+- [Scraper] Aspect ratio auto-detection: Scraper does not yet auto-detect 9:16 vertical resolution to pre-select Shorts shelf.
+- [Stream Health] Link liveness monitor: No automated background script to ping external CDN URLs and alert on expired links.
+- [Cloud Sync] In-browser GitHub API token commit: Approvals save to local storage/feed file; direct GitHub API commit from browser is not yet wired.
+- [Video Player] Quality switcher for Shorts: Manual resolution selector (1080p, 720p, 480p) exists on `player.html` but is not yet added to `shorts.html`.
+```
