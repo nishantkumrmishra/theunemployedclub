@@ -15,7 +15,7 @@ Modular chunk architecture:
   - modules/metadata_parser.py  -> Title & description extraction
   - modules/stream_extractor.py -> Video stream extraction
   - modules/artwork_extractor.py-> Photo / artwork extraction
-  - modules/block_storage.py    -> Persists modular data blocks to extracted/blocks/
+  - modules/block_storage.py    -> Persists modular data blocks to extracted/blocks/ & staging feed
 
 Usage:
   extractor.bat                              # 1-Click launcher
@@ -134,28 +134,37 @@ def extract_video_link(url: str, verbose: bool = True) -> dict:
     return record
 
 def print_record_banner(record: dict):
-    """Prints extracted record in clean copy-paste format for Admin Studio."""
+    """Prints extracted record banner with clear Staging & Review Queue instructions."""
     print("\n" + "=" * 70)
-    print("SUCCESSFULLY EXTRACTED VIDEO DATA BLOCK")
+    print("SUCCESSFULLY EXTRACTED & STAGED FOR EDITORIAL REVIEW")
     print("=" * 70)
+    print("Status:              [DRAFT - PENDING ADMIN REVIEW]")
+    print("                     (Saved in website staging; NOT live on public site)")
     print(f"Video Title:         {record.get('title')}")
     print(f"Video CDN URL:       {record.get('video_url')}")
     print(f"Photo / Artwork CDN: {record.get('artwork_url')}")
     print(f"Description:         {record.get('description')}")
     print(f"Author / Channel:    {record.get('author')}")
     print("-" * 70)
-    print("Ready to paste directly into Admin Studio (admin.html)!")
-    print(f"Saved into: tools/extracted/extracted_videos.txt")
+    print("HOW TO REVIEW & PUBLISH:")
+    print("  1. Log into Admin Studio: admin.html")
+    print("  2. Check the 'Review Queue' (Pending Drafts)")
+    print("  3. Preview video stream & select section:")
+    print("     • Top 2 Rows (Featured Grid)")
+    print("     • Middle Row (Curated Break)")
+    print("     • Shorts Shelf (9:14 Vertical)")
+    print("     • Bottom Feed (Endless Scroll)")
+    print("  4. Click 'Approve & Publish' to add to live stream catalog!")
     print("=" * 70 + "\n")
 
 def interactive_loop():
-    """Runs continuous interactive loop: paste link, get metadata."""
+    """Runs continuous interactive loop: paste link, stage for review."""
     print("=" * 70)
     print("The Unemployed Club - Modular Video Link & Stream Extractor")
     print("=" * 70)
-    print("Supports aamchor.com, Direct CDNs (.mp4/.m3u8), YouTube, Vimeo, and more.")
+    print("Supports aamchor.com, Direct CDNs (.mp4/.m3u8), YouTube, Vimeo, etc.")
     print("Paste any video link to extract Title, Video CDN, Artwork, & Description.")
-    print("Data blocks are saved modularly into tools/extracted/blocks/\n")
+    print("Extracted links are STAGED as Drafts for your review in Admin Studio.\n")
 
     while True:
         try:
@@ -206,7 +215,7 @@ def main():
             rec = extract_video_link(u, verbose=True)
             if rec and not args.json:
                 print_record_banner(rec)
-        print(f"\n[+] Batch extraction complete. Check tools/extracted/extracted_videos.txt")
+        print(f"\n[+] Batch extraction complete. Check Admin Studio (admin.html) to review!")
         return
 
     if args.url:

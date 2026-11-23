@@ -1,13 +1,14 @@
 /**
  * The Unemployed Club - Unified Editorial Catalog Data Store
  * Manages video metadata, stream links, artwork CDN URLs, section placement,
- * and zero-technical-knowledge export for GitHub Pages.
+ * staging / review queue pipeline, and zero-technical-knowledge export for GitHub Pages.
  */
 
 (function (window) {
   'use strict';
 
   const STORAGE_KEY = 'webvideo_catalog_v1';
+  const STAGING_KEY = 'webvideo_staging_v1';
 
   function initCatalog() {
     let items = [];
@@ -42,7 +43,43 @@
     }
   }
 
+  // --- Staging Queue Storage & Synchronization ---
+  function initStaging() {
+    let staged = [];
+    try {
+      const stored = localStorage.getItem(STAGING_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) staged = parsed;
+      }
+    } catch (e) {
+      console.warn('[Catalog] Staging LocalStorage parse error:', e);
+    }
+
+    // Merge static feed window.WEBVIDEO_STAGING if present
+    if (Array.isArray(window.WEBVIDEO_STAGING)) {
+      window.WEBVIDEO_STAGING.forEach(item => {
+        const exists = staged.some(s => s.id === item.id || (s.videoUrl && s.videoUrl === item.videoUrl));
+        if (!exists) {
+          staged.push(item);
+        }
+      });
+      saveStagingToStorage(staged);
+    }
+
+    return staged;
+  }
+
+  function saveStagingToStorage(items) {
+    try {
+      localStorage.setItem(STAGING_KEY, JSON.stringify(items));
+    } catch (e) {
+      console.error('[Catalog] Failed to save staging:', e);
+    }
+  }
+
   let catalogItems = initCatalog();
+  let stagingItems = initStaging();
 
   const Catalog = {
     getAll() {
@@ -102,7 +139,7 @@
         duration: videoData.duration || '12:00'
       };
 
-      // Add to beginning of section
+      // Add to beginning of catalog
       catalogItems.unshift(newVideo);
       saveToStorage(catalogItems);
       return newVideo;
@@ -137,6 +174,67 @@
         return true;
       }
       return false;
+    },
+
+    // --- Staging & Review Pipeline Methods ---
+    getStaging() {
+      return [...stagingItems];
+    },
+
+    addStaged(item) {
+      const id = item.id || ('draft_' + Date.now());
+      const stagedItem = {
+        id,
+        title: item.title || 'Extracted Stream',
+        videoUrl: item.videoUrl || item.video_url || '',
+        artworkUrl: item.artworkUrl || item.artwork_url || 'images/pic01.jpg',
+        description: item.description || '',
+        author: item.author || 'The Unemployed Club',
+        sourceUrl: item.sourceUrl || item.source_url || '',
+        status: 'pending_review',
+        extractedAt: item.extractedAt || item.extracted_at || new Date().toLocaleString()
+      };
+      stagingItems = stagingItems.filter(s => s.videoUrl !== stagedItem.videoUrl && s.id !== stagedItem.id);
+      stagingItems.unshift(stagedItem);
+      saveStagingToStorage(stagingItems);
+      return stagedItem;
+    },
+
+    approveStaged(id, targetSection = 'top', overrides = {}) {
+      const idx = stagingItems.findIndex(s => String(s.id) === String(id));
+      if (idx === -1) return null;
+
+      const staged = stagingItems[idx];
+      const videoData = {
+        title: overrides.title !== undefined ? overrides.title : staged.title,
+        description: overrides.description !== undefined ? overrides.description : staged.description,
+        videoUrl: overrides.videoUrl !== undefined ? overrides.videoUrl : staged.videoUrl,
+        artworkUrl: overrides.artworkUrl !== undefined ? overrides.artworkUrl : staged.artworkUrl,
+        author: overrides.author !== undefined ? overrides.author : staged.author,
+        section: targetSection,
+        type: targetSection === 'shorts' ? 'short' : 'video',
+        views: '1.4K views',
+        duration: targetSection === 'shorts' ? '0:45' : '12:00'
+      };
+
+      const published = this.addVideo(videoData);
+
+      // Remove from staging
+      stagingItems.splice(idx, 1);
+      saveStagingToStorage(stagingItems);
+
+      return published;
+    },
+
+    rejectStaged(id) {
+      stagingItems = stagingItems.filter(s => String(s.id) !== String(id));
+      saveStagingToStorage(stagingItems);
+      return true;
+    },
+
+    clearStaging() {
+      stagingItems = [];
+      saveStagingToStorage(stagingItems);
     },
 
     resetToDefaults() {

@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js"></script>
   <script src="js/components.js"></script>
   <script>
     // Strict authentication guard for Admin Studio
@@ -56,6 +57,160 @@
       gap: 10px;
       align-items: center;
     }
+
+    /* Editorial Review Queue / Staged Drafts Card */
+    .admin-review-card {
+      background: var(--bg-card);
+      border: solid 1px var(--color-border);
+      border-left: 4px solid #f59e0b; /* Amber tone for pending review */
+      padding: 28px 32px;
+      margin-bottom: 32px;
+    }
+    .admin-review-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--color-border);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .admin-review-header h2 {
+      font-size: 1.25rem;
+      color: var(--color-fg-bold);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .staged-badge-count {
+      background: #f59e0b;
+      color: #ffffff;
+      padding: 2px 8px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+    .staged-item-card {
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      padding: 16px;
+      margin-bottom: 14px;
+      display: grid;
+      grid-template-columns: 140px 1fr auto;
+      gap: 20px;
+      align-items: center;
+      transition: border-color 0.15s ease;
+    }
+    .staged-item-card:hover {
+      border-color: var(--color-accent);
+    }
+    .staged-thumb-box {
+      width: 140px;
+      aspect-ratio: 16 / 9;
+      background: #eaeaea;
+      overflow: hidden;
+      position: relative;
+    }
+    .staged-thumb-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .staged-thumb-box.is-short-thumb {
+      width: 75px;
+      aspect-ratio: 9 / 14;
+    }
+    .staged-details {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+    .staged-title {
+      font-size: 0.95rem;
+      color: var(--color-fg-bold);
+      font-weight: 400 !important;
+      line-height: 1.3;
+    }
+    .staged-desc {
+      font-size: 0.8rem;
+      color: var(--color-fg);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.4;
+    }
+    .staged-meta {
+      font-size: 0.74rem;
+      color: var(--color-fg-light);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .staged-actions-col {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 190px;
+    }
+    .select-staged-placement {
+      height: 32px;
+      padding: 0 8px;
+      background: #fbfbfb;
+      border: solid 1px var(--color-border);
+      font-size: 0.78rem;
+      color: var(--color-fg-bold);
+      border-radius: 0 !important;
+      outline: none;
+      width: 100%;
+    }
+    .btn-approve-staged {
+      height: 32px;
+      padding: 0 12px;
+      background: var(--color-accent);
+      color: #ffffff;
+      border: solid 1px var(--color-accent);
+      font-size: 0.78rem;
+      cursor: pointer;
+      border-radius: 0 !important;
+      transition: opacity 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-approve-staged:hover {
+      opacity: 0.9;
+    }
+    .staged-btn-row {
+      display: flex;
+      gap: 6px;
+    }
+    .staged-sub-btn {
+      flex: 1;
+      height: 28px;
+      border: 1px solid var(--color-border);
+      background: transparent;
+      font-size: 0.74rem;
+      color: var(--color-fg);
+      cursor: pointer;
+      border-radius: 0 !important;
+      transition: all 0.15s ease;
+    }
+    .staged-sub-btn:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+    .staged-sub-btn.btn-dismiss:hover {
+      border-color: #e0245e;
+      color: #e0245e;
+    }
+
+    /* Video Add / Edit Card */
     .admin-form-card {
       background: var(--bg-card);
       border: solid 1px var(--color-border);
@@ -138,6 +293,7 @@
       text-align: center;
       padding: 20px;
     }
+
     /* Catalog Management List */
     .catalog-filter-tabs {
       display: flex;
@@ -271,13 +427,67 @@
       border-color: #e0245e;
       color: #e0245e;
     }
+
+    /* Stream Preview Modal */
+    .stream-preview-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .stream-preview-backdrop.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .stream-preview-modal {
+      background: #ffffff;
+      width: 90%;
+      max-width: 800px;
+      border: 1px solid var(--color-border);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+    }
+    .stream-preview-modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .stream-preview-modal-body {
+      background: #000000;
+      aspect-ratio: 16 / 9;
+      width: 100%;
+      position: relative;
+    }
+    .stream-preview-modal-body video {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
     @media screen and (max-width: 900px) {
       .admin-grid-layout {
         grid-template-columns: 1fr;
       }
-      .catalog-item-row {
+      .catalog-item-row, .staged-item-card {
+        grid-template-columns: 1fr;
+        display: flex;
         flex-direction: column;
         align-items: flex-start;
+      }
+      .staged-actions-col {
+        width: 100%;
       }
     }
   </style>
@@ -296,7 +506,7 @@
       
       <div class="content-header">
         <h2>Content Admin Studio</h2>
-        <p>Curate, index, and organize video streams and photo artwork across all website sections</p>
+        <p>Curate, index, review, and organize video streams across all website sections</p>
       </div>
 
       <!-- Zero-Technical-Knowledge GitHub Update Banner -->
@@ -304,7 +514,7 @@
         <div class="admin-banner-info">
           <h3>Zero-Knowledge 1-Click Update for GitHub</h3>
           <p>
-            When you add or edit videos below, they save instantly to your browser. To push updates live to <strong>GitHub Pages</strong> for all visitors, click <strong>Download Updated Catalog</strong> and drag the single file into your GitHub repo's <code>js/</code> folder. Done!
+            When you add or approve videos below, they save instantly to your browser. To push updates live to <strong>GitHub Pages</strong> for all visitors, click <strong>Download Catalog File</strong> and drag the single file into your GitHub repo's <code>js/</code> folder. Done!
           </p>
         </div>
         <div class="admin-banner-actions">
@@ -317,7 +527,35 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             <span>Sign Out</span>
           </button>
+        </div>
+      </div>
 
+      <!-- ============================================================== -->
+      <!-- EDITORIAL REVIEW QUEUE (STAGED DRAFTS FROM EXTRACTOR) -->
+      <!-- ============================================================== -->
+      <div class="admin-review-card" id="admin-review-section">
+        <div class="admin-review-header">
+          <h2>
+            <span>Editorial Review Queue</span>
+            <span class="staged-badge-count" id="staged-badge-count">0 Pending</span>
+          </h2>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-secondary" id="btn-import-stage-url" style="height: 32px; font-size: 0.78rem;">
+              + Stage URL Directly
+            </button>
+            <button class="btn-secondary" id="btn-clear-staging" style="height: 32px; font-size: 0.78rem;">
+              Clear All Staged
+            </button>
+          </div>
+        </div>
+
+        <p style="font-size: 0.84rem; color: var(--color-fg); margin-bottom: 20px; line-height: 1.5;">
+          Videos extracted via <code>tools/extractor.bat</code> or URL staging appear here first as <strong>Drafts</strong>. They are <strong>NOT live</strong> on the public website until you preview the stream, assign which section they belong to (Top 2 Rows, Middle Row, Shorts Shelf, or Bottom Feed), and click <strong>Approve & Publish</strong>.
+        </p>
+
+        <!-- Staged Items Container -->
+        <div id="staged-items-container">
+          <!-- Rendered dynamically by js/admin.js -->
         </div>
       </div>
 
@@ -344,7 +582,7 @@
               <div class="form-group">
                 <label for="video-cdn-url">Video Stream CDN URL *</label>
                 <input type="url" id="video-cdn-url" placeholder="https://cdn.example.com/videos/stream.mp4 or HLS .m3u8" required />
-                <span class="form-hint">Direct CDN stream link, MP4 video file, or streaming URL.</span>
+                <span class="form-hint">Direct CDN stream link, MP4 video file, or HLS .m3u8 streaming URL.</span>
               </div>
 
               <div class="form-group">
@@ -450,10 +688,24 @@
     </main>
   </div>
 
+  <!-- Quick Video Stream Preview Modal -->
+  <div class="stream-preview-backdrop" id="stream-preview-modal">
+    <div class="stream-preview-modal">
+      <div class="stream-preview-modal-header">
+        <h3 id="modal-stream-title" style="font-size: 1rem; color: var(--color-fg-bold); font-weight: 400; margin: 0;">Preview Stream</h3>
+        <button id="btn-close-modal" style="background: transparent; border: none; font-size: 1.2rem; cursor: pointer; color: var(--color-fg);">&times;</button>
+      </div>
+      <div class="stream-preview-modal-body">
+        <video id="modal-video-player" controls playsinline></video>
+      </div>
+    </div>
+  </div>
+
   <!-- Notification Toast -->
   <div id="admin-toast" style="position: fixed; bottom: 24px; right: 24px; background: #1e1e24; color: #fff; padding: 10px 18px; font-size: 0.82rem; border-left: 3px solid var(--color-accent); box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 3000; opacity: 0; transform: translateY(12px); pointer-events: none; transition: all 0.2s ease;"></div>
 
   <!-- Scripts -->
+  <script src="js/staging-feed.js" onerror="window.WEBVIDEO_STAGING=window.WEBVIDEO_STAGING||[]"></script>
   <script src="js/catalog-feed.js"></script>
   <script src="js/catalog.js"></script>
   <script src="js/admin.js"></script>
