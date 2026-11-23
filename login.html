@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In - The Unemployed Club</title>
+  <!-- Google Fonts: Manrope Thin -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/components.js"></script>
+  <style>
+    .auth-alert-box {
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 0.84rem;
+      letter-spacing: 0.02em;
+      border: solid 1px transparent;
+      display: none;
+      line-height: 1.45;
+    }
+    .auth-alert-box.is-error {
+      display: block;
+      background: #fff5f5;
+      color: #b91c1c;
+      border-color: #fecaca;
+    }
+    .auth-alert-box.is-success {
+      display: block;
+      background: #f0fdf4;
+      color: #166534;
+      border-color: #bbf7d0;
+    }
+    .auth-alert-box.is-info {
+      display: block;
+      background: #f0f9ff;
+      color: #0369a1;
+      border-color: #bae6fd;
+    }
+  </style>
+</head>
+<body class="auth-page">
+  <!-- Modular Zero-Build Header -->
+  <site-header></site-header>
+
+  <div id="wrapper">
+    <!-- Modular Zero-Build Sidebar -->
+    <site-sidebar></site-sidebar>
+
+    <!-- Main Auth Area -->
+    <main id="main-content">
+      <div class="auth-card">
+        <div class="auth-header">
+          <h2>Sign In</h2>
+          <p>Welcome back to The Unemployed Club</p>
+        </div>
+
+        <!-- Inline Status/Error Notification -->
+        <div id="auth-alert" class="auth-alert-box" role="alert"></div>
+
+        <form class="auth-form" id="login-form" novalidate>
+          <div class="form-group">
+            <label for="login-email">Email or Username</label>
+            <input type="text" id="login-email" placeholder="name@example.com or admin" required autocomplete="username" />
+          </div>
+
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password" />
+          </div>
+
+          <div class="form-meta-row">
+            <label class="remember-label">
+              <input type="checkbox" id="remember-me" name="remember" />
+              <span>Remember me</span>
+            </label>
+            <a href="#" class="forgot-link">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="btn-auth-submit" id="btn-login-submit">Sign In</button>
+        </form>
+
+        <div class="auth-footer">
+          <span>Don't have an account?</span>
+          <a href="register.html">Register</a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("login-form");
+      const emailInput = document.getElementById("login-email");
+      const passwordInput = document.getElementById("login-password");
+      const rememberCheckbox = document.getElementById("remember-me");
+      const alertBox = document.getElementById("auth-alert");
+
+      function showAlert(msg, type) {
+        if (!alertBox) return;
+        alertBox.textContent = msg;
+        alertBox.className = `auth-alert-box is-${type}`;
+      }
+
+      function hideAlert() {
+        if (!alertBox) return;
+        alertBox.className = "auth-alert-box";
+        alertBox.textContent = "";
+      }
+
+      // Check URL query parameters (e.g. redirected from admin.html)
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("notice") === "admin_required") {
+        showAlert("Administrator login required to access Admin Studio.", "info");
+        emailInput.value = "admin";
+        passwordInput.focus();
+      }
+
+      if (form) {
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          hideAlert();
+
+          const username = (emailInput.value || "").trim();
+          const password = (passwordInput.value || "").trim();
+
+          if (!username) {
+            showAlert("Please enter your email or username.", "error");
+            emailInput.focus();
+            return;
+          }
+          if (!password) {
+            showAlert("Please enter your password.", "error");
+            passwordInput.focus();
+            return;
+          }
+
+          // Administrator Credentials Check:
+          // Username: "admin"
+          // Password: "admin@123"
+          if (username.toLowerCase() === "admin") {
+            if (password === "admin@123") {
+              showAlert("Administrator verified. Redirecting to Admin Studio...", "success");
+              try {
+                sessionStorage.setItem("tuc_admin_auth", "true");
+                if (rememberCheckbox && rememberCheckbox.checked) {
+                  localStorage.setItem("tuc_admin_auth", "true");
+                }
+                localStorage.setItem("tuc_user", "Admin");
+              } catch (err) {}
+
+              setTimeout(() => {
+                window.location.href = "admin.html";
+              }, 400);
+              return;
+            } else {
+              showAlert("Invalid password for administrator account.", "error");
+              passwordInput.value = "";
+              passwordInput.focus();
+              return;
+            }
+          }
+
+          // Standard Member Sign In
+          showAlert(`Signed in as ${username}. Redirecting...`, "success");
+          try {
+            sessionStorage.removeItem("tuc_admin_auth");
+            localStorage.removeItem("tuc_admin_auth");
+            localStorage.setItem("tuc_user", username.split("@")[0]);
+          } catch (err) {}
+
+          setTimeout(() => {
+            window.location.href = "index.html";
+          }, 450);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

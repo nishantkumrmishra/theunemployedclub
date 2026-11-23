@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shorts - The Unemployed Club</title>
+  <!-- Google Fonts: Manrope Thin -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/components.js"></script>
+</head>
+<body class="shorts-page">
+  <!-- Modular Zero-Build Header -->
+  <site-header></site-header>
+
+  <div id="wrapper">
+    <!-- Modular Zero-Build Sidebar -->
+    <site-sidebar active="shorts"></site-sidebar>
+
+    <!-- Main Content Area: Dedicated Shorts Stage -->
+    <main id="main-content" class="shorts-main-content">
+      <div class="shorts-stage">
+        <!-- 9:16 Vertical Video Screen -->
+        <div class="shorts-screen-box" id="shorts-box">
+          <!-- Video element ready for CDN stream or local loop -->
+          <video id="shorts-video" class="shorts-video-element" poster="images/pic03.jpg" playsinline loop preload="metadata">
+            <source id="shorts-source" src="" type="video/mp4" />
+            Your browser does not support HTML5 video playback.
+          </video>
+
+          <!-- Click to play/pause overlay -->
+          <div class="shorts-overlay-play" id="shorts-play-overlay">
+            <button class="shorts-screen-play-btn" id="shorts-screen-play-btn" aria-label="Play Short">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+                <polygon points="6 3 20 12 6 21 6 3"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Bottom Info Layer: Channel info, caption, audio title, progress -->
+          <div class="shorts-bottom-info">
+            <div class="shorts-channel-row">
+              <img src="images/avatar.jpg" alt="Channel Avatar" class="shorts-channel-avatar" />
+              <span class="shorts-channel-name">@theunemployedclub</span>
+              <button class="btn-shorts-subscribe" id="btn-shorts-sub">Subscribe</button>
+            </div>
+
+            <div class="shorts-caption" id="shorts-caption">
+              Everyday minimalism in editorial design
+            </div>
+
+            <div class="shorts-sound-row">
+              <!-- Lucide: music (14px) -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+                <path d="M9 18V5l12-2v13"/>
+                <circle cx="6" cy="18" r="3"/>
+                <circle cx="18" cy="16" r="3"/>
+              </svg>
+              <span>The Unemployed Club &bull; Original Sound</span>
+            </div>
+
+            <!-- Slim bottom timeline progress -->
+            <div class="shorts-timeline-progress">
+              <div class="shorts-progress-bar" id="shorts-progress-bar"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Vertical Actions Column -->
+        <div class="shorts-actions-column">
+          <!-- Like -->
+          <div class="shorts-action-item">
+            <button class="shorts-action-btn" id="btn-short-like" aria-label="Like Short">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+                <path d="M7 10v12"/>
+                <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h3"/>
+                <path d="M14 10V4.5a2.5 2.5 0 0 0-5 0v1.5"/>
+              </svg>
+            </button>
+            <span class="shorts-action-count" id="short-like-count">38K</span>
+          </div>
+
+          <!-- Dislike -->
+          <div class="shorts-action-item">
+            <button class="shorts-action-btn" id="btn-short-dislike" aria-label="Dislike Short">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+                <path d="M17 14V2"/>
+                <path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-3"/>
+                <path d="M10 14v5.5a2.5 2.5 0 0 0 5 0V18"/>
+              </svg>
+            </button>
+            <span class="shorts-action-count">Dislike</span>
+          </div>
+
+          <!-- Comments -->
+          <div class="shorts-action-item">
+            <button class="shorts-action-btn" id="btn-short-comment" aria-label="Comments">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+                <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>
+              </svg>
+            </button>
+            <span class="shorts-action-count">642</span>
+          </div>
+
+          <!-- Share -->
+          <div class="shorts-action-item">
+            <button class="shorts-action-btn" id="btn-short-share" aria-label="Share Short">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+                <circle cx="18" cy="5" r="3"/>
+                <circle cx="6" cy="12" r="3"/>
+                <circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/>
+                <line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/>
+              </svg>
+            </button>
+            <span class="shorts-action-count">Share</span>
+          </div>
+
+          <!-- Sound Mute Toggle -->
+          <div class="shorts-action-item">
+            <button class="shorts-action-btn" id="btn-short-volume" aria-label="Mute / Unmute">
+              <svg id="short-vol-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+                <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/>
+                <path d="M16 9a5 5 0 0 1 0 6"/>
+                <path d="M19.364 18.364a9 9 0 0 0 0-12.728"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Prev/Next Up/Down Navigation Arrows -->
+          <div class="shorts-nav-arrows">
+            <button class="btn-short-arrow" id="btn-short-prev" aria-label="Previous Short" title="Previous Short (Up Arrow)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+                <path d="m18 15-6-6-6 6"/>
+              </svg>
+            </button>
+            <button class="btn-short-arrow" id="btn-short-next" aria-label="Next Short" title="Next Short (Down Arrow)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Companion Panel: Comments & Up Next Queue -->
+        <aside class="shorts-companion-panel" id="shorts-companion-panel">
+          <div class="shorts-tabs-header">
+            <button class="shorts-tab-btn is-active" id="tab-btn-comments" data-tab="comments">
+              Comments (642)
+            </button>
+            <button class="shorts-tab-btn" id="tab-btn-queue" data-tab="queue">
+              Up Next (5)
+            </button>
+          </div>
+
+          <!-- Tab 1: Comments -->
+          <div class="shorts-tab-content is-active" id="tab-content-comments">
+            <div class="shorts-comment-input-row">
+              <img src="images/avatar.jpg" alt="User Avatar" class="comment-author-avatar" />
+              <div class="comment-input-box">
+                <input type="text" id="new-comment-input" placeholder="Add a public comment..." />
+                <button class="btn-post-comment" id="btn-post-comment">Post</button>
+              </div>
+            </div>
+            <ul class="shorts-comments-list" id="comments-list"></ul>
+          </div>
+
+          <!-- Tab 2: Up Next Queue -->
+          <div class="shorts-tab-content" id="tab-content-queue">
+            <ul class="shorts-queue-list" id="shorts-queue-list"></ul>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/catalog-feed.js"></script>
+  <script src="js/catalog.js"></script>
+  <script src="js/shorts.js"></script>
+</body>
+</html>
