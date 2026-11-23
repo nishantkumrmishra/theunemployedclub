@@ -1,24 +1,21 @@
 # The Unemployed Club — Progress Report
 
-> **Title:** Duplicate Content Detection, Review Deck Seed Data & Complete Emoji Eradication
+> **Title:** Shorts Viewer 3-Box Architectural Redesign, Hover Timeline Scrubber & Translucent Action Controls
 > **Repository:** `nishantkumrmishra/theunemployedclub`
-> **Live Site:** `https://nishantkumrmishra.github.io/theunemployedclub/`
+> **Live Site:** `https://nishantkumrmishra.github.io/theunemployedclub/shorts.html`
 
 ```diff
 + WORK DONE
-+ [Duplicate Detection Engine] Built `tools/modules/duplicate_detector.py` to detect duplicate video streams by CDN URL, original source webpage, and normalized title against catalog and staging.
-+ [Extractor CLI Duplicate Alert] Updated `tools/main.py` to run duplicate check on single URL, batch files, and interactive loop, printing terminal warnings and staging duplicate tags.
-+ [Admin Deck Duplicate Banner] Built prominent alert banner in `admin.html` and `js/admin.js` notifying admin when a draft stream matches an existing video in catalog or staging.
-+ [1-Click Delete Duplicate] Added dedicated red `[Delete Duplicate Draft]` button to instantly remove duplicate drafts from the review deck and advance to the next item.
-+ [Duplicate Approval Guard] Implemented confirmation safeguard in `btnDeckApprove` preventing accidental duplicate publishing unless explicitly confirmed.
-+ [Sample Pending Drafts] Seeded 4 high-fidelity editorial drafts into `js/staging-feed.js` and `Catalog.initStaging()` (3 unique streams, 1 intentional duplicate test against vid_top_1).
-+ [Zero Emojis Enforced] Stripped 100% of emojis across entire codebase (select dropdown options, aspect badges, shelf pills); using standard Lucide SVG icons and clean typography.
-+ [Sequential Review Deck] Sequential 1-by-1 Focus Deck in `admin.html` with smooth card transitions and auto-advance.
-+ [Compact Catalog Table] High-density catalog table view with slide-out inline edit drawer and live thumbnail preview.
-+ [Dynamic Tags System] Horizontal scrollable tag filter bar next to "Featured Videos" on `index.html`.
-+ [5-Tier Editorial Hierarchy] Structured into Top 20 Entries, Shorts Shelf 1, Curated Mid Stream, Trending Shorts 2, and Endless Default Feed.
-+ [Shorts Player Polish] Spinning CD vinyl icon, flyout volume slider, mouse wheel / touch swipe navigation, and 0-comment notice.
-+ [Security] Maintained `js/staging-feed.js` and `tools/extracted/` in `.gitignore` to prevent repository suspensions.
++ [Shorts 3-Box Stage Layout] Architected balanced 3-box editorial layout across `shorts.html` and `css/style.css`: Left Info Panel (320px), Middle 9:16 Video Stage (380px), Right Companion Panel (340px).
++ [Dedicated Left Info Panel] Extracted author avatar, channel title, view counter, subscribe button, video title, full description, tag pills, and spinning CD original sound badge into a clean left-hand card, removing all visual clutter from the video frame.
++ [Translucent Dynamic Action Stack] Converted vertical action buttons (Like, Dislike, Comment, Share, Volume Flyout, Next/Prev Arrows) into frosted glass controls (`rgba(0, 0, 0, 0.5)` with `backdrop-filter: blur(12px)` and light border), adapting cleanly over both dark and bright video frames.
++ [Interactive Hover Timeline Scrubber] Engineered bottom timeline scrubber bar inside `.shorts-hover-controls` that remains hidden by default and smoothly reveals only when the user hovers over the video player (`opacity: 0` to `1`).
++ [Instant Scrub & Seek Drag] Enabled click and drag seeking across the scrubber track with immediate visual feedback (`updateScrubber`), buffered bar fill, 12px scrub thumb handle, and timestamp indicator (`0:18 / 0:46`).
++ [Mini Play/Pause Toggle] Added compact play/pause toggle button directly in the hover scrubber bar with state sync and click event isolation to prevent accidental video pause toggles during seeking.
++ [Right Companion Panel] Dedicated right-hand box housing Under-Construction Comments (0) tab and Up Next queue list.
++ [Zero Emojis Enforced] 100% emoji-free interface throughout all components, using Lucide SVG icons and strict typography.
++ [Duplicate Detection Engine] `tools/modules/duplicate_detector.py` and sequential review deck in `admin.html` with duplicate alerts and 1-click delete duplicate draft actions.
++ [5-Tier Editorial Shelf System] Top 20 Entries, Shorts Shelf 1, Curated Mid Stream, Trending Shorts 2, and Endless Default Feed with dynamic tag pills.
 ```
 
 ```diff

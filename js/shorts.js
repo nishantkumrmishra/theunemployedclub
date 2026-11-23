@@ -1,11 +1,15 @@
-// The Unemployed Club - Dedicated Shorts Player Logic
-// Supports Direct MP4, WebM, and Adaptive HLS (.m3u8) streams,
-// Wheel Scroll Navigation, Flyout Volume Slider, Animated CD Logo, and Catalog Integration.
+// The Unemployed Club - Dedicated Shorts Player Controller
+// 3-Box Balanced Stage: Left Info Panel, Center Video Player with Hover Scrubber, Right Companion Panel.
+// Supports Direct MP4, WebM, Adaptive HLS (.m3u8), Wheel Navigation, Frosted Action Controls, and Animated CD.
 
 const fallbackShorts = [
   {
     id: "s1",
     title: "Everyday minimalism in editorial design",
+    description: "Architectural exploration of monolithic raw concrete surfaces and geometric shadows. High fidelity pacing with zero compression degradation.",
+    author: "The Unemployed Club",
+    avatar: "images/avatar.jpg",
+    tags: ["Shorts", "Editorial", "Minimalism", "4K"],
     views: "520K views",
     likes: "38K",
     comments: "0",
@@ -15,6 +19,10 @@ const fallbackShorts = [
   {
     id: "s2",
     title: "Behind the darkroom prints & film",
+    description: "Silver gelatin optical prints developed by hand under red safety lights. Vintage grain pacing and analog texture.",
+    author: "Studio Minimal",
+    avatar: "images/avatar.jpg",
+    tags: ["Darkroom", "35mm", "Analog", "Monochrome"],
     views: "340K views",
     likes: "25K",
     comments: "0",
@@ -24,6 +32,10 @@ const fallbackShorts = [
   {
     id: "s3",
     title: "Typographic rhythm in under 60 seconds",
+    description: "High-contrast Swiss grid alignments and monospace typography. Zero extraneous decoration, pure function.",
+    author: "Editorial Arch",
+    avatar: "images/avatar.jpg",
+    tags: ["Typography", "Design", "SwissGrid", "Motion"],
     views: "1.2M views",
     likes: "89K",
     comments: "0",
@@ -33,6 +45,10 @@ const fallbackShorts = [
   {
     id: "s4",
     title: "Analog camera walk through autumn streets",
+    description: "Autumn leaves falling through golden hour backlighting. Captured on vintage 16mm Bolex camera.",
+    author: "The Unemployed Club",
+    avatar: "images/avatar.jpg",
+    tags: ["Cinematic", "Autumn", "16mm", "Vlog"],
     views: "890K views",
     likes: "61K",
     comments: "0",
@@ -42,6 +58,10 @@ const fallbackShorts = [
   {
     id: "s5",
     title: "Soundscapes of the foggy coastline",
+    description: "Deep oceanic bass drones and tape saturation field recordings captured at Big Sur, California.",
+    author: "Sound & Pacing",
+    avatar: "images/avatar.jpg",
+    tags: ["Soundscapes", "Ambient", "Ocean", "Calm"],
     views: "670K views",
     likes: "45K",
     comments: "0",
@@ -51,6 +71,10 @@ const fallbackShorts = [
   {
     id: "s6",
     title: "Future Imperfect: 10 years later",
+    description: "Retrospective examination of classical web design frameworks versus modern brutalist minimalism.",
+    author: "The Unemployed Club",
+    avatar: "images/avatar.jpg",
+    tags: ["Documentary", "Tech", "Minimalism"],
     views: "430K views",
     likes: "31K",
     comments: "0",
@@ -63,6 +87,7 @@ let currentIndex = 0;
 let isMuted = true;
 let currentVolume = 0.8;
 let hlsInstance = null;
+let isScrubbing = false;
 
 const VOL_ICONS = {
   muted: '<path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/>',
@@ -78,6 +103,10 @@ document.addEventListener("DOMContentLoaded", () => {
       catalogShorts = raw.map(s => ({
         id: s.id,
         title: s.title || "Untitled Short",
+        description: s.description || "High fidelity editorial curation • Pacing, typography, and pure brutalist aesthetic with zero compression degradation.",
+        author: s.author || "The Unemployed Club",
+        avatar: s.avatar || "images/avatar.jpg",
+        tags: Array.isArray(s.tags) && s.tags.length > 0 ? s.tags : ["Shorts", "Editorial", "Minimalism"],
         views: s.views || "450K views",
         likes: "42K",
         comments: "0",
@@ -103,16 +132,38 @@ document.addEventListener("DOMContentLoaded", () => {
     if (foundIdx !== -1) currentIndex = foundIdx;
   }
 
-  // 3. Elements
+  // 3. UI Element Queries
   const stageEl = document.getElementById("shorts-stage");
   const shortsBox = document.getElementById("shorts-box");
   const video = document.getElementById("shorts-video");
   const playOverlay = document.getElementById("shorts-play-overlay");
   const screenPlayBtn = document.getElementById("shorts-screen-play-btn");
-  const captionEl = document.getElementById("shorts-caption");
+
+  // Left Info Panel Elements
+  const infoTitle = document.getElementById("shorts-info-title");
+  const infoDesc = document.getElementById("shorts-info-desc");
+  const infoChannel = document.getElementById("shorts-info-channel");
+  const infoViews = document.getElementById("shorts-info-views");
+  const infoAvatar = document.getElementById("shorts-info-avatar");
+  const soundTitle = document.getElementById("shorts-sound-title");
+  const infoTags = document.getElementById("shorts-info-tags");
+  const btnSub = document.getElementById("btn-shorts-sub");
+
+  // Bottom Hover Controls & Interactive Scrubber Elements
+  const hoverControls = document.getElementById("shorts-hover-controls");
+  const scrubberTrack = document.getElementById("shorts-scrubber-track");
+  const scrubberFill = document.getElementById("shorts-scrubber-fill");
+  const scrubberBuffered = document.getElementById("shorts-scrubber-buffered");
+  const scrubberHandle = document.getElementById("shorts-scrubber-handle");
+  const currentTimeEl = document.getElementById("shorts-current-time");
+  const durationEl = document.getElementById("shorts-duration");
+  const miniPlayBtn = document.getElementById("shorts-mini-play-btn");
+  const miniPlayIcon = document.getElementById("shorts-mini-play-icon");
+  const progressBar = document.getElementById("shorts-progress-bar");
+
+  // Action Toolbar Elements
   const likeCountEl = document.getElementById("short-like-count");
   const commentCountEl = document.getElementById("short-comment-count");
-  const progressBar = document.getElementById("shorts-progress-bar");
   const volIcon = document.getElementById("short-vol-icon");
   const btnPrev = document.getElementById("btn-short-prev");
   const btnNext = document.getElementById("btn-short-next");
@@ -120,10 +171,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnVol = document.getElementById("btn-short-volume");
   const volSlider = document.getElementById("shorts-volume-slider");
   const volPctEl = document.getElementById("shorts-vol-pct");
-  const btnSub = document.getElementById("btn-shorts-sub");
   const btnComment = document.getElementById("btn-short-comment");
+  const btnShare = document.getElementById("btn-short-share");
 
-  // Tabs & Lists
+  // Right Companion Panel Tabs & Lists
   const tabComments = document.getElementById("tab-btn-comments");
   const tabQueue = document.getElementById("tab-btn-queue");
   const contentComments = document.getElementById("tab-content-comments");
@@ -157,6 +208,14 @@ document.addEventListener("DOMContentLoaded", () => {
       switchTab("comments");
       if (commentInput) commentInput.focus();
     });
+  }
+
+  // Time Formatter (mm:ss)
+  function formatTime(sec) {
+    if (isNaN(sec) || sec < 0) return "0:00";
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
   }
 
   // Render Zero Comments with Editorial Empty State
@@ -277,6 +336,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function onMetadataReady() {
+    if (durationEl && video.duration && !isNaN(video.duration)) {
+      durationEl.textContent = formatTime(video.duration);
+    }
     attemptAutoplay();
   }
 
@@ -299,13 +361,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // 5. Load Short & Update Left Box, Center Video, and Right Queue
   function loadShort(idx) {
     currentIndex = (idx + activeShorts.length) % activeShorts.length;
     const currentShort = activeShorts[currentIndex];
 
-    if (captionEl) captionEl.textContent = currentShort.title;
+    // Populate Left Box (Name & Description)
+    if (infoTitle) infoTitle.textContent = currentShort.title;
+    if (infoDesc) infoDesc.textContent = currentShort.description || "High fidelity editorial curation • Pacing, typography, and pure brutalist aesthetic with zero compression degradation.";
+    if (infoChannel) infoChannel.textContent = `@${(currentShort.author || "theunemployedclub").toLowerCase().replace(/[^a-z0-9]/g, "")}`;
+    if (infoViews) infoViews.textContent = currentShort.views || "520K views";
+    if (infoAvatar) infoAvatar.src = currentShort.avatar || "images/avatar.jpg";
+    if (soundTitle) soundTitle.textContent = `${currentShort.author || "The Unemployed Club"} • Original Sound`;
+
+    if (infoTags) {
+      infoTags.innerHTML = "";
+      const tags = Array.isArray(currentShort.tags) && currentShort.tags.length > 0
+        ? currentShort.tags
+        : ["Shorts", "Editorial", "Minimalism"];
+      tags.forEach(t => {
+        const span = document.createElement("span");
+        span.className = "shorts-tag-pill";
+        span.textContent = `#${t.replace(/^#/, "")}`;
+        infoTags.appendChild(span);
+      });
+    }
+
+    // Populate Center Video Player
     if (likeCountEl) likeCountEl.textContent = currentShort.likes || "38K";
-    if (progressBar) progressBar.style.width = "0%";
+    updateScrubber(0);
 
     if (currentShort.image && video) {
       video.poster = currentShort.image;
@@ -318,17 +402,86 @@ document.addEventListener("DOMContentLoaded", () => {
     renderQueue();
   }
 
-  // 5. Playback Synchronization & Animated CD Status
+  // 6. Interactive Scrubber & Hover Control Logic
+  function updateScrubber(pct) {
+    pct = Math.max(0, Math.min(100, pct));
+    if (scrubberFill) scrubberFill.style.width = `${pct}%`;
+    if (scrubberHandle) scrubberHandle.style.left = `${pct}%`;
+    if (progressBar) progressBar.style.width = `${pct}%`;
+  }
+
+  function seekFromEvent(e) {
+    if (!scrubberTrack) return;
+    const rect = scrubberTrack.getBoundingClientRect();
+    const clickX = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+    const ratio = Math.max(0, Math.min(1, (clickX - rect.left) / rect.width));
+    updateScrubber(ratio * 100);
+    if (video && video.duration && !isNaN(video.duration)) {
+      video.currentTime = ratio * video.duration;
+      if (currentTimeEl) currentTimeEl.textContent = formatTime(video.currentTime);
+    }
+  }
+
+  if (scrubberTrack) {
+    scrubberTrack.addEventListener("mousedown", (e) => {
+      e.stopPropagation();
+      isScrubbing = true;
+      if (hoverControls) hoverControls.classList.add("is-scrubbing");
+      seekFromEvent(e);
+    });
+
+    window.addEventListener("mousemove", (e) => {
+      if (!isScrubbing) return;
+      seekFromEvent(e);
+    });
+
+    window.addEventListener("mouseup", () => {
+      if (isScrubbing) {
+        isScrubbing = false;
+        if (hoverControls) hoverControls.classList.remove("is-scrubbing");
+      }
+    });
+
+    scrubberTrack.addEventListener("touchstart", (e) => {
+      e.stopPropagation();
+      isScrubbing = true;
+      seekFromEvent(e);
+    }, { passive: false });
+
+    window.addEventListener("touchmove", (e) => {
+      if (!isScrubbing) return;
+      seekFromEvent(e);
+    }, { passive: false });
+
+    window.addEventListener("touchend", () => {
+      isScrubbing = false;
+    });
+  }
+
+  if (miniPlayBtn) {
+    miniPlayBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      togglePlayPause();
+    });
+  }
+
+  // 7. Playback Synchronization & UI
   function updatePlayUI(playing) {
     if (!playOverlay) return;
     if (playing) {
       playOverlay.classList.add("is-playing");
       if (stageEl) stageEl.classList.add("is-playing");
       if (shortsBox) shortsBox.classList.add("is-playing");
+      if (miniPlayIcon) {
+        miniPlayIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+      }
     } else {
       playOverlay.classList.remove("is-playing");
       if (stageEl) stageEl.classList.remove("is-playing");
       if (shortsBox) shortsBox.classList.remove("is-playing");
+      if (miniPlayIcon) {
+        miniPlayIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
+      }
     }
   }
 
@@ -344,9 +497,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     video.addEventListener("timeupdate", () => {
-      if (progressBar && video.duration && !isNaN(video.duration)) {
+      if (!isScrubbing && video.duration && !isNaN(video.duration)) {
         const pct = (video.currentTime / video.duration) * 100;
-        progressBar.style.width = `${pct}%`;
+        updateScrubber(pct);
+        if (currentTimeEl) currentTimeEl.textContent = formatTime(video.currentTime);
+        if (durationEl) durationEl.textContent = formatTime(video.duration);
+
+        // Update buffered range
+        if (scrubberBuffered && video.buffered.length > 0) {
+          const bufEnd = video.buffered.end(video.buffered.length - 1);
+          const bufPct = (bufEnd / video.duration) * 100;
+          scrubberBuffered.style.width = `${Math.min(100, bufPct)}%`;
+        }
       }
     });
   }
@@ -364,7 +526,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (shortsBox) {
     shortsBox.addEventListener("click", (e) => {
       if (e.target && typeof e.target.closest === "function") {
-        if (e.target.closest(".shorts-bottom-info") || e.target.closest(".shorts-actions-column")) {
+        if (e.target.closest("#shorts-hover-controls") || e.target.closest(".shorts-actions-column")) {
           return;
         }
       }
@@ -387,14 +549,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ==============================================================
-  // 6. SCROLL UP AND DOWN MOVES TO DIFFERENT SHORTS
+  // 8. SCROLL UP AND DOWN MOVES TO DIFFERENT SHORTS
   // ==============================================================
   let isWheeling = false;
 
   const handleWheelScroll = (e) => {
     // Ignore wheel events if scrolling inside the comments or up next lists
     if (e.target && typeof e.target.closest === "function") {
-      if (e.target.closest("#tab-content-comments") || e.target.closest("#tab-content-queue") || e.target.closest("#shorts-companion-panel")) {
+      if (e.target.closest("#tab-content-comments") || e.target.closest("#tab-content-queue") || e.target.closest("#shorts-companion-panel") || e.target.closest(".shorts-info-body")) {
         return;
       }
     }
@@ -442,7 +604,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, { passive: true });
   }
 
-  // 7. Navigation Buttons
+  // 9. Up / Down Navigation Buttons
   if (btnPrev) {
     btnPrev.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -475,7 +637,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ==============================================================
-  // 8. VOLUME FLYOUT SLIDER & MUTE CONTROLS
+  // 10. VOLUME FLYOUT SLIDER & MUTE CONTROLS
   // ==============================================================
   function updateVolumeUI() {
     if (volIcon) {
@@ -533,7 +695,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 9. Like Button
+  // 11. Like Button
   let liked = false;
   if (btnLike) {
     btnLike.addEventListener("click", (e) => {
@@ -547,17 +709,36 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 10. Subscribe Button
+  // 12. Share Button
+  if (btnShare) {
+    btnShare.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(window.location.href);
+        const countSpan = btnShare.parentElement.querySelector(".shorts-action-count");
+        if (countSpan) {
+          const original = countSpan.textContent;
+          countSpan.textContent = "Copied!";
+          setTimeout(() => { countSpan.textContent = original; }, 1500);
+        }
+      }
+    });
+  }
+
+  // 13. Subscribe Button
   if (btnSub) {
     btnSub.addEventListener("click", (e) => {
       e.stopPropagation();
       btnSub.textContent = btnSub.textContent === "Subscribe" ? "Subscribed" : "Subscribe";
-      btnSub.style.background = btnSub.textContent === "Subscribed" ? "#444444" : "#ffffff";
-      btnSub.style.color = btnSub.textContent === "Subscribed" ? "#ffffff" : "#000000";
+      btnSub.style.background = btnSub.textContent === "Subscribed" ? "#444444" : "var(--color-fg-bold)";
+      btnSub.style.color = "#ffffff";
     });
   }
 
   // Initial Load
+  if (new URLSearchParams(window.location.search).get('hover') === 'true') {
+    if (shortsBox) shortsBox.classList.add('is-hovered');
+  }
   updateVolumeUI();
   loadShort(currentIndex);
   renderComments();
