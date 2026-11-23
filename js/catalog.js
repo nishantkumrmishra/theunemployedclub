@@ -22,7 +22,7 @@
 (function (window) {
   'use strict';
 
-  const STORAGE_KEY = 'webvideo_catalog_v5';
+  const STORAGE_KEY = 'webvideo_catalog_v6';
   const STAGING_KEY = 'webvideo_staging_v5';
   const PROCESSED_KEY = 'webvideo_staging_processed_v5';
 

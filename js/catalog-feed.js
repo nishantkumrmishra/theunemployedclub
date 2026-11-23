@@ -232,6 +232,139 @@ window.WEBVIDEO_FEED = [
     ]
   },
   {
+    "id": "short_1",
+    "section": "shorts1",
+    "type": "short",
+    "title": "Everyday minimalism in editorial design",
+    "description": "How clean spacing and typography make all the difference in under 60 seconds.",
+    "date": "Recent",
+    "author": "The Unemployed Club",
+    "avatar": "images/avatar.jpg",
+    "artworkUrl": "images/pic03.jpg",
+    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    "views": "520K views",
+    "duration": "0:42",
+    "tags": [
+      "Typography",
+      "Editorial",
+      "Design"
+    ]
+  },
+  {
+    "id": "short_3",
+    "section": "shorts1",
+    "type": "short",
+    "title": "Typographic rhythm in under 60 seconds",
+    "description": "Kinetic typography breakdown inspired by 1960s Swiss modernist book design.",
+    "date": "Recent",
+    "author": "Modernist Press",
+    "avatar": "images/avatar.jpg",
+    "artworkUrl": "images/pic03.jpg",
+    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    "views": "1.2M views",
+    "duration": "0:55",
+    "tags": [
+      "Typography",
+      "Modernism",
+      "Swiss"
+    ]
+  },
+  {
+    "id": "short_5",
+    "section": "shorts1",
+    "type": "short",
+    "title": "Soundscapes of the foggy coastline",
+    "description": "Deep oceanic bass drones and tape saturation field recordings captured at Big Sur.",
+    "date": "Recent",
+    "author": "Sound & Pacing",
+    "avatar": "images/avatar.jpg",
+    "artworkUrl": "images/pic03.jpg",
+    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+    "views": "670K views",
+    "duration": "0:48",
+    "tags": [
+      "Soundscapes",
+      "Ambient",
+      "Ocean"
+    ]
+  },
+  {
+    "id": "short_7",
+    "section": "shorts1",
+    "type": "short",
+    "title": "Street photography with vintage rangefinder",
+    "description": "Fast street framing using manual zone focusing in rainy downtown Kyoto.",
+    "date": "Recent",
+    "author": "Film Club",
+    "avatar": "images/avatar.jpg",
+    "artworkUrl": "images/pic04.jpg",
+    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    "views": "950K views",
+    "duration": "0:38",
+    "tags": [
+      "Photography",
+      "Street",
+      "Film"
+    ]
+  },
+  {
+    "id": "short_9",
+    "section": "shorts1",
+    "type": "short",
+    "title": "Architectural shadows in brutalist concrete",
+    "description": "Geometric shadow studies across raw concrete structures in midday sunlight.",
+    "date": "Recent",
+    "author": "Concrete Journal",
+    "avatar": "images/avatar.jpg",
+    "artworkUrl": "images/pic05.jpg",
+    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    "views": "780K views",
+    "duration": "0:45",
+    "tags": [
+      "Architecture",
+      "Brutalism",
+      "Shadows"
+    ]
+  },
+  {
+    "id": "short_11",
+    "section": "shorts1",
+    "type": "short",
+    "title": "Ambient tape loop sounds for editing",
+    "description": "Cassette tape loops, acoustic piano harmonics, and analog hiss texture.",
+    "date": "Recent",
+    "author": "Analog Archive",
+    "avatar": "images/avatar.jpg",
+    "artworkUrl": "images/pic06.jpg",
+    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4",
+    "views": "410K views",
+    "duration": "0:50",
+    "tags": [
+      "Audio",
+      "Tape",
+      "Ambient"
+    ]
+  },
+  {
+    "id": "short_13",
+    "section": "shorts1",
+    "type": "short",
+    "title": "35mm grain patterns and contrast",
+    "description": "Side-by-side microscopic comparison of Tri-X 400 versus HP5 grain structures.",
+    "date": "Recent",
+    "author": "Darkroom Lab",
+    "avatar": "images/avatar.jpg",
+    "artworkUrl": "images/pic07.jpg",
+    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+    "views": "620K views",
+    "duration": "0:36",
+    "tags": [
+      "Darkroom",
+      "35mm",
+      "Grain"
+    ]
+  },
+  {
     "id": "vid_mid_1",
     "section": "mid",
     "type": "video",
@@ -346,60 +479,22 @@ window.WEBVIDEO_FEED = [
     ]
   },
   {
-    "id": "short_1",
-    "section": "shorts1",
-    "type": "short",
-    "title": "Everyday minimalism in editorial design",
-    "description": "How clean spacing and typography make all the difference in under 60 seconds.",
-    "date": "Recent",
-    "author": "The Unemployed Club",
-    "avatar": "images/avatar.jpg",
-    "artworkUrl": "images/pic03.jpg",
-    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-    "views": "520K views",
-    "duration": "0:42",
-    "tags": [
-      "Typography",
-      "Editorial",
-      "Design"
-    ]
-  },
-  {
     "id": "short_2",
     "section": "shorts2",
     "type": "short",
     "title": "Behind the darkroom prints and film",
-    "description": "Developing 35mm Tri-X film by hand in red light.",
+    "description": "Silver gelatin chemical development process in complete darkroom amber safety light.",
     "date": "Recent",
-    "author": "The Unemployed Club",
+    "author": "Analog Archive",
     "avatar": "images/avatar.jpg",
-    "artworkUrl": "images/pic04.jpg",
-    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    "artworkUrl": "images/pic03.jpg",
+    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4",
     "views": "340K views",
-    "duration": "0:58",
+    "duration": "0:38",
     "tags": [
-      "Soundscapes",
-      "Coastline",
-      "Ambient"
-    ]
-  },
-  {
-    "id": "short_3",
-    "section": "shorts1",
-    "type": "short",
-    "title": "Typographic rhythm in under 60 seconds",
-    "description": "Why Manrope Thin 300 creates an editorial feeling.",
-    "date": "Recent",
-    "author": "The Unemployed Club",
-    "avatar": "images/avatar.jpg",
-    "artworkUrl": "images/pic05.jpg",
-    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-    "views": "1.2M views",
-    "duration": "0:35",
-    "tags": [
-      "Documentary",
-      "Street",
-      "35mm"
+      "Analog",
+      "Darkroom",
+      "Film"
     ]
   },
   {
@@ -407,37 +502,18 @@ window.WEBVIDEO_FEED = [
     "section": "shorts2",
     "type": "short",
     "title": "Analog camera walk through autumn streets",
-    "description": "Field recording with vintage rangefinder in natural golden hour light.",
+    "description": "Color tone exploration on Kodak Portra 400 in morning mist and golden foliage.",
     "date": "Recent",
-    "author": "The Unemployed Club",
+    "author": "Film Club",
     "avatar": "images/avatar.jpg",
-    "artworkUrl": "images/pic06.jpg",
+    "artworkUrl": "images/pic03.jpg",
     "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4",
     "views": "890K views",
-    "duration": "0:49",
+    "duration": "0:46",
     "tags": [
-      "Brutalist",
-      "Monochrome",
-      "Concrete"
-    ]
-  },
-  {
-    "id": "short_5",
-    "section": "shorts1",
-    "type": "short",
-    "title": "Soundscapes of the foggy coastline",
-    "description": "Field audio recording with vintage ribbon microphone.",
-    "date": "Recent",
-    "author": "The Unemployed Club",
-    "avatar": "images/avatar.jpg",
-    "artworkUrl": "images/pic07.jpg",
-    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
-    "views": "670K views",
-    "duration": "0:52",
-    "tags": [
-      "Animation",
-      "Visuals",
-      "Shorts"
+      "Cinematic",
+      "Autumn",
+      "16mm"
     ]
   },
   {
@@ -445,18 +521,94 @@ window.WEBVIDEO_FEED = [
     "section": "shorts2",
     "type": "short",
     "title": "Future Imperfect: 10 years later",
-    "description": "How classic HTML5 UP brutalism evolved into a modern video platform.",
+    "description": "Retrospective examination of classical web frameworks versus brutalist minimalism.",
     "date": "Recent",
     "author": "The Unemployed Club",
     "avatar": "images/avatar.jpg",
-    "artworkUrl": "images/pic08.jpg",
-    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+    "artworkUrl": "images/pic03.jpg",
+    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
     "views": "430K views",
+    "duration": "0:52",
+    "tags": [
+      "Documentary",
+      "Tech",
+      "Minimalism"
+    ]
+  },
+  {
+    "id": "short_8",
+    "section": "shorts2",
+    "type": "short",
+    "title": "Mono ink printing in industrial Tokyo",
+    "description": "Hand-cranked letterpress workshop stamping heavy cotton board with carbon black.",
+    "date": "Recent",
+    "author": "Tokyo Press",
+    "avatar": "images/avatar.jpg",
+    "artworkUrl": "images/pic04.jpg",
+    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    "views": "610K views",
     "duration": "0:44",
     "tags": [
-      "Reel",
-      "Nightlife",
-      "HighFPS"
+      "Print",
+      "Letterpress",
+      "Tokyo"
+    ]
+  },
+  {
+    "id": "short_10",
+    "section": "shorts2",
+    "type": "short",
+    "title": "How to frame motion on 16mm reel",
+    "description": "Bolex H16 reflex camera shutter timing and pan speed calibration guide.",
+    "date": "Recent",
+    "author": "Cinema Craft",
+    "avatar": "images/avatar.jpg",
+    "artworkUrl": "images/pic05.jpg",
+    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    "views": "1.5M views",
+    "duration": "0:59",
+    "tags": [
+      "16mm",
+      "Cinematography",
+      "Motion"
+    ]
+  },
+  {
+    "id": "short_12",
+    "section": "shorts2",
+    "type": "short",
+    "title": "Editorial grid layouts in real life",
+    "description": "Finding baseline grids and modular rhythms in subway signage and architecture.",
+    "date": "Recent",
+    "author": "Design Critique",
+    "avatar": "images/avatar.jpg",
+    "artworkUrl": "images/pic06.jpg",
+    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4",
+    "views": "820K views",
+    "duration": "0:41",
+    "tags": [
+      "Grid",
+      "Editorial",
+      "Design"
+    ]
+  },
+  {
+    "id": "short_14",
+    "section": "shorts2",
+    "type": "short",
+    "title": "Studio lighting with pure daylight",
+    "description": "Single north-facing window diffuser setup for high-contrast portrait studies.",
+    "date": "Recent",
+    "author": "Studio North",
+    "avatar": "images/avatar.jpg",
+    "artworkUrl": "images/pic07.jpg",
+    "videoUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
+    "views": "540K views",
+    "duration": "0:35",
+    "tags": [
+      "Studio",
+      "Lighting",
+      "Portraits"
     ]
   },
   {

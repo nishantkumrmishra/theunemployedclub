@@ -1,20 +1,18 @@
 # The Unemployed Club — Progress Report
 
-> **Title:** Exact 3-Box Shorts Stage Layout, Bottom-Aligned Companion Panels & Hover Scrubber
+> **Title:** Single-Row Homepage Shorts Shelves (5 Uncollapsed, 6 Collapsed), Full 7-Short Seed & Proper Visual Hierarchy
 > **Repository:** `nishantkumrmishra/theunemployedclub`
-> **Live Site:** `https://nishantkumrmishra.github.io/theunemployedclub/shorts.html`
+> **Live Site:** `https://nishantkumrmishra.github.io/theunemployedclub/`
 
 ```diff
 + WORK DONE
-+ [Exact 3-Box Proportions & Sizing] Refactored `shorts.html` and `css/style.css` to match user's annotated layout with precision: Left Video Info Box (clamp(260px, 22vw, 340px) x 210px), Middle Tall 9:16 Video Player (380px x 660px), and Right Comments & Up Next Box (clamp(340px, 35vw, 540px) x 320px).
-+ [Bottom Baseline Alignment] Unified all 3 boxes along the exact same bottom baseline using flex-end alignment, allowing the tall center player to command the vertical stage while companion boxes anchor gracefully at bottom-left and bottom-right.
-+ [Minimalist Left Box] Stripped away channel avatars, badges, subscribe buttons, tags, and icons to deliver strictly the video title and editorial description with 0px brutalist spacing.
-+ [Dynamic Translucent Action Stack] Integrated vertical frosted glass action buttons directly floating on the right edge of the video player (44px controls with 12px backdrop blur and white SVG icons) adapting seamlessly over dynamic video frames.
-+ [Bottom Hover Timeline Scrubber] Positioned bottom timeline scrubber inside the video container that remains invisible until hovered, supporting drag-seeking, buffer fill, thumb handle, mini play toggle, and live duration counter.
-+ [Wide Right Companion Box] Expanded companion box width to provide breathing room for the Under-Construction Comments (0) notice and Up Next queue list.
-+ [Modular Header & Sidebar Integration] Connected `<site-header>` and `<site-sidebar>` web components with zero layout shift and responsive sidebar offset.
++ [Single-Row Dynamic Shorts Shelf] Restored exact dynamic single-row layout on `index.html`: Displays strictly 5 compact shorts when sidebar is uncollapsed (`body:not(.sidebar-collapsed)`), and automatically expands to 6 compact shorts when sidebar is collapsed (`body.sidebar-collapsed`).
++ [Card Over-Expansion Eradicated] Replaced unconstrained `auto-fit` with strictly proportioned 5-column / 6-column grid (`repeat(5, minmax(0, 1fr))` / `repeat(6, minmax(0, 1fr))`), completely eliminating giant billboard thumbnails and keeping cards to neat, uniform ~190px widths.
++ [Full 14-Item Curated Shorts Feed] Expanded `js/catalog-feed.js` from 6 to 14 curated vertical streams: 7 items in Shelf 1 ("Shorts") and 7 items in Shelf 2 ("Trending Shorts"), ensuring each shelf always fills full rows without wrapping.
++ [Storage Key Migration] Bumped `js/catalog.js` to `webvideo_catalog_v6` ensuring instant zero-cache refresh across all visitor browsers.
++ [Visual Hierarchy Restored] Homepage shorts thumbnails are now compact (~190px width), while the actual shorts video player on `shorts.html` is commanding (380px-420px width x 680px height), completely resolving the inverted sizing issue.
++ [Exact 3-Box Shorts Stage] Left video title & description box, center tall vertical video player with hover scrubber & translucent buttons, right comments & up next queue box, all bottom-aligned.
 + [Zero Emojis Enforced] 100% emoji-free UI across all elements, using Lucide SVG icons and strict typography.
-+ [Duplicate Detection Engine] `tools/modules/duplicate_detector.py` and sequential review deck in `admin.html` with duplicate alerts and 1-click delete duplicate draft actions.
 ```
 
 ```diff

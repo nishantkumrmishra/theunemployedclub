@@ -1833,9 +1833,21 @@ body.sidebar-collapsed.player-page .player-container {
 
 .shorts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
   width: 100%;
+}
+
+body:not(.sidebar-collapsed) .shorts-grid > .short-card:nth-child(n+6) {
+  display: none !important;
+}
+
+body.sidebar-collapsed .shorts-grid {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+body.sidebar-collapsed .shorts-grid > .short-card:nth-child(n+7) {
+  display: none !important;
 }
 
 .short-card {
@@ -2589,6 +2601,41 @@ body.sidebar-collapsed #video-grid-top > .mini-post:nth-child(n+11) {
 }
 body.sidebar-collapsed #video-grid-mid > .mini-post:nth-child(n+6) {
   display: none;
+}
+
+/* Dynamic Auto-Hide for Single Row Shorts Grid */
+@media screen and (max-width: 1140px) {
+  .shorts-grid,
+  body.sidebar-collapsed .shorts-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+  body:not(.sidebar-collapsed) .shorts-grid > .short-card:nth-child(n+5),
+  body.sidebar-collapsed .shorts-grid > .short-card:nth-child(n+5) {
+    display: none !important;
+  }
+}
+
+@media screen and (max-width: 860px) {
+  .shorts-grid,
+  body.sidebar-collapsed .shorts-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+  body:not(.sidebar-collapsed) .shorts-grid > .short-card:nth-child(n+4),
+  body.sidebar-collapsed .shorts-grid > .short-card:nth-child(n+4) {
+    display: none !important;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .shorts-grid,
+  body.sidebar-collapsed .shorts-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px;
+  }
+  body:not(.sidebar-collapsed) .shorts-grid > .short-card:nth-child(n+3),
+  body.sidebar-collapsed .shorts-grid > .short-card:nth-child(n+3) {
+    display: none !important;
+  }
 }
 
 .infinite-sentinel {
