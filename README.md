@@ -6,27 +6,18 @@ A lightweight, zero-build editorial video streaming platform designed for GitHub
 
 ## 1. Modular Video Extractor Tool (`tools/`)
 
-All Python extraction scripts are organized into the [`tools/`](file:///C:/Users/lenovoo/Downloads/Compressed/webvideo/tools) directory with dedicated support for **aamchor.com**, direct CDNs, YouTube, and Vimeo:
-
-### Supported Inputs & Extraction:
-* **aamchor.com URLs**: Automatically bypasses Cloudflare/Next.js protection, matches the video slug, and extracts:
-  * **Video Title**: Clean video title without site suffixes.
-  * **Video CDN URL**: Direct playable stream link (`https://cdn.aamchor.com/videos/....mp4`).
-  * **Photo CDN URL**: Matching cover poster image link (`https://cdn.aamchor.com/thumbnails/....jpg`).
-  * **Description**: Authentic description text.
-* **Direct MP4 / M3U8 Stream Links**: Cloudflare R2, AWS S3, Google Cloud, BunnyCDN, etc.
-* **YouTube, Vimeo, & 1,800+ Streaming Sites** via built-in `yt-dlp` integration.
+All extraction utilities are organized into the [`tools/`](file:///C:/Users/lenovoo/Downloads/Compressed/webvideo/tools) directory with a modular architecture and an automated batch launcher:
 
 ### How to Run:
 * **Option A (Double-Click Batch File — Easiest)**:
-  Open [`tools/`](file:///C:/Users/lenovoo/Downloads/Compressed/webvideo/tools) and open the [`tools/`](file:///C:/Users/lenovoo/Downloads/Compressed/webvideo/tools) folder and double-click [`extractorextractor.bat`](file:///C:/Users/lenovoo/Downloads/Compressed/webvideo/tools/extractortools/extractor.bat). Paste any video URL to instantly see and save the block.
+  Open the [`tools/`](file:///C:/Users/lenovoo/Downloads/Compressed/webvideo/tools) folder and double-click [`extractor.bat`](file:///C:/Users/lenovoo/Downloads/Compressed/webvideo/tools/extractor.bat). Paste any video URL to instantly see the extracted block.
 * **Option B (Command Line Interactive Loop)**:
   ```bash
   python tools/main.py
   ```
 * **Option C (Single Link Extraction)**:
   ```bash
-  python tools/main.py "https://aamchor.com/videos/tamil-aunty-hard-fucking-leaked-mms"
+  python tools/main.py "https://example.com/videos/stream-123"
   ```
 * **Option D (Batch Process Links from File)**:
   ```bash
@@ -37,19 +28,19 @@ All Python extraction scripts are organized into the [`tools/`](file:///C:/Users
 ```text
 webvideo/
 ├── tools/
-│   ├── extractorextractor.bat                            # Double-click launcher toto run extractorrun extractor
+│   ├── extractor.bat              # Double-click launcher to run extractor
 │   ├── main.py                    # Main runner (interactive, CLI, & batch)
-│   ├── extracted/                 # Extracted data store
-│   │   ├── blocks/                # Individual JSON blocks per video (block_*.json)
+│   ├── extracted/                 # Local extracted data store (git-ignored)
+│   │   ├── blocks/                # Individual JSON blocks per video
 │   │   ├── extracted_videos.txt   # Clean text blocks ready to paste into Admin Studio
 │   │   └── extracted_catalog.json # Consolidated JSON catalog of extracted items
 │   └── modules/                   # Modular extraction engines
-│       ├── aamchor_handler.py     # Dedicated aamchor.com parser (slug matching, video/photo CDN)
-│       ├── fetcher.py             # TLS bypass (curl.exe) & HTTP fetcher
+│       ├── aamchor_handler.py     # High-precision CDN extractor
+│       ├── fetcher.py             # Resilient network fetcher with TLS bypass
 │       ├── metadata_parser.py     # Title, description, and author parser
 │       ├── stream_extractor.py    # Direct MP4/M3U8 CDN stream extractor
 │       ├── artwork_extractor.py   # Photo/artwork CDN link extractor
-│       └── block_storage.py       # Modular block persistence
+│       └── block_storage.py       # Modular local block persistence
 ```
 
 ---
