@@ -754,6 +754,55 @@ document.addEventListener("DOMContentLoaded", () => {
     if (shortsBox) shortsBox.classList.add('is-hovered');
   }
   updateVolumeUI();
+  
+  // Under-Construction Flash Trigger for Shorts Player
+  const playerConstructionBanner = document.getElementById("shorts-player-construction-banner");
+  const playbackToast = document.getElementById("shorts-playback-toast");
+  let toastTimer = null;
+
+  function flashPlayerConstructionNotice(msg) {
+    if (playerConstructionBanner) {
+      playerConstructionBanner.classList.add("notice-flash");
+      setTimeout(() => playerConstructionBanner.classList.remove("notice-flash"), 800);
+    }
+    if (playbackToast) {
+      const span = playbackToast.querySelector("span");
+      if (span && msg) span.textContent = msg;
+      playbackToast.classList.add("is-active");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        playbackToast.classList.remove("is-active");
+      }, 2500);
+    }
+  }
+
+  if (playerConstructionBanner) {
+    playerConstructionBanner.addEventListener("click", (e) => {
+      e.stopPropagation();
+      flashPlayerConstructionNotice("Shorts playback is currently under construction.");
+    });
+  }
+
+  // Flash when attempting to toggle play or tap screen
+  if (screenPlayBtn) {
+    screenPlayBtn.addEventListener("click", () => {
+      flashPlayerConstructionNotice("Shorts player is under construction. Playing preview.");
+    });
+  }
+  if (playOverlay) {
+    playOverlay.addEventListener("click", () => {
+      flashPlayerConstructionNotice("Shorts player is under construction. Playing preview.");
+    });
+  }
+  if (shortsBox) {
+    shortsBox.addEventListener("click", (e) => {
+      if (e.target.closest(".shorts-actions-column") || e.target.closest(".shorts-hover-controls") || e.target.closest(".shorts-player-overlay-info")) {
+        return;
+      }
+      flashPlayerConstructionNotice("Shorts player is under construction. Playing preview.");
+    });
+  }
+
   loadShort(currentIndex);
   renderComments();
   renderQueue();
